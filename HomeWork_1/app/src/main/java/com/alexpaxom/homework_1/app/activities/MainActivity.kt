@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         outState.putParcelable(CALENDAR_EVENTS_LIST_STATE, calendarEventsListState)
 
         outState.putParcelableArray(
-            CALENDAR_EVENTS_LIST_DATA, calendarEventsAdapter.mDataList.toTypedArray()
+            CALENDAR_EVENTS_LIST_DATA, calendarEventsAdapter.dataList.toTypedArray()
         )
         super.onSaveInstanceState(outState)
     }

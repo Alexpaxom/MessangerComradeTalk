@@ -38,11 +38,12 @@ class CalendarEventsRepository(private val appContext: Context) {
         val ret: ArrayList<CalendarEventInfo> = arrayListOf()
 
         while (cur.moveToNext()) {
-            val calendarEvent = CalendarEventInfo()
-            calendarEvent.title = cur.getString(PROJECTION_TITLE)?: ""
-            calendarEvent.dtstart = cur.getLong(PROJECTION_DTSTART)
-            calendarEvent.dtend = cur.getLong(PROJECTION_DTEND)
-            calendarEvent.organizer = cur.getString(PROJECTION_ORGANIZER)?: ""
+            val calendarEvent = CalendarEventInfo(
+                title =  cur.getString(PROJECTION_TITLE)?: "",
+                dtstart =  cur.getLong(PROJECTION_DTSTART),
+                dtend = cur.getLong(PROJECTION_DTEND),
+                organizer = cur.getString(PROJECTION_ORGANIZER)?: ""
+            )
 
             ret.add(calendarEvent)
         }

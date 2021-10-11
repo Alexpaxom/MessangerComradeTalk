@@ -5,8 +5,8 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class CalendarEventInfo (
-    var title: String = "",
-    var dtstart: Long = 0,
-    var dtend: Long = 0,
-    var organizer: String = "",
+    val title: String = "",
+    val dtstart: Long = 0,
+    val dtend: Long = 0,
+    val organizer: String = "",
 ): Parcelable

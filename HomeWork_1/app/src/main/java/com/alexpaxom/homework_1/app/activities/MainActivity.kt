@@ -27,47 +27,53 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
 
-        initActivityLauncher()
-        initRecyclerViewLists()
-        initListeners()
+        //initializing
 
-        setContentView(binding.root)
-    }
+        binding.calendarEventsRw.layoutManager = LinearLayoutManager(this)
+        binding.calendarEventsRw.adapter = calendarEventsAdapter
 
-    private fun initListeners() {
+        activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val calendarEventsList = result.data
+                    ?.getParcelableArrayExtra(CalendarEventsLoadActivity.CALENDAR_EVENTS_ID)
+                    ?.map {it as CalendarEventInfo }
+                    ?.toList()
+
+                if(calendarEventsList == null) {
+                    displayError(getString(R.string.error_bad_data))
+                    return@registerForActivityResult
+                }
+
+                fillCalendarEventsRw(calendarEventsList)
+            }
+            else {
+                displayError(getString(R.string.error_cant_load))
+            }
+        }
+
         binding.btnGetData.setOnClickListener{
             loadCalendarEventsData()
         }
-    }
 
+        // Restore previous state activity
+        savedInstanceState?.let {
+            val calendarEventsListState: Parcelable? = savedInstanceState
+                .getParcelable(CALENDAR_EVENTS_LIST_STATE)
 
-    private fun initRecyclerViewLists() {
-        binding.calendarEventsRw.layoutManager = LinearLayoutManager(this)
-        binding.calendarEventsRw.adapter = calendarEventsAdapter
-    }
+            val calendarEventsListDataSaved = savedInstanceState
+                .getParcelableArray(CALENDAR_EVENTS_LIST_DATA)
+                ?.map {it as CalendarEventInfo }
+                ?.toList() ?: listOf()
 
-    private fun initActivityLauncher() {
-        activityResultLauncher =registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                result ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    val calendarEventsList = result.data
-                        ?.getParcelableArrayExtra(CalendarEventsLoadActivity.CALENDAR_EVENTS_ID)
-                        ?.map {it as CalendarEventInfo }
-                        ?.toList()
-
-                    if(calendarEventsList == null) {
-                        displayError(getString(R.string.error_bad_data))
-                        return@registerForActivityResult
-                    }
-
-                    fillCalendarEventsRw(calendarEventsList)
-                }
-                else {
-                    displayError(getString(R.string.error_cant_load))
-                }
+            if (calendarEventsListState != null && calendarEventsListDataSaved.isNotEmpty()) {
+                binding.calendarEventsRw.layoutManager?.onRestoreInstanceState(calendarEventsListState)
+                fillCalendarEventsRw(calendarEventsListDataSaved)
             }
-
+        }
+        setContentView(binding.root)
     }
+
 
     private fun displayError(errorMessage: String) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
@@ -91,23 +97,6 @@ class MainActivity : AppCompatActivity() {
             CALENDAR_EVENTS_LIST_DATA, calendarEventsAdapter.dataList.toTypedArray()
         )
         super.onSaveInstanceState(outState)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        val calendarEventsListState: Parcelable? = savedInstanceState
-            .getParcelable(CALENDAR_EVENTS_LIST_STATE)
-
-        val calendarEventsListDataSaved = savedInstanceState
-            .getParcelableArray(CALENDAR_EVENTS_LIST_DATA)
-            ?.map {it as CalendarEventInfo }
-            ?.toList() ?: listOf()
-
-        if (calendarEventsListState != null && calendarEventsListDataSaved.isNotEmpty()) {
-            binding.calendarEventsRw.layoutManager?.onRestoreInstanceState(calendarEventsListState)
-            fillCalendarEventsRw(calendarEventsListDataSaved)
-        }
-
-        super.onRestoreInstanceState(savedInstanceState)
     }
 
 

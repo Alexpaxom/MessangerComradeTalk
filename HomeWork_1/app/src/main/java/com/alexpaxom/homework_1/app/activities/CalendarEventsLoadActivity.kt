@@ -10,14 +10,15 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.alexpaxom.homework_1.R
-import com.alexpaxom.homework_1.app.servises.GetCalendarDataIntentService
+import com.alexpaxom.homework_1.app.servises.GetCalendarDataJobIntentService
 import com.alexpaxom.homework_1.databinding.ActivityCalendarEventsBinding
-import com.alexpaxom.homework_1.databinding.ActivityMainBinding
+import androidx.core.app.JobIntentService
+
+
+
 
 class CalendarEventsLoadActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCalendarEventsBinding
@@ -32,7 +33,7 @@ class CalendarEventsLoadActivity : AppCompatActivity() {
                 finish();
             }
         },
-            IntentFilter(GetCalendarDataIntentService.CALENDAR_DATA_INTENT_ID)
+            IntentFilter(GetCalendarDataJobIntentService.CALENDAR_DATA_INTENT_ID)
         );
 
 
@@ -81,8 +82,13 @@ class CalendarEventsLoadActivity : AppCompatActivity() {
     }
 
     private fun requestCalendarData() {
-        val intent = Intent(this, GetCalendarDataIntentService::class.java)
-        startService(intent)
+        val intent = Intent(this, GetCalendarDataJobIntentService::class.java)
+        JobIntentService.enqueueWork(
+            this,
+            GetCalendarDataJobIntentService::class.java,
+            JOB_ID_SERVICE,
+            intent
+        )
     }
 
     private fun errorReturnFromActivity() {
@@ -91,7 +97,8 @@ class CalendarEventsLoadActivity : AppCompatActivity() {
     }
 
     companion object {
-        val CALENDAR_EVENTS_ID = GetCalendarDataIntentService.CALENDAR_EVENTS_ID
+        val CALENDAR_EVENTS_ID = GetCalendarDataJobIntentService.CALENDAR_EVENTS_ID
         private const val CALENDAR_PERMISSION_READ_ID = 1
+        private const val JOB_ID_SERVICE = 111
     }
 }

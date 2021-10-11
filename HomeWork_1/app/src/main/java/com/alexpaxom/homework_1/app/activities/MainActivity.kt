@@ -18,17 +18,15 @@ private const val CALENDAR_EVENTS_LIST_STATE = "com.alexpaxom.CALENDAR_EVENTS_LI
 private const val CALENDAR_EVENTS_LIST_DATA = "com.alexpaxom.CALENDAR_EVENTS_LIST_DATA"
 
 class MainActivity : AppCompatActivity() {
-    private var _binding: ActivityMainBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: ActivityMainBinding
     private var activityResultLauncher: ActivityResultLauncher<Intent>? = null
     private val calendarEventsAdapter = CalendarEventsAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _binding = ActivityMainBinding.inflate(layoutInflater)
 
         //initializing
-
+        binding = ActivityMainBinding.inflate(layoutInflater)
         binding.calendarEventsRw.layoutManager = LinearLayoutManager(this)
         binding.calendarEventsRw.adapter = calendarEventsAdapter
 
@@ -97,11 +95,5 @@ class MainActivity : AppCompatActivity() {
             CALENDAR_EVENTS_LIST_DATA, calendarEventsAdapter.dataList.toTypedArray()
         )
         super.onSaveInstanceState(outState)
-    }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 }

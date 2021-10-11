@@ -17,14 +17,14 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.alexpaxom.homework_1.R
 import com.alexpaxom.homework_1.app.servises.GetCalendarDataIntentService
 import com.alexpaxom.homework_1.databinding.ActivityCalendarEventsBinding
+import com.alexpaxom.homework_1.databinding.ActivityMainBinding
 
 class CalendarEventsLoadActivity : AppCompatActivity() {
-    private var _binding: ActivityCalendarEventsBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: ActivityCalendarEventsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _binding = ActivityCalendarEventsBinding.inflate(layoutInflater)
+        binding = ActivityCalendarEventsBinding.inflate(layoutInflater)
 
         LocalBroadcastManager.getInstance(this).registerReceiver(object: BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -88,11 +88,6 @@ class CalendarEventsLoadActivity : AppCompatActivity() {
     private fun errorReturnFromActivity() {
         setResult(RESULT_CANCELED, intent);
         finish()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 
     companion object {

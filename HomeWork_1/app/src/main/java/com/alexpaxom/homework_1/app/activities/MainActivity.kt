@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fillCalendarEventsRw(calendarEvents: List<CalendarEventInfo>) {
-        calendarEventsAdapter.setList(calendarEvents)
+        calendarEventsAdapter.updateItems(calendarEvents)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

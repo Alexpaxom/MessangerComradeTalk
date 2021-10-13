@@ -23,7 +23,7 @@ class EmojiReactionCounter  @JvmOverloads constructor(
             requestLayout()
         }
 
-    var spaceSeparator = 20
+    var spaceSeparator = 10
         set(value) {
             field = value
             requestLayout()
@@ -37,12 +37,12 @@ class EmojiReactionCounter  @JvmOverloads constructor(
     private val countTextCoordinate = PointF()
 
     private val emojiPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        textSize = 50f
+        textSize = 45f
     }
 
     private val countReactionPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.BLUE
-        textSize = 45f
+        textSize = 40f
     }
 
     private val emojiFontMetrics = Paint.FontMetrics()

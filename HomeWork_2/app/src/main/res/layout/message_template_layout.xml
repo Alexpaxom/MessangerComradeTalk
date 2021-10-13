@@ -1,63 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/avatar_img"
+        android:id="@+id/massage_user_avatar_img"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginRight="30dp"
-        android:src="@mipmap/ic_launcher" />
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="5dp"
+        android:src="@mipmap/ic_launcher"/>
 
     <TextView
-        android:id="@+id/message_name_user"
+        android:id="@+id/massage_name_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ivanov Ivan"
-        android:textSize="15sp" />
+        tools:text="Ivanov Ivan"
+        android:textSize="14sp"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" />
 
     <TextView
-        android:id="@+id/message_text"
+        android:id="@+id/massage_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="АААА АААА АААА АААА АААА АААА АААА"
-        android:textSize="12sp" />
+        tools:text="@tools:sample/lorem"
+        android:textSize="13sp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" />
 
     <com.alexpaxom.homework_2.customview.FlexBoxLayout
+        android:id="@+id/massage_reactions_list"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <com.alexpaxom.homework_2.customview.EmojiReactionCounter
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"/>
-
-        <com.alexpaxom.homework_2.customview.EmojiReactionCounter
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"/>
-
-        <com.alexpaxom.homework_2.customview.EmojiReactionCounter
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"/>
-        <com.alexpaxom.homework_2.customview.EmojiReactionCounter
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"/>
-        <com.alexpaxom.homework_2.customview.EmojiReactionCounter
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"/>
-        <com.alexpaxom.homework_2.customview.EmojiReactionCounter
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"/>
-        <com.alexpaxom.homework_2.customview.EmojiReactionCounter
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"/>
-    </com.alexpaxom.homework_2.customview.FlexBoxLayout>
-
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
 </merge>

@@ -16,7 +16,7 @@ class FlexBoxLayout @JvmOverloads constructor(
 
 
     private var maxWidth = 0
-    private var separatorSize = 10
+    private var separatorSize = 15
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         maxWidth = MeasureSpec.getSize(widthMeasureSpec)
@@ -58,6 +58,7 @@ class FlexBoxLayout @JvmOverloads constructor(
         }
 
         totalHeight+=maxRowHeight+separatorSize
+        totalWidth = maxOf(totalWidth, rowWidth)
 
         val resultWidth = resolveSize(totalWidth, widthMeasureSpec)
         val resultHeight = resolveSize(totalHeight, heightMeasureSpec)

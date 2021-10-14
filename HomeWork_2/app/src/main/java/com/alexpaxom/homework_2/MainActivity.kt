@@ -20,10 +20,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.massage.findViewById<TextView>(R.id.massage_name_user).text = "Иванов Иван"
-        binding.massage.findViewById<TextView>(R.id.massage_text).text = "Привет! Это тестовое сообщение. На него можно не отвечать, лучше отдохни и выпей чаю."
+        binding.massage.nameTextView.text = "Иванов Иван"
+        binding.massage.messageTextView.text = "Привет! Это тестовое сообщение. На него можно не отвечать, лучше отдохни и выпей чаю."
 
-        binding.massage.findViewById<FlexBoxLayout>(R.id.massage_reactions_list).apply {
+        binding.massage.reactionsListLayout.apply {
             repeat(10) {
                 val emoji = View.inflate(this@MainActivity, R.layout.emoji_view, null)
 

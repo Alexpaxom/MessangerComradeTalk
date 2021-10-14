@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import com.alexpaxom.homework_2.R
 
 class EmojiReactionCounter  @JvmOverloads constructor(
     context: Context,
@@ -11,19 +12,23 @@ class EmojiReactionCounter  @JvmOverloads constructor(
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
-    var displayEmoji = "\uD83D\uDE36"
+
+    // Строка с символом отображаемого юникода
+    var displayEmoji:String = "\uD83D\uDE36"
         set(value) {
             field = value
             requestLayout()
         }
 
-    var countReaction = 10
+    // Количество рекцицй
+    var countReaction = 1
         set(value) {
             field = value
             requestLayout()
         }
 
-    var spaceSeparator = 10
+    // Пространство между емоджи и количеством, px
+    var separatorWith = 10
         set(value) {
             field = value
             requestLayout()
@@ -35,18 +40,41 @@ class EmojiReactionCounter  @JvmOverloads constructor(
 
     private val countReactionTextBounds = Rect()
     private val countTextCoordinate = PointF()
-
-    private val emojiPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        textSize = 45f
-    }
-
-    private val countReactionPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.BLUE
-        textSize = 40f
-    }
+    private val emojiPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val countReactionPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     private val emojiFontMetrics = Paint.FontMetrics()
     private val countReactionFontMetrics = Paint.FontMetrics()
+
+    init {
+        with(context.obtainStyledAttributes(attrs, R.styleable.EmojiReactionCounter)) {
+            displayEmoji = getString(R.styleable.EmojiReactionCounter_emojiUnicode) ?: displayEmoji
+            countReaction = getInt(R.styleable.EmojiReactionCounter_countReactions, countReaction)
+
+            separatorWith = getDimensionPixelSize(
+                R.styleable.EmojiReactionCounter_separatorSize,
+                separatorWith
+            )
+
+            emojiPaint.textSize = getDimensionPixelSize(
+                R.styleable.EmojiReactionCounter_emojiTextSize,
+                45
+            ).toFloat()
+
+            countReactionPaint.textSize = getDimensionPixelSize(
+                R.styleable.EmojiReactionCounter_android_textSize,
+                40
+            ).toFloat()
+
+            countReactionPaint.color = getColor(
+                R.styleable.EmojiReactionCounter_android_textColor,
+                Color.WHITE
+            )
+
+
+            recycle()
+        }
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         emojiPaint.getTextBounds(displayEmoji, 0, displayEmoji.length, emojiBounds)
@@ -57,7 +85,7 @@ class EmojiReactionCounter  @JvmOverloads constructor(
             countReactionTextBounds
         )
 
-        val totalWidth = emojiBounds.width() + countReactionTextBounds.width() + spaceSeparator + paddingRight + paddingLeft
+        val totalWidth = emojiBounds.width() + countReactionTextBounds.width() + separatorWith + paddingRight + paddingLeft
         val totalHeight = maxOf(emojiBounds.height(), countReactionTextBounds.height()) + paddingTop + paddingBottom
 
         val resultViewWidth = resolveSize(totalWidth, widthMeasureSpec)
@@ -83,7 +111,7 @@ class EmojiReactionCounter  @JvmOverloads constructor(
         // смещается вправо при этом обрезается - на сколько я понял это связано
         // с особенностями шрифта и расчета границ. Решение проблемы и описание нашел задесь:
         // https://stackoverflow.com/questions/5714600/gettextbounds-in-android/14766372#14766372
-        countTextCoordinate.x = -countReactionTextBounds.left + paddingLeft + emojiBounds.width() + spaceSeparator.toFloat()
+        countTextCoordinate.x = -countReactionTextBounds.left + paddingLeft + emojiBounds.width() + separatorWith.toFloat()
         // здесь мы просто центруем по высоте поэтому emojiBounds.top в этом случае не нужно отнимать
         countTextCoordinate.y = h/2f + countReactionTextBounds.height()/2f
     }

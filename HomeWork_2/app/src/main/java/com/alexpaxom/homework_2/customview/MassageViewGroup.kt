@@ -5,6 +5,8 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.view.*
 import com.alexpaxom.homework_2.R
 
@@ -12,14 +14,14 @@ inline fun View.getWidthWithMargins(): Int = measuredWidth + marginLeft + margin
 inline fun View.getHeightWithMargins(): Int = measuredHeight + marginTop + marginBottom
 
 inline fun View.layoutByNeighbors(left: View?, top: View?, addToLeft:Int = 0, addToTop: Int = 0) {
-    val left = addToLeft + (left?.right ?: 0) + (left?.marginRight ?: 0) + marginLeft
-    val top = addToTop + (top?.bottom ?: 0) + (top?.marginBottom ?: 0) + marginTop
+    val leftCoord = addToLeft + (left?.right ?: 0) + (left?.marginRight ?: 0) + marginLeft
+    val topCoord = addToTop + (top?.bottom ?: 0) + (top?.marginBottom ?: 0) + marginTop
 
     layout(
-        left,
-        top,
-        left + measuredWidth,
-        top + measuredHeight,
+        leftCoord,
+        topCoord,
+        leftCoord + measuredWidth,
+        topCoord + measuredHeight,
     )
 }
 
@@ -30,22 +32,42 @@ class MassageViewGroup @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val messageBackgroundRect = RectF()
-
-    private val messageBackgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.GRAY
+    var radius = 50f
+    set(value) {
+        field = value
+        requestLayout()
     }
+
+    private val messageBackgroundRect = RectF()
+    val avatarImageView: ImageView
+    val nameTextView: TextView
+    val messageTextView: TextView
+    val reactionsListLayout: FlexBoxLayout
+
+    private val messageBackgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     init {
         inflate(context, R.layout.message_template_layout, this)
+
+        avatarImageView = findViewById(R.id.massage_user_avatar_img)
+        nameTextView = findViewById(R.id.massage_name_user)
+        messageTextView = findViewById(R.id.massage_text)
+        reactionsListLayout = findViewById(R.id.massage_reactions_list)
+
+        with(context.obtainStyledAttributes(attrs, R.styleable.MassageViewGroup)) {
+            messageBackgroundPaint.color = getColor(
+                R.styleable.MassageViewGroup_massageTextBackground,
+                Color.GRAY
+            )
+
+            radius = getDimensionPixelSize(
+                R.styleable.MassageViewGroup_massageTextRadius,
+                radius.toInt()
+            ).toFloat()
+        }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val avatarImageView = getChildAt(0)
-        val nameTextView = getChildAt(1)
-        val messageTextView = getChildAt(2)
-        val reactionsListLayout = getChildAt(3)
-
         var totalWidth = 0
         var totalHeight = 0
 
@@ -110,10 +132,6 @@ class MassageViewGroup @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        val avatarImageView = getChildAt(0)
-        val nameTextView = getChildAt(1)
-        val messageTextView = getChildAt(2)
-        val reactionsListLayout = getChildAt(3)
 
         val avatar = if(avatarImageView.isVisible) avatarImageView else null
         val leftPaddingWhereNotImage = if(avatarImageView.isVisible) 0 else paddingLeft
@@ -157,7 +175,7 @@ class MassageViewGroup @JvmOverloads constructor(
     override fun dispatchDraw(canvas: Canvas?) {
 
         canvas?.let {
-            canvas.drawRoundRect(messageBackgroundRect, 50f, 50f, messageBackgroundPaint);
+            canvas.drawRoundRect(messageBackgroundRect, radius, radius, messageBackgroundPaint);
         }
 
         super.dispatchDraw(canvas)

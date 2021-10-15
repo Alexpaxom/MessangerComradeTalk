@@ -7,4 +7,9 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="main_background">#121212</color>
+    <color name="massage_text_background">#1C1C1C</color>
+    <color name="massage_user_name_color">#2A9D8F</color>
+    <color name="color_reaction_selected">#3A3A3A</color>
+    <color name="color_reaction_unselected">#1C1C1C</color>
 </resources>

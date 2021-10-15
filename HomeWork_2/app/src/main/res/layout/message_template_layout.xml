@@ -10,12 +10,13 @@
         android:layout_height="50dp"
         android:layout_marginEnd="15dp"
         android:layout_marginTop="5dp"
-        android:src="@mipmap/ic_launcher"/>
+        android:src="@mipmap/ic_launcher_round"/>
 
     <TextView
         android:id="@+id/massage_name_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/massage_user_name_color"
         tools:text="Ivanov Ivan"
         android:textSize="14sp"
         android:paddingTop="10dp"
@@ -27,6 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="@tools:sample/lorem"
+        android:textColor="@color/white"
         android:textSize="13sp"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"

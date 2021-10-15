@@ -2,9 +2,7 @@ package com.alexpaxom.homework_2.customview
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.ViewGroup
-import androidx.core.view.marginTop
 import com.alexpaxom.homework_2.R
 
 class FlexBoxLayout @JvmOverloads constructor(
@@ -14,9 +12,21 @@ class FlexBoxLayout @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr, defStyleRes) {
 
+    //Расстояние между элементами по высоте и ширине, px
+    var separatorSize = 15
+        set(value) {
+            field = value
+            requestLayout()
+        }
 
     private var maxWidth = 0
-    private var separatorSize = 15
+
+    init {
+        with(context.obtainStyledAttributes(attrs, R.styleable.FlexBoxLayout)) {
+            separatorSize = getDimensionPixelSize(R.styleable.FlexBoxLayout_separatorSizeHW, separatorSize)
+            recycle()
+        }
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         maxWidth = MeasureSpec.getSize(widthMeasureSpec)
@@ -30,34 +40,37 @@ class FlexBoxLayout @JvmOverloads constructor(
         }
 
         // размещаем первый элемент на первой строке не важно хватает нам места или нет
-        val child = getChildAt(0)
+        var child = getChildAt(0)
         measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, totalHeight)
 
         var rowWidth = child.measuredWidth
-        var maxRowHeight = child.measuredHeight
+        var maxRowElementHeight = child.measuredHeight
 
+        var hasTwoRowsAndMore = false
+        var onStartOfRow = false
 
+        // размещаем остальные элементы
         for(i in 1 until childCount) {
-            var separate = separatorSize
-            val child = getChildAt(i)
-
+            child = getChildAt(i)
             measureChildWithMargins(child, widthMeasureSpec, rowWidth, heightMeasureSpec, totalHeight)
 
-            if(rowWidth+child.measuredWidth+separate >= maxWidth) {
-                totalWidth = maxOf(totalWidth, rowWidth)
-                totalHeight += maxRowHeight+separate
-                rowWidth = 0
-                maxRowHeight = 0
-                measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, totalHeight)
-                separate = 0
+            if(rowWidth+child.measuredWidth+separatorSize < maxWidth) {
+                rowWidth += child.measuredWidth+separatorSize
+                maxRowElementHeight = maxOf(maxRowElementHeight, child.measuredHeight)
             }
+            else {
+                totalWidth = maxOf(totalWidth, rowWidth)
+                totalHeight += maxRowElementHeight + separatorSize
 
-            rowWidth += child.measuredWidth + separate
-            maxRowHeight = maxOf(maxRowHeight, child.measuredHeight)
+                measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, totalHeight)
 
+                rowWidth = child.measuredWidth
+                maxRowElementHeight = child.measuredHeight
+                hasTwoRowsAndMore = true
+            }
         }
 
-        totalHeight+=maxRowHeight+separatorSize
+        totalHeight += maxRowElementHeight + if (hasTwoRowsAndMore) separatorSize else 0
         totalWidth = maxOf(totalWidth, rowWidth)
 
         val resultWidth = resolveSize(totalWidth, widthMeasureSpec)
@@ -71,40 +84,40 @@ class FlexBoxLayout @JvmOverloads constructor(
 
         var top = 0
         var left = 0
+        var right = 0
 
-        val child = getChildAt(0)
+        var child = getChildAt(0)
 
         // размещаем первый элемент на первой строке не важно хватает нам места или нет
-        var rowWidth = child.measuredWidth
-        var maxRowHeight = child.measuredHeight
+        var maxRowElementHeight = child.measuredHeight
 
         child.layout(left, top,left + child.measuredWidth,top + child.measuredHeight)
+        left = child.measuredWidth
 
         // размещаем остальные элементы
         for(i in 1 until childCount) {
-            var separate = separatorSize
-            val child = getChildAt(i)
+            child = getChildAt(i)
 
-            left+=child.measuredWidth + separate
-
-            if(rowWidth+child.measuredWidth+separate >= maxWidth) {
-                top += maxRowHeight + separate
-                left = 0
-                rowWidth = 0
-                maxRowHeight = 0
-                separate = 0 // не учитываем разделитель для первого элемента
+            if(left+child.measuredWidth+separatorSize < maxWidth) {
+                left += separatorSize
+                maxRowElementHeight = maxOf(maxRowElementHeight, child.measuredHeight)
             }
+            else {
+                left = 0
+                top += maxRowElementHeight + separatorSize
+                maxRowElementHeight = child.measuredHeight
+            }
+
+            right = left+child.measuredWidth
 
             child.layout(
                 left,
                 top,
-                left + child.measuredWidth,
+                right,
                 top + child.measuredHeight
             )
 
-            rowWidth += child.measuredWidth + separate
-            maxRowHeight = maxOf(maxRowHeight, child.measuredHeight)
-
+            left = right
         }
     }
 

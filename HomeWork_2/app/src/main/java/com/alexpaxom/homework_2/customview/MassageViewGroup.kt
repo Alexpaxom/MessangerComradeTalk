@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.*
 import com.alexpaxom.homework_2.R
+import com.bumptech.glide.Glide
 
 inline fun View.getWidthWithMargins(): Int = measuredWidth + marginLeft + marginRight
 inline fun View.getHeightWithMargins(): Int = measuredHeight + marginTop + marginBottom
@@ -38,13 +39,26 @@ class MassageViewGroup @JvmOverloads constructor(
         requestLayout()
     }
 
-    private val messageBackgroundRect = RectF()
-    val avatarImageView: ImageView
-    val nameTextView: TextView
-    val messageTextView: TextView
-    val reactionsListLayout: FlexBoxLayout
+    var userName: CharSequence
+        get() = nameTextView.text
+        set(value) {
+            nameTextView.text = value
+        }
+
+    var messageText: CharSequence
+        get() = messageTextView.text
+        set(value) {
+            messageTextView.text = value
+        }
+
 
     private val messageBackgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val messageBackgroundRect = RectF()
+    private val avatarImageView: ImageView
+    private val nameTextView: TextView
+    private val messageTextView: TextView
+    private val reactionsListLayout: FlexBoxLayout
+    private var onReactionClickListener: (EmojiReactionCounter.()->Unit)? = null
 
     init {
         inflate(context, R.layout.message_template_layout, this)
@@ -65,6 +79,59 @@ class MassageViewGroup @JvmOverloads constructor(
                 radius.toInt()
             ).toFloat()
         }
+    }
+
+    fun setAvatarByUrl(url:String) {
+        Glide
+            .with(this)
+            .load(url)
+            .circleCrop()
+            .into(avatarImageView)
+    }
+
+
+    fun addReaction(codeEmoji: String = "\uD83D\uDE36", count:Int = 1, selected: Boolean = false) {
+        val emoji = View.inflate(context, R.layout.emoji_view, null) as EmojiReactionCounter
+
+        removeReaction(codeEmoji) // удаляем идентичную рекцию если она уже была
+
+        emoji.displayEmoji = codeEmoji
+        emoji.countReaction = count
+        emoji.isSelected = selected
+        reactionsListLayout.addView(emoji)
+
+
+
+        emoji.setOnClickListener {
+            onReactionClickListener?.invoke(it as EmojiReactionCounter)
+        }
+    }
+
+    fun findReactionId(codeEmoji: String): View? {
+
+        for(i in 0 until reactionsListLayout.childCount) {
+            val emoji = reactionsListLayout.getChildAt(i) as EmojiReactionCounter
+            if(emoji.displayEmoji == codeEmoji)
+                return emoji
+        }
+
+        return null
+    }
+
+    fun removeReaction(codeEmoji: String) {
+        reactionsListLayout.removeView( findReactionId(codeEmoji) )
+    }
+
+    fun removeReaction(view: View) {
+        reactionsListLayout.removeView( view )
+    }
+
+    fun removeAllReactions() {
+        reactionsListLayout.removeAllViews()
+    }
+
+    fun setOnReactionClickListener(onClickListener:(EmojiReactionCounter.()->Unit)?  = null) {
+        onReactionClickListener = onClickListener
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

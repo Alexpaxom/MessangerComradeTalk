@@ -20,25 +20,34 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.massage.nameTextView.text = "Иванов Иван"
-        binding.massage.messageTextView.text = "Привет! Это тестовое сообщение. На него можно не отвечать, лучше отдохни и выпей чаю."
+        binding.massage.userName = "Иванов Иван"
+        binding.massage.messageText = "Привет! Это тестовое сообщение. На него можно не отвечать, лучше отдохни и выпей чаю."
 
-        binding.massage.reactionsListLayout.apply {
-            repeat(10) {
-                val emoji = View.inflate(this@MainActivity, R.layout.emoji_view, null)
+        binding.massage.setOnReactionClickListener {
+            countReaction += if(isSelected) -1 else 1
 
-                emoji.setOnClickListener {
-                    it as EmojiReactionCounter
-                    it.countReaction += if(it.isSelected) -1 else 1
-
-                    it.isSelected = !it.isSelected
-                }
-
-                addView(
-                    emoji,
-                    LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-                )
-            }
+            if(countReaction < 1)
+                binding.massage.removeReaction(this)
+            else
+                isSelected = !isSelected
         }
+
+        binding.massage.setAvatarByUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Vladimir_Putin_11-10-2020_%28cropped%29.jpg/250px-Vladimir_Putin_11-10-2020_%28cropped%29.jpg")
+
+
+        binding.massage.addReaction()
+        binding.massage.addReaction("\uD83D\uDE06")
+        binding.massage.addReaction("\uD83E\uDD23", count=10, selected= true)
+        binding.massage.addReaction("\uD83E\uDD29")
+        binding.massage.addReaction("\uD83D\uDE1D")
+        binding.massage.addReaction("\uD83E\uDD2A", selected= true)
+        binding.massage.addReaction("\uD83D\uDC4D", count=99)
+        binding.massage.addReaction("\uD83D\uDE10")
+        binding.massage.addReaction("\uD83D\uDE0E")
+        binding.massage.addReaction("\uD83D\uDC7B")
+        binding.massage.addReaction("\uD83D\uDD96")
+
+
+
     }
 }

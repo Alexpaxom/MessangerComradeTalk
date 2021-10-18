@@ -12,25 +12,36 @@ class FlexBoxLayout @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr, defStyleRes) {
 
-    var itemBoundMinWidth = 75
+    // Минимальная ширина выделяемая для каждого элемента
+    var itemBoundMinWidth = DEFAULT_ITEM_BOUND_MIN_WIDTH
         set(value) {
             field = value
             requestLayout()
         }
 
     //Расстояние между элементами по высоте и ширине, px
-    var separatorSize = 15
+    var separatorSize = DEFAULT_SEPARATOR_SIZE
         set(value) {
             field = value
             requestLayout()
         }
 
+    // Максимальна ширина FlexBoxLayout задается на этапе измерения
     private var maxWidth = 0
 
     init {
         with(context.obtainStyledAttributes(attrs, R.styleable.FlexBoxLayout)) {
-            separatorSize = getDimensionPixelSize(R.styleable.FlexBoxLayout_separatorSizeHW, separatorSize)
-            itemBoundMinWidth = getDimensionPixelSize(R.styleable.FlexBoxLayout_itemBoundMinWidth, itemBoundMinWidth)
+
+            separatorSize = getDimensionPixelSize(
+                R.styleable.FlexBoxLayout_separatorSizeHW,
+                DEFAULT_SEPARATOR_SIZE
+            )
+
+            itemBoundMinWidth = getDimensionPixelSize(
+                R.styleable.FlexBoxLayout_itemBoundMinWidth,
+                DEFAULT_ITEM_BOUND_MIN_WIDTH
+            )
+
             recycle()
         }
     }
@@ -141,6 +152,11 @@ class FlexBoxLayout @JvmOverloads constructor(
 
     override fun generateLayoutParams(p: LayoutParams): LayoutParams {
         return MarginLayoutParams(p)
+    }
+
+    companion object {
+        private const val DEFAULT_ITEM_BOUND_MIN_WIDTH = 75
+        private const val DEFAULT_SEPARATOR_SIZE = 15
     }
 
 }

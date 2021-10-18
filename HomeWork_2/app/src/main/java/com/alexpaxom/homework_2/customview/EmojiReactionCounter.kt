@@ -17,22 +17,25 @@ class EmojiReactionCounter  @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     // Строка с символом отображаемого юникода
-    var displayEmoji:String = "\uD83D\uDE36"
+    var displayEmoji:String = DEFAULT_EMOJI
         set(value) {
             field = value
             requestLayout()
         }
 
     // Количество рекцицй
-    var countReaction: Int = 1
+    var countReaction: Int = DEFAULT_COUNT_REACTIONS
         set(value) {
             field = value
             stringPresentationCount = NumAbbreviationFormatter.convertNumToAbbreviation(value)
             requestLayout()
         }
 
-    private var stringPresentationCount = "1"
-    var separatorWith = 10
+    private var stringPresentationCount = DEFAULT_STRING_PRESENTATION_COUNT
+
+    // Минимальные расстояние между смойлом и количеством
+    // Если места для текста больше его ширины он будет отцентрован в свободном пространстве
+    var separatorWith = DEFAULT_SEPARATOR_WIDTH
         set(value) {
             field = value
             requestLayout()
@@ -54,27 +57,27 @@ class EmojiReactionCounter  @JvmOverloads constructor(
 
     init {
         with(context.obtainStyledAttributes(attrs, R.styleable.EmojiReactionCounter)) {
-            displayEmoji = getString(R.styleable.EmojiReactionCounter_emojiUnicode) ?: displayEmoji
-            countReaction = getInt(R.styleable.EmojiReactionCounter_countReactions, countReaction)
+            displayEmoji = getString(R.styleable.EmojiReactionCounter_emojiUnicode) ?: DEFAULT_EMOJI
+            countReaction = getInt(R.styleable.EmojiReactionCounter_countReactions, DEFAULT_COUNT_REACTIONS)
 
             separatorWith = getDimensionPixelSize(
                 R.styleable.EmojiReactionCounter_separatorSize,
-                separatorWith
+                DEFAULT_SEPARATOR_WIDTH
             )
 
             emojiPaint.textSize = getDimensionPixelSize(
                 R.styleable.EmojiReactionCounter_emojiTextSize,
-                45
+                DEFAULT_EMOJI_TEXT_SIZE
             ).toFloat()
 
             countReactionPaint.textSize = getDimensionPixelSize(
                 R.styleable.EmojiReactionCounter_android_textSize,
-                40
+                DEFAULT_COUNT_REACTION_TEXT_SIZE
             ).toFloat()
 
             countReactionPaint.color = getColor(
                 R.styleable.EmojiReactionCounter_android_textColor,
-                Color.WHITE
+                DEFAULT_COUNT_REACTION_TEXT_COLOR
             )
 
 
@@ -169,6 +172,13 @@ class EmojiReactionCounter  @JvmOverloads constructor(
     }
 
     companion object {
+        private const val DEFAULT_EMOJI = "\uD83D\uDE36"
+        private const val DEFAULT_COUNT_REACTIONS = 1
+        private const val DEFAULT_STRING_PRESENTATION_COUNT = "1"
+        private const val DEFAULT_SEPARATOR_WIDTH = 10
+        private const val DEFAULT_EMOJI_TEXT_SIZE = 45
+        private const val DEFAULT_COUNT_REACTION_TEXT_SIZE = 40
+        private const val DEFAULT_COUNT_REACTION_TEXT_COLOR = Color.WHITE
         private val SUPPORTED_DRAWABLE_STATE = intArrayOf(android.R.attr.state_selected)
     }
 

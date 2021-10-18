@@ -33,7 +33,7 @@ class MassageViewGroup @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr, defStyleRes) {
 
-    var radius = 50f
+    var messageRadius = DEFAULT_MESSAGE_CORNER_RADIUS
     set(value) {
         field = value
         requestLayout()
@@ -74,9 +74,9 @@ class MassageViewGroup @JvmOverloads constructor(
                 Color.GRAY
             )
 
-            radius = getDimensionPixelSize(
+            messageRadius = getDimensionPixelSize(
                 R.styleable.MassageViewGroup_massageTextRadius,
-                radius.toInt()
+                DEFAULT_MESSAGE_CORNER_RADIUS.toInt()
             ).toFloat()
         }
     }
@@ -242,7 +242,7 @@ class MassageViewGroup @JvmOverloads constructor(
     override fun dispatchDraw(canvas: Canvas?) {
 
         canvas?.let {
-            canvas.drawRoundRect(messageBackgroundRect, radius, radius, messageBackgroundPaint);
+            canvas.drawRoundRect(messageBackgroundRect, messageRadius, messageRadius, messageBackgroundPaint);
         }
 
         super.dispatchDraw(canvas)
@@ -258,6 +258,10 @@ class MassageViewGroup @JvmOverloads constructor(
 
     override fun generateLayoutParams(p: LayoutParams): LayoutParams {
         return MarginLayoutParams(p)
+    }
+
+    companion object {
+        private const val DEFAULT_MESSAGE_CORNER_RADIUS = 50f
     }
 
 }

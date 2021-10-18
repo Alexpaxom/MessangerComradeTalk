@@ -70,16 +70,16 @@ class EmojiReactionCounter  @JvmOverloads constructor(
                 DEFAULT_EMOJI_TEXT_SIZE
             ).toFloat()
 
-            countReactionPaint.textSize = getDimensionPixelSize(
-                R.styleable.EmojiReactionCounter_android_textSize,
-                DEFAULT_COUNT_REACTION_TEXT_SIZE
-            ).toFloat()
-
-            countReactionPaint.color = getColor(
-                R.styleable.EmojiReactionCounter_android_textColor,
-                DEFAULT_COUNT_REACTION_TEXT_COLOR
-            )
-
+            countReactionPaint.apply {
+                textSize = getDimensionPixelSize(
+                    R.styleable.EmojiReactionCounter_android_textSize,
+                    DEFAULT_COUNT_REACTION_TEXT_SIZE
+                ).toFloat()
+                color = getColor(
+                    R.styleable.EmojiReactionCounter_android_textColor,
+                    DEFAULT_COUNT_REACTION_TEXT_COLOR
+                )
+            }
 
             recycle()
         }

@@ -12,6 +12,12 @@ class FlexBoxLayout @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr, defStyleRes) {
 
+    var itemBoundMinWidth = 75
+        set(value) {
+            field = value
+            requestLayout()
+        }
+
     //Расстояние между элементами по высоте и ширине, px
     var separatorSize = 15
         set(value) {
@@ -24,6 +30,7 @@ class FlexBoxLayout @JvmOverloads constructor(
     init {
         with(context.obtainStyledAttributes(attrs, R.styleable.FlexBoxLayout)) {
             separatorSize = getDimensionPixelSize(R.styleable.FlexBoxLayout_separatorSizeHW, separatorSize)
+            itemBoundMinWidth = getDimensionPixelSize(R.styleable.FlexBoxLayout_itemBoundMinWidth, itemBoundMinWidth)
             recycle()
         }
     }
@@ -43,19 +50,19 @@ class FlexBoxLayout @JvmOverloads constructor(
         var child = getChildAt(0)
         measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, totalHeight)
 
-        var rowWidth = child.measuredWidth
+        var rowWidth = maxOf(child.measuredWidth, itemBoundMinWidth)
         var maxRowElementHeight = child.measuredHeight
 
         var hasTwoRowsAndMore = false
-        var onStartOfRow = false
 
         // размещаем остальные элементы
         for(i in 1 until childCount) {
             child = getChildAt(i)
             measureChildWithMargins(child, widthMeasureSpec, rowWidth, heightMeasureSpec, totalHeight)
+            var elementWidth = maxOf(child.measuredWidth, itemBoundMinWidth)
 
-            if(rowWidth+child.measuredWidth+separatorSize < maxWidth) {
-                rowWidth += child.measuredWidth+separatorSize
+            if(rowWidth+elementWidth+separatorSize < maxWidth) {
+                rowWidth += elementWidth+separatorSize
                 maxRowElementHeight = maxOf(maxRowElementHeight, child.measuredHeight)
             }
             else {
@@ -63,8 +70,9 @@ class FlexBoxLayout @JvmOverloads constructor(
                 totalHeight += maxRowElementHeight + separatorSize
 
                 measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, totalHeight)
+                elementWidth = maxOf(child.measuredWidth, itemBoundMinWidth)
 
-                rowWidth = child.measuredWidth
+                rowWidth = elementWidth
                 maxRowElementHeight = child.measuredHeight
                 hasTwoRowsAndMore = true
             }
@@ -92,13 +100,15 @@ class FlexBoxLayout @JvmOverloads constructor(
         var maxRowElementHeight = child.measuredHeight
 
         child.layout(left, top,left + child.measuredWidth,top + child.measuredHeight)
-        left = child.measuredWidth
+        left = maxOf(child.measuredWidth, itemBoundMinWidth)
 
         // размещаем остальные элементы
         for(i in 1 until childCount) {
             child = getChildAt(i)
+            var elementWidth = maxOf(child.measuredWidth, itemBoundMinWidth)
 
-            if(left+child.measuredWidth+separatorSize < maxWidth) {
+
+            if(left+elementWidth+separatorSize < maxWidth) {
                 left += separatorSize
                 maxRowElementHeight = maxOf(maxRowElementHeight, child.measuredHeight)
             }
@@ -117,7 +127,7 @@ class FlexBoxLayout @JvmOverloads constructor(
                 top + child.measuredHeight
             )
 
-            left = right
+            left = left+elementWidth
         }
     }
 

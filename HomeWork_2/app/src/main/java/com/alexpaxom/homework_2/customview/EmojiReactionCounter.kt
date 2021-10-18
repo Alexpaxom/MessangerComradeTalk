@@ -5,6 +5,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.helpers.NumAbbreviationFormatter
 
 class EmojiReactionCounter  @JvmOverloads constructor(
     context: Context,
@@ -21,13 +22,14 @@ class EmojiReactionCounter  @JvmOverloads constructor(
         }
 
     // Количество рекцицй
-    var countReaction = 1
+    var countReaction: Int = 1
         set(value) {
             field = value
+            stringPresentationCount = NumAbbreviationFormatter.convertNumToAbbreviation(value)
             requestLayout()
         }
 
-    // Пространство между емоджи и количеством, px
+    private var stringPresentationCount = "1"
     var separatorWith = 10
         set(value) {
             field = value
@@ -41,7 +43,9 @@ class EmojiReactionCounter  @JvmOverloads constructor(
     private val countReactionTextBounds = Rect()
     private val countTextCoordinate = PointF()
     private val emojiPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val countReactionPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val countReactionPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textAlign = Paint.Align.CENTER
+    }
 
     private val emojiFontMetrics = Paint.FontMetrics()
     private val countReactionFontMetrics = Paint.FontMetrics()
@@ -80,13 +84,16 @@ class EmojiReactionCounter  @JvmOverloads constructor(
         emojiPaint.getTextBounds(displayEmoji, 0, displayEmoji.length, emojiBounds)
 
         countReactionPaint.getTextBounds(
-            countReaction.toString(),
-            0, countReaction.toString().length,
+            stringPresentationCount,
+            0, stringPresentationCount.length,
             countReactionTextBounds
         )
 
-        val totalWidth = emojiBounds.width() + countReactionTextBounds.width() + separatorWith + paddingRight + paddingLeft
-        val totalHeight = maxOf(emojiBounds.height(), countReactionTextBounds.height()) + paddingTop + paddingBottom
+        var totalWidth = emojiBounds.width() + countReactionTextBounds.width() + separatorWith + paddingRight + paddingLeft
+        var totalHeight = maxOf(emojiBounds.height(), countReactionTextBounds.height()) + paddingTop + paddingBottom
+
+        totalWidth = maxOf(totalWidth, minimumWidth)
+        totalHeight = maxOf(totalHeight, minimumHeight)
 
         val resultViewWidth = resolveSize(totalWidth, widthMeasureSpec)
         val resultViewHeight = resolveSize(totalHeight, heightMeasureSpec)
@@ -107,19 +114,20 @@ class EmojiReactionCounter  @JvmOverloads constructor(
         // здесь мы просто центруем по высоте поэтому emojiBounds.top в этом случае не нужно отнимать
         emojiCoordinate.y = h / 2f + emojiBounds.height()/2f - emojiFontMetrics.descent
 
-        // Приходится отнимать emojiBounds.left потому при отрисовке(canvas.drawText) весь текст
-        // смещается вправо при этом обрезается - на сколько я понял это связано
-        // с особенностями шрифта и расчета границ. Решение проблемы и описание нашел задесь:
-        // https://stackoverflow.com/questions/5714600/gettextbounds-in-android/14766372#14766372
-        countTextCoordinate.x = -countReactionTextBounds.left + paddingLeft + emojiBounds.width() + separatorWith.toFloat()
-        // здесь мы просто центруем по высоте поэтому emojiBounds.top в этом случае не нужно отнимать
+
+        countTextCoordinate.x = (w-separatorWith)/2f + (w-separatorWith)/4f
         countTextCoordinate.y = h/2f + countReactionTextBounds.height()/2f
     }
 
     override fun onDraw(canvas: Canvas) {
         // Отдельно рисуем смайлик и количество реакций
         canvas.drawText(displayEmoji, emojiCoordinate.x, emojiCoordinate.y, emojiPaint)
-        canvas.drawText(countReaction.toString(), countTextCoordinate.x, countTextCoordinate.y, countReactionPaint)
+        canvas.drawText (
+            stringPresentationCount,
+            countTextCoordinate.x,
+            countTextCoordinate.y,
+            countReactionPaint
+        )
     }
 
     override fun onCreateDrawableState(extraSpace: Int): IntArray {

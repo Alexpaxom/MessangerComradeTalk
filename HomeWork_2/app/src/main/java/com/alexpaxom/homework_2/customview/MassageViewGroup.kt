@@ -93,7 +93,7 @@ class MassageViewGroup @JvmOverloads constructor(
     fun addReaction(codeEmoji: String = "\uD83D\uDE36", count:Int = 1, selected: Boolean = false) {
         val emoji = View.inflate(context, R.layout.emoji_view, null) as EmojiReactionCounter
 
-        removeReaction(codeEmoji) // удаляем идентичную рекцию если она уже была
+        //removeReaction(codeEmoji) // удаляем идентичную рекцию если она уже была
 
         emoji.displayEmoji = codeEmoji
         emoji.countReaction = count

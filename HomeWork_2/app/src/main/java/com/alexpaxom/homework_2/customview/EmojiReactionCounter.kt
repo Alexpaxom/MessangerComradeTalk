@@ -2,10 +2,12 @@ package com.alexpaxom.homework_2.customview
 
 import android.content.Context
 import android.graphics.*
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.helpers.NumAbbreviationFormatter
+import kotlinx.android.parcel.Parcelize
 
 class EmojiReactionCounter  @JvmOverloads constructor(
     context: Context,
@@ -138,9 +140,30 @@ class EmojiReactionCounter  @JvmOverloads constructor(
         return drawableState
     }
 
+    override fun onSaveInstanceState(): Parcelable {
+        return State(isSelected, displayEmoji, countReaction, super.onSaveInstanceState())
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+
+        with(state as State) {
+            isSelected = isSelectedState
+            displayEmoji = displayEmojiState
+            countReaction = countReactionState
+            super.onRestoreInstanceState(superState)
+        }
+
+
+    }
 
     companion object {
         private val SUPPORTED_DRAWABLE_STATE = intArrayOf(android.R.attr.state_selected)
     }
+
+    @Parcelize
+    data class State (val isSelectedState:Boolean,
+                       val displayEmojiState:String,
+                       val countReactionState:Int,
+                        val superState:Parcelable? ): Parcelable
 
 }

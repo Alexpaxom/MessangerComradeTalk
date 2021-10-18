@@ -16,10 +16,15 @@ class ChatHistoryAdapter: BaseAdapter<Message>() {
 
     inner class MessageViewHolder(private val messageItemBinding: MessageItemBinding): BaseViewHolder<Message>(messageItemBinding) {
         override fun bind(model: Message) {
-            messageItemBinding.messageItem.addReaction(count=99)
+            messageItemBinding.messageItem.removeAllReactions()
+
+            model.reactionList.groupingBy { it.emojiUnicode }.eachCount().forEach {
+                messageItemBinding.messageItem.addReaction(it.key, it.value)
+            }
+
             messageItemBinding.messageItem.userName = model.userName
             messageItemBinding.messageItem.messageText = model.text
-            messageItemBinding.messageItem.setAvatarByUrl(model.avatarUrl ?: "https://secure.gravatar.com/avatar/4c00913fa20d9871e41cb5ce82576585?s=80&d=identicon")
+            messageItemBinding.messageItem.setAvatarByUrl(model.avatarUrl ?: "")
         }
     }
 }

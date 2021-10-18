@@ -1,6 +1,9 @@
 package com.alexpaxom.homework_2.data.repositories
 
 import com.alexpaxom.homework_2.data.models.Message
+import com.alexpaxom.homework_2.data.models.Reaction
+import java.sql.Time
+import kotlin.random.Random
 
 class TestMessagesRepository {
 
@@ -25,20 +28,62 @@ class TestMessagesRepository {
         "Илон Маск"
     )
 
+    private val reactions = listOf(
+        "\uD83D\uDE00",
+        "\uD83D\uDE05",
+        "\uD83E\uDD23",
+        "\uD83E\uDD23",
+        "\uD83D\uDE07",
+        "\uD83E\uDD72",
+        "\uD83D\uDE1B",
+        "\uD83E\uDD2A",
+        "\uD83D\uDE11",
+    )
+
     fun getMessages(count: Int): ArrayList<Message> {
         val ret = arrayListOf<Message>()
+
+
         repeat(count) {
             val user = names.random().split(">")
+
+
+
             ret.add (
                 Message(
                     id = it,
                     userName = user[0],
                     avatarUrl = user[1],
-                    text = messages.random()
+                    text = messages.random(),
+                    reactionList = reactionsList(100)
                 )
             )
         }
+
+
         return ret
+
+    }
+
+    private fun reactionsList(maxCount: Int): ArrayList<Reaction>{
+        val random = Random(100)
+
+        val countReactions = random.nextInt(maxCount)
+
+        val reactionList: ArrayList<Reaction> = arrayListOf()
+
+        for (i in 0..countReactions) {
+
+            reactionList.add(
+                Reaction(
+                    userId = i,
+                    emojiUnicode = reactions.random()
+                )
+            )
+
+        }
+
+        return reactionList
     }
 
 }

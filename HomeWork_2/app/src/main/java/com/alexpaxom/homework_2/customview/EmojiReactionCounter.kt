@@ -80,6 +80,8 @@ class EmojiReactionCounter  @JvmOverloads constructor(
 
             recycle()
         }
+
+        setOnClickListener{} // Устанавливаем дефолтный слушатель
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -152,8 +154,18 @@ class EmojiReactionCounter  @JvmOverloads constructor(
             countReaction = countReactionState
             super.onRestoreInstanceState(superState)
         }
+    }
 
+    override fun setOnClickListener(l: OnClickListener?) {
+        val onClick = OnClickListener { v ->
+            countReaction += if(isSelected) -1 else 1
+            countReaction = if(countReaction >= 0) countReaction else 0
+            isSelected = !isSelected
 
+            l?.onClick(v)
+        }
+
+        super.setOnClickListener(onClick)
     }
 
     companion object {

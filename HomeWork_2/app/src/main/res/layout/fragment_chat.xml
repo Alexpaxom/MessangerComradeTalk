@@ -26,9 +26,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
-        android:hint="@string/massage_enter"
-        android:textColorHint="@color/white"
         app:boxBackgroundMode="outline"
+        app:hintEnabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/message_send_btn"
         app:layout_constraintStart_toStartOf="parent">
@@ -39,8 +38,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:background="@drawable/bg_massage_enter_edit"
+            android:hint="@string/massage_enter"
             android:padding="15dp"
             android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -52,7 +53,7 @@
         android:layout_marginTop="5dp"
         android:background="@drawable/bg_massage_send_button"
         android:padding="0dp"
-        android:src="@android:drawable/ic_menu_send"
+        android:src="@android:drawable/ic_menu_add"
         app:layout_constraintBottom_toBottomOf="@+id/massage_enter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/massage_enter" />

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/my_message_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:layout_marginEnd="10dp"
+    android:gravity="right"
+    app:flow_horizontalAlign="center">
+
+    <com.alexpaxom.homework_2.customview.MassageViewGroup
+        android:id="@+id/my_message_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:massageTextBackground="@color/my_massage_text_background" />
+
+</LinearLayout>

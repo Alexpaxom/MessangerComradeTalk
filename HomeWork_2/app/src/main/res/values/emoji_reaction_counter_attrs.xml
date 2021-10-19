@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="EmojiReactionCounter">
+        <attr name="emojiUnicode" format="string" />
+        <attr name="emojiTextSize" format="dimension" />
+        <attr name="separatorSize" format="dimension" />
+        <attr name="countReactions" format="integer" />
+        <attr name="android:textSize" />
+        <attr name="android:textColor" />
+    </declare-styleable>
+</resources>

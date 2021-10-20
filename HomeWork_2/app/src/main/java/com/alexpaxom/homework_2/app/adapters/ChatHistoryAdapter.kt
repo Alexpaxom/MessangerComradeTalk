@@ -3,15 +3,17 @@ package com.alexpaxom.homework_2.app.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.app.activities.MainActivity
+import com.alexpaxom.homework_2.app.adapters.decorators.DecorationCondition
 import com.alexpaxom.homework_2.customview.EmojiReactionCounter
 import com.alexpaxom.homework_2.customview.MassageViewGroup
 import com.alexpaxom.homework_2.data.models.Message
 import com.alexpaxom.homework_2.data.models.Reaction
 import com.alexpaxom.homework_2.databinding.MessageItemBinding
 import com.alexpaxom.homework_2.databinding.MyMessageItemBinding
+import java.util.*
+import java.util.concurrent.TimeUnit
 
-class ChatHistoryAdapter: BaseAdapter<Message>() {
+class ChatHistoryAdapter: BaseAdapter<Message>(), DecorationCondition {
 
     private var onReactionClickListener: (EmojiReactionCounter.(parentMessage: MassageViewGroup, model: Message)->Unit)? = null
 
@@ -33,6 +35,10 @@ class ChatHistoryAdapter: BaseAdapter<Message>() {
             }
             else -> throw Exception("Bed Type")
         }
+    }
+
+    fun getItemAt(index: Int): Message {
+        return dataList[index]
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -108,5 +114,18 @@ class ChatHistoryAdapter: BaseAdapter<Message>() {
 
     companion object {
         private const val MY_USER_ID = 99999
+    }
+
+    override fun isDecorate(itemPosition: Int): Boolean {
+        if(itemPosition == 0)
+            return true
+
+        val prevDate = GregorianCalendar()
+        val date = GregorianCalendar()
+        prevDate.timeInMillis = dataList[itemPosition-1].datetime.time
+        date.timeInMillis = dataList[itemPosition].datetime.time
+        val diffDays = TimeUnit.MILLISECONDS.toDays(date.timeInMillis - prevDate.timeInMillis)
+
+        return (diffDays > 1 || prevDate.get(Calendar.DAY_OF_MONTH) !=  date.get(Calendar.DAY_OF_MONTH))
     }
 }

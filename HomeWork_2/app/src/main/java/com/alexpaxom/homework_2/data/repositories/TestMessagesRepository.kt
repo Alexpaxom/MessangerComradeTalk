@@ -2,7 +2,8 @@ package com.alexpaxom.homework_2.data.repositories
 
 import com.alexpaxom.homework_2.data.models.Message
 import com.alexpaxom.homework_2.data.models.Reaction
-import java.sql.Time
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 class TestMessagesRepository {
@@ -40,22 +41,22 @@ class TestMessagesRepository {
 
     fun getMessages(count: Int): ArrayList<Message> {
         val ret = arrayListOf<Message>()
-
+        val date = Date()
+        date.time -= 1000*60*60*12*count
 
         repeat(count) {
             val user = names.random().split(">")
-
-
-
             ret.add (
                 Message(
                     id = it,
                     userName = user[0],
                     avatarUrl = user[1],
                     text = messages.random(),
+                    datetime = Date(date.time),
                     reactionList = reactionsList(100)
                 )
             )
+            date.time += 1000*60*60*6
         }
 
 

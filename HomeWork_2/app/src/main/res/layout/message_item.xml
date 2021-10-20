@@ -4,8 +4,7 @@
     android:id="@+id/message_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:flow_horizontalAlign="center"
-    android:layout_marginTop="10dp">
+    app:flow_horizontalAlign="center">
 
     <com.alexpaxom.homework_2.customview.MassageViewGroup
         android:id="@+id/message_item"

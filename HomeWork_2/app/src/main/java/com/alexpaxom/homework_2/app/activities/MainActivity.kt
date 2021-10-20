@@ -5,14 +5,16 @@ import android.os.Bundle
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewbinding.ViewBinding
-import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.BaseAdapterCallback
 import com.alexpaxom.homework_2.app.adapters.ChatHistoryAdapter
+import com.alexpaxom.homework_2.app.adapters.decorators.ChatDateDecorator
 import com.alexpaxom.homework_2.app.fragments.FragmentEmojiSelector
 import com.alexpaxom.homework_2.data.models.Message
 import com.alexpaxom.homework_2.data.models.Reaction
 import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
 import com.alexpaxom.homework_2.databinding.FragmentChatBinding
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
@@ -55,6 +57,10 @@ class MainActivity : AppCompatActivity() {
         binding.chatingHistory.layoutManager = LinearLayoutManager(this)
         binding.chatingHistory.adapter = chatHistoryAdapter
 
+
+        val decorator = ChatDateDecorator(binding.chatingHistory)
+        binding.chatingHistory.addItemDecoration(decorator)
+
         chatHistoryAdapter.setOnReactionClickListener { parentMessage, message ->
             if(isSelected) {
                 message.reactionList.add(
@@ -86,13 +92,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.messageSendBtn.setOnClickListener() {
-            chatHistoryAdapter.addItem(Message(
-                MESSAGE_ID++,
-                "My message",
-                binding.messageEnterEdit.text.toString(),
-                null
-            ))
-            binding.messageEnterEdit.text?.clear()
+            binding.messageEnterEdit.text?.let {
+                if (it.isNotEmpty()) {
+                    chatHistoryAdapter.addItem(Message(
+                        MESSAGE_ID++,
+                        "My message",
+                        binding.messageEnterEdit.text.toString(),
+                        Date(),
+                        null
+                    ))
+                    binding.messageEnterEdit.text?.clear()
+                }
+            }
         }
 
         binding.messageEnterEdit.doOnTextChanged { text, start, before, count ->

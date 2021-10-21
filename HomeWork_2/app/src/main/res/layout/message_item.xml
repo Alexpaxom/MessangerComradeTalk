@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/message_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginRight="50dp"
     app:flow_horizontalAlign="center">
 
     <com.alexpaxom.homework_2.customview.MassageViewGroup
         android:id="@+id/message_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:massageTextBackground="@color/massage_text_background"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:massageTextBackground="@drawable/bg_chat_message">
 
-</LinearLayout>
+    </com.alexpaxom.homework_2.customview.MassageViewGroup>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

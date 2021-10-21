@@ -2,6 +2,7 @@ package com.alexpaxom.homework_2.customview
 
 import android.content.Context
 import android.graphics.*
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +15,9 @@ import com.bumptech.glide.Glide
 inline fun View.getWidthWithMargins(): Int = measuredWidth + marginLeft + marginRight
 inline fun View.getHeightWithMargins(): Int = measuredHeight + marginTop + marginBottom
 
-inline fun View.layoutByNeighbors(left: View?, top: View?, addToLeft:Int = 0, addToTop: Int = 0) {
-    val leftCoord = addToLeft + (left?.right ?: 0) + (left?.marginRight ?: 0) + marginLeft
-    val topCoord = addToTop + (top?.bottom ?: 0) + (top?.marginBottom ?: 0) + marginTop
+inline fun View.layoutByLeftTopNeighbors(left: View?, top: View?, addOffsetLeft:Int = 0, addOffsetTop: Int = 0) {
+    val leftCoord = addOffsetLeft + (left?.right ?: 0) + (left?.marginRight ?: 0) + marginLeft
+    val topCoord = addOffsetTop + (top?.bottom ?: 0) + (top?.marginBottom ?: 0) + marginTop
 
     layout(
         leftCoord,
@@ -26,18 +27,29 @@ inline fun View.layoutByNeighbors(left: View?, top: View?, addToLeft:Int = 0, ad
     )
 }
 
+inline fun View.layoutByRightTopNeighbors(
+    right: View?, top: View?,
+    addOffsetRight:Int = 0, addOffsetTop: Int = 0,
+    maxWidth: Int = 0) {
+
+    val rightCoord = maxWidth - addOffsetRight - (right?.left ?: 0) - (right?.marginLeft ?: 0) - marginRight
+    val topCoord = addOffsetTop + (top?.bottom ?: 0) + (top?.marginBottom ?: 0) + marginTop
+
+    layout(
+        rightCoord-measuredWidth,
+        topCoord,
+        rightCoord,
+        topCoord + measuredHeight,
+    )
+}
+
+
 class MassageViewGroup @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr, defStyleRes) {
-
-    var messageRadius = DEFAULT_MESSAGE_CORNER_RADIUS
-    set(value) {
-        field = value
-        requestLayout()
-    }
 
     var userName: CharSequence
         get() = nameTextView.text
@@ -51,9 +63,15 @@ class MassageViewGroup @JvmOverloads constructor(
             messageTextView.text = value
         }
 
+    var align: String
 
-    private val messageBackgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val messageBackgroundRect = RectF()
+    // макет фона сообщения
+    private var messageBackgroundDrawable: Drawable? = null
+    // Дополнитлеьные паддиги вокруг сообщения, созданные фоном
+    private val messageBackgroundPaddings = Rect()
+    // Размеры фона сообщения
+    private val messageBackgroundRect = Rect()
+
     private val avatarImageView: ImageView
     private val nameTextView: TextView
     private val messageTextView: TextView
@@ -69,15 +87,32 @@ class MassageViewGroup @JvmOverloads constructor(
         reactionsListLayout = findViewById(R.id.massage_reactions_list)
 
         with(context.obtainStyledAttributes(attrs, R.styleable.MassageViewGroup)) {
-            messageBackgroundPaint.color = getColor(
-                R.styleable.MassageViewGroup_massageTextBackground,
-                Color.GRAY
+            messageBackgroundDrawable = getDrawable(
+                R.styleable.MassageViewGroup_massageTextBackground
             )
 
-            messageRadius = getDimensionPixelSize(
-                R.styleable.MassageViewGroup_massageTextRadius,
-                DEFAULT_MESSAGE_CORNER_RADIUS.toInt()
-            ).toFloat()
+            align = getString(R.styleable.MassageViewGroup_horizontalAlign) ?: DEFAULT_ALIGN
+
+            messageTextView.isVisible = getBoolean(
+                R.styleable.MassageViewGroup_showMessageText,
+                DEFAULT_SHOW_MESSAGE_FLAG
+            )
+
+            avatarImageView.isVisible = getBoolean(
+                R.styleable.MassageViewGroup_showAvatar,
+                DEFAULT_SHOW_AVATAR_FLAG
+            )
+
+            reactionsListLayout.isVisible = getBoolean(
+                R.styleable.MassageViewGroup_showReactionsList,
+                DEFAULT_SHOW_REACTIONS_LIST_FLAG
+
+            )
+
+            nameTextView.isVisible = getBoolean(
+                R.styleable.MassageViewGroup_showUserName,
+                DEFAULT_SHOW_USER_NAME_FLAG
+            )
         }
     }
 
@@ -92,8 +127,6 @@ class MassageViewGroup @JvmOverloads constructor(
 
     fun addReaction(codeEmoji: String = "\uD83D\uDE36", count:Int = 1, selected: Boolean = false) {
         val emoji = View.inflate(context, R.layout.emoji_view, null) as EmojiReactionCounter
-
-        //removeReaction(codeEmoji) // удаляем идентичную рекцию если она уже была
 
         emoji.displayEmoji = codeEmoji
         emoji.countReaction = count
@@ -138,7 +171,10 @@ class MassageViewGroup @JvmOverloads constructor(
         var totalWidth = 0
         var totalHeight = 0
 
+        messageBackgroundDrawable?.getPadding(messageBackgroundPaddings)
+
         // Получаем параметры аватара пользователя
+        if(avatarImageView.isVisible)
         measureChildWithMargins(
             avatarImageView,
             widthMeasureSpec,
@@ -148,30 +184,37 @@ class MassageViewGroup @JvmOverloads constructor(
         )
 
         // Получаем параметры текствью с именем пользователя
+        if(nameTextView.isVisible)
         measureChildWithMargins(
             nameTextView,
             widthMeasureSpec,
-            avatarImageView.getWidthWithMargins(),
+            avatarImageView.getWidthWithMargins()
+                    +messageBackgroundPaddings.left
+                    +messageBackgroundPaddings.right,
             heightMeasureSpec,
-            0
+            messageBackgroundPaddings.top
         )
 
         // Получаем параметры текствью с сообщением
+        if(messageTextView.isVisible)
         measureChildWithMargins(
             messageTextView,
             widthMeasureSpec,
-            avatarImageView.getWidthWithMargins(),
+            avatarImageView.getWidthWithMargins()
+                    +messageBackgroundPaddings.left
+                    +messageBackgroundPaddings.right,
             heightMeasureSpec,
-            0
+            nameTextView.top
         )
 
         // Получаем параметры слоя с реакциями и их колчеством
+        if(reactionsListLayout.isVisible)
         measureChildWithMargins(
             reactionsListLayout,
             widthMeasureSpec,
-            avatarImageView.getWidthWithMargins(),
+            avatarImageView.getWidthWithMargins()+messageBackgroundPaddings.left,
             heightMeasureSpec,
-            0
+            messageTextView.top+messageBackgroundPaddings.top
         )
 
         if (avatarImageView.isVisible)
@@ -183,12 +226,16 @@ class MassageViewGroup @JvmOverloads constructor(
             reactionsListLayout.getWidthWithMargins(),
         )
 
+        totalWidth += messageBackgroundPaddings.right + messageBackgroundPaddings.left
+
         totalHeight = maxOf(
             avatarImageView.getHeightWithMargins(),
 
             nameTextView.getHeightWithMargins()
                     + messageTextView.getHeightWithMargins()
                     + reactionsListLayout.getHeightWithMargins()
+                    + messageBackgroundPaddings.top
+                    + messageBackgroundPaddings.bottom
         )
 
 
@@ -199,50 +246,111 @@ class MassageViewGroup @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        if(align == "right")
+            alignLayoutRight()
+        else
+            alignLayoutLeft()
 
+        calcMessageBackgroundBounds()
+    }
+
+    private fun alignLayoutRight() {
+
+        // располагаем имя пользователя
+        nameTextView.layoutByRightTopNeighbors(
+            right = null,
+            top = null,
+            addOffsetRight = paddingRight+messageBackgroundPaddings.right,
+            addOffsetTop = paddingTop+messageBackgroundPaddings.top
+        )
+
+        // располагаем сообщение пользователя
+        messageTextView.layoutByRightTopNeighbors(
+            right = null,
+            top = nameTextView,
+            addOffsetRight = paddingRight+messageBackgroundPaddings.right,
+            maxWidth = measuredWidth
+        )
+
+        // располагаем аватар
+        avatarImageView.layoutByRightTopNeighbors(
+            right = messageTextView,
+            top = null,
+            addOffsetRight = messageBackgroundPaddings.left,
+            addOffsetTop = paddingTop
+        )
+
+        // располагаем список рекций пользователя
+        reactionsListLayout.layoutByRightTopNeighbors(
+            right = null,
+            top = messageTextView,
+            addOffsetTop = messageBackgroundPaddings.bottom,
+            addOffsetRight = paddingRight+messageBackgroundPaddings.right,
+            maxWidth = measuredWidth
+        )
+
+        messageBackgroundRect.left = messageTextView.left
+        messageBackgroundRect.top = nameTextView.top
+        messageBackgroundRect.right = maxOf(messageTextView.right, nameTextView.right)
+        messageBackgroundRect.bottom = messageTextView.bottom
+
+    }
+
+    private fun alignLayoutLeft() {
         val avatar = if(avatarImageView.isVisible) avatarImageView else null
         val leftPaddingWhereNotImage = if(avatarImageView.isVisible) 0 else paddingLeft
 
         // располагаем аватар
-        avatarImageView.layoutByNeighbors(
+        avatarImageView.layoutByLeftTopNeighbors(
             left = null,
             top = null,
-            addToLeft = paddingLeft,
-            addToTop = paddingTop
+            addOffsetLeft = paddingLeft,
+            addOffsetTop = paddingTop
         )
 
         // располагаем имя пользователя
-        nameTextView.layoutByNeighbors(
+        nameTextView.layoutByLeftTopNeighbors(
             left = avatar,
             top = null,
-            addToLeft = leftPaddingWhereNotImage,
-            addToTop = paddingTop
+            addOffsetLeft = leftPaddingWhereNotImage+messageBackgroundPaddings.left,
+            addOffsetTop = paddingTop+messageBackgroundPaddings.top
         )
 
         // располагаем сообщение пользователя
-        messageTextView.layoutByNeighbors(
+        messageTextView.layoutByLeftTopNeighbors(
             left = avatar,
             top = nameTextView,
-            addToLeft = leftPaddingWhereNotImage
+            addOffsetLeft = leftPaddingWhereNotImage+messageBackgroundPaddings.left,
         )
 
         // располагаем список рекций пользователя
-        reactionsListLayout.layoutByNeighbors(
+        reactionsListLayout.layoutByLeftTopNeighbors(
             left = avatar,
             top = messageTextView,
-            addToLeft = leftPaddingWhereNotImage
+            addOffsetTop = messageBackgroundPaddings.top,
+            addOffsetLeft = leftPaddingWhereNotImage,
         )
 
-        messageBackgroundRect.left = minOf(nameTextView.left, messageTextView.left).toFloat()
-        messageBackgroundRect.top = nameTextView.top.toFloat()
-        messageBackgroundRect.right = maxOf(messageTextView.right, nameTextView.right).toFloat()
-        messageBackgroundRect.bottom = messageTextView.bottom.toFloat()
+        messageBackgroundRect.left = minOf(nameTextView.left, messageTextView.left)
+        messageBackgroundRect.top = nameTextView.top
+        messageBackgroundRect.right = maxOf(messageTextView.right, nameTextView.right)
+        messageBackgroundRect.bottom = messageTextView.bottom
     }
+
+    private fun calcMessageBackgroundBounds() {
+        // Расчитываем размеры фона сообщения в зависимости от размеров имени, сообщения и их видимости
+        messageBackgroundRect.left -= messageBackgroundPaddings.left
+        messageBackgroundRect.right += messageBackgroundPaddings.right
+        messageBackgroundRect.top -= messageBackgroundPaddings.top
+        messageBackgroundRect.bottom += messageBackgroundPaddings.bottom
+    }
+
 
     override fun dispatchDraw(canvas: Canvas?) {
 
         canvas?.let {
-            canvas.drawRoundRect(messageBackgroundRect, messageRadius, messageRadius, messageBackgroundPaint);
+            messageBackgroundDrawable?.bounds = messageBackgroundRect
+            messageBackgroundDrawable?.draw(canvas)
         }
 
         super.dispatchDraw(canvas)
@@ -261,7 +369,11 @@ class MassageViewGroup @JvmOverloads constructor(
     }
 
     companion object {
-        private const val DEFAULT_MESSAGE_CORNER_RADIUS = 50f
+        private const val DEFAULT_SHOW_MESSAGE_FLAG = true
+        private const val DEFAULT_SHOW_AVATAR_FLAG = true
+        private const val DEFAULT_SHOW_USER_NAME_FLAG = true
+        private const val DEFAULT_SHOW_REACTIONS_LIST_FLAG = true
+        private const val DEFAULT_ALIGN = "left"
     }
 
 }

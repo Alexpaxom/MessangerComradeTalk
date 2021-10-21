@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/bg_chat_delimiter_date.xml" value="0.1078125" />
+        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/bg_chat_message.xml" value="0.21302083333333333" />
+        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/bg_chat_my_message.xml" value="0.21302083333333333" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/bg_emoji_reaction_counter.xml" value="0.21302083333333333" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/bg_emoji_reaction_counter_selected.xml" value="0.21302083333333333" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/bg_emoji_reaction_counter_unselected.xml" value="0.21302083333333333" />
@@ -21,7 +23,7 @@
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/layout.xml" value="0.18" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/layout_test.xml" value="0.17" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/massage_item.xml" value="0.20885416666666667" />
-        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/message_item.xml" value="0.25" />
+        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/message_item.xml" value="0.33" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/message_template_layout.xml" value="0.2" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/my_message_item.xml" value="0.33" />
       </map>

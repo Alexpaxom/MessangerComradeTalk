@@ -2,6 +2,10 @@
 <resources>
     <declare-styleable name="MassageViewGroup">
         <attr name="massageTextBackground" format="reference|color" />
-        <attr name="massageTextRadius" format="dimension" />
+        <attr name="showMessageText" format="boolean" />
+        <attr name="showUserName" format="boolean" />
+        <attr name="showAvatar" format="boolean" />
+        <attr name="showReactionsList" format="boolean" />
+        <attr name="horizontalAlign" format="string" />
     </declare-styleable>
 </resources>

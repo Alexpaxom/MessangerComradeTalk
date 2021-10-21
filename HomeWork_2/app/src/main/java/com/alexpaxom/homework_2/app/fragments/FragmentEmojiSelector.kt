@@ -19,7 +19,6 @@ class FragmentEmojiSelector : BottomSheetDialogFragment() {
     private var _binding: EmojiSelectorBottomDialogBinding? = null
     private val binding get() = _binding!!
 
-    private var resultCallback: ((Bundle) -> Unit)? = null
     private val emojiSelectorAdapter = EmojiSelectorAdapter()
 
     override fun onCreateView(
@@ -71,20 +70,16 @@ class FragmentEmojiSelector : BottomSheetDialogFragment() {
     }
 
 
-    fun setOnResultCallback(callback:((Bundle) -> Unit)?) {
-        resultCallback = callback
-    }
-
 
 
     private fun returnResult(emojiUnicode: String) {
-        val messageId = arguments?.getInt(MESSAGE_ID)
-        requireNotNull(messageId)
+        val resultId = arguments?.getInt(RESULT_ID)
+        requireNotNull(resultId)
 
         val result = Bundle()
-        result.putInt(MESSAGE_ID, messageId)
+        result.putInt(RESULT_ID, resultId)
         result.putString(EMOJI_UNICODE, emojiUnicode)
-        resultCallback?.invoke(result)
+        parentFragmentManager.setFragmentResult(EMOJI_SELECT_RESULT_DIALOG_ID, result)
 
         dismiss()
     }
@@ -95,8 +90,19 @@ class FragmentEmojiSelector : BottomSheetDialogFragment() {
     }
 
     companion object {
-        const val TAG = "ModalBottomSheet"
-        const val MESSAGE_ID = "com.alexpaxom.MESSAGE_ID"
+
+        fun newInstance(resultId: Int) : FragmentEmojiSelector {
+            val params = Bundle()
+            params.putInt(RESULT_ID, resultId)
+
+            val fragmentEmojiSelector = FragmentEmojiSelector()
+            fragmentEmojiSelector.arguments = params
+
+            return fragmentEmojiSelector
+        }
+
+        const val EMOJI_SELECT_RESULT_DIALOG_ID = "com.alexpaxom.EMOJI_SELECT_RESULT_DIALOG_ID"
+        const val RESULT_ID = "com.alexpaxom.RESULT_ID"
         const val EMOJI_UNICODE = "com.alexpaxom.EMOJI_UNICODE"
         const val SIZE_OF_EMOJI_VIEW_IN_DP = 50f
     }

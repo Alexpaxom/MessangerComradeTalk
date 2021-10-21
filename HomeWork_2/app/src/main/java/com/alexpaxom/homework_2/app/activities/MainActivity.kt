@@ -23,24 +23,19 @@ class MainActivity : AppCompatActivity() {
 
     private val chatHistoryAdapter = ChatHistoryAdapter()
 
-    val fragmentEmojiSelector = FragmentEmojiSelector()
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
 
         binding = FragmentChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Обрабочики нажатий на элементы списка сообщений
+
         chatHistoryAdapter.attachCallback(object: BaseAdapterCallback<Message> {
             override fun onItemClick(model: Message, view: ViewBinding){}
 
             override fun onLongClick(model: Message, view: ViewBinding): Boolean {
-                val params = Bundle()
-                params.putInt(FragmentEmojiSelector.MESSAGE_ID, model.id)
-                fragmentEmojiSelector.arguments = params
-                fragmentEmojiSelector.show(supportFragmentManager, FragmentEmojiSelector.TAG)
-
+                val fragmentEmojiSelector = FragmentEmojiSelector.newInstance(model.id)
+                fragmentEmojiSelector.show(supportFragmentManager, FragmentEmojiSelector.EMOJI_SELECT_RESULT_DIALOG_ID)
                 return true
             }
         })
@@ -83,13 +78,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fragmentEmojiSelector.setOnResultCallback { resultBundle ->
-            val emojiUnicode = resultBundle.getString(FragmentEmojiSelector.EMOJI_UNICODE)
-            val messageId = resultBundle.getInt(FragmentEmojiSelector.MESSAGE_ID)
-            emojiUnicode?.let { emojiUnicode ->
-                chatHistoryAdapter.addReactionByMessageID(messageId, Reaction(MY_USER_ID, emojiUnicode))
-            }
-        }
+
+        // Обработка результата выбора эмоджи через диалог
+
+        supportFragmentManager.setFragmentResultListener(FragmentEmojiSelector.EMOJI_SELECT_RESULT_DIALOG_ID, this,
+            { _, resultBundle ->
+                val emojiUnicode = resultBundle.getString(FragmentEmojiSelector.EMOJI_UNICODE)
+                val messageId = resultBundle.getInt(FragmentEmojiSelector.RESULT_ID)
+                emojiUnicode?.let { emojiUnicode ->
+                    chatHistoryAdapter.addReactionByMessageID(messageId, Reaction(MY_USER_ID, emojiUnicode))
+                }
+            })
+
+
+        // Обработка нажатия на кнопку отправки сообщения
 
         binding.messageSendBtn.setOnClickListener() {
             binding.messageEnterEdit.text?.let {
@@ -105,6 +107,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        // Обработка состояний при вводе данных в поле сообщения
 
         binding.messageEnterEdit.doOnTextChanged { text, start, before, count ->
             binding.messageEnterEdit.text?.let {

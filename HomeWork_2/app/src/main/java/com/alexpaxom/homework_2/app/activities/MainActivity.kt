@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.chatingHistory.layoutManager = LinearLayoutManager(this)
         binding.chatingHistory.adapter = chatHistoryAdapter
+        binding.chatingHistory.scrollToPosition(chatHistoryAdapter.dataList.size-1)
 
 
         val decorator = ChatDateDecorator(binding.chatingHistory)
@@ -120,7 +121,6 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-
         super.onCreate(savedInstanceState)
     }
 

@@ -2,6 +2,7 @@ package com.alexpaxom.homework_2.app.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.decorators.ItemDecorationCondition
 import com.alexpaxom.homework_2.customview.EmojiReactionCounter
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit
 class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String> {
 
     private var onReactionClickListener: (EmojiReactionCounter.(message: Message)->Unit)? = null
+    private var parentRecycler: RecyclerView? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<Message> {
         return when(viewType) {
@@ -89,6 +91,16 @@ class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String
         }
     }
 
+    override fun addItem(newItem: Message) {
+        super.addItem(newItem)
+        parentRecycler?.smoothScrollToPosition(dataList.size-1)
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        parentRecycler = recyclerView
+        super.onAttachedToRecyclerView(recyclerView)
+    }
+
     inner class MyMessageViewHolder(private val myMessageItemBinding: MyMessageItemBinding): BaseViewHolder<Message>(myMessageItemBinding) {
         override fun bind(model: Message) {
             model.reactionsGroup.userIdOwner = MY_USER_ID
@@ -99,10 +111,6 @@ class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String
                 onReactionClickListener?.invoke(this, model)
             }
         }
-    }
-
-    companion object {
-        private const val MY_USER_ID = 99999
     }
 
     override fun isDecorate(itemPosition: Int): Boolean {
@@ -122,4 +130,9 @@ class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String
         val sf = SimpleDateFormat("E, dd MMM")
         return "${sf.format(dataList[itemPosition].datetime)}"
     }
+
+    companion object {
+        private const val MY_USER_ID = 99999
+    }
+
 }

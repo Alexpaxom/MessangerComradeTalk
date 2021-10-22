@@ -8,20 +8,20 @@ abstract class BaseAdapter<P>: RecyclerView.Adapter<BaseViewHolder<P>>() {
 
     var hasItems = false
 
-    fun attachCallback(callback: BaseAdapterCallback<P>) {
+    open fun attachCallback(callback: BaseAdapterCallback<P>) {
         this.mCallback = callback
     }
 
-    fun detachCallback() {
+    open fun detachCallback() {
         this.mCallback = null
     }
 
-    fun addItem(newItem: P) {
+    open fun addItem(newItem: P) {
         dataList.add(newItem)
         notifyItemInserted(dataList.size - 1)
     }
 
-    fun updateItems(itemsList: List<P>) {
+    open fun updateItems(itemsList: List<P>) {
         dataList.clear()
         dataList.addAll(itemsList)
         notifyDataSetChanged()

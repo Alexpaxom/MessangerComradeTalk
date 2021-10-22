@@ -34,6 +34,11 @@ class FragmentEmojiSelector : BottomSheetDialogFragment() {
             "\uD83D\uDE1B",
             "\uD83E\uDD2A",
             "\uD83D\uDE11",
+            "\uD83E\uDD70",
+            "\uD83D\uDE0D",
+            "\uD83E\uDD29",
+            "\uD83D\uDE37",
+            "\uD83E\uDD22",
         ))
 
         emojiSelectorAdapter.attachCallback(object :BaseAdapterCallback<String> {

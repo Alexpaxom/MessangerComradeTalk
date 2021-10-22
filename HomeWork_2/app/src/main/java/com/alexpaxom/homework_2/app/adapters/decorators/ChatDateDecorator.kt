@@ -23,14 +23,13 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
         parent: RecyclerView,
         state: RecyclerView.State
     ) {
-        val adapter = parent.adapter as ChatHistoryAdapter
+        val adapter = parent.adapter as ItemDecorationCondition<String>
 
         outRect.top = view.context.resources.getDimensionPixelSize(R.dimen.chat_delimiter_messages)
 
         if(adapter.isDecorate(parent.getChildAdapterPosition(view))) {
             drawableLayer.textDate.let {
-                it.text =
-                    adapter.getItemAt(parent.getChildAdapterPosition(view)).datetime.toString()
+                it.text = adapter.getDecorateParam(parent.getChildAdapterPosition(view))
                 measureView()
                 outRect.top += it.marginTop + it.marginBottom + it.height
             }
@@ -39,8 +38,7 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         super.onDrawOver(c, parent, state)
-        val adapter = parent.adapter as ChatHistoryAdapter
-
+        val adapter = parent.adapter as ItemDecorationCondition<String>
 
         val left = parent.paddingLeft
         val right = parent.width - parent.paddingLeft
@@ -53,7 +51,7 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
                 continue
 
 
-            drawableLayer.textDate.text = adapter.getItemAt(parent.getChildAdapterPosition(child)).datetime.toString()
+            drawableLayer.textDate.text = adapter.getDecorateParam(parent.getChildAdapterPosition(child))
             val y = child.top.toFloat()-drawableLayer.textDate.height - drawableLayer.textDate.marginBottom
             drawView(c, x-drawableLayer.textDate.width/2, y)
         }

@@ -10,6 +10,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.*
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.data.models.Reaction
+import com.alexpaxom.homework_2.data.models.ReactionsGroup
 import com.bumptech.glide.Glide
 
 inline fun View.getWidthWithMargins(): Int = measuredWidth + marginLeft + marginRight
@@ -77,6 +79,7 @@ class MassageViewGroup @JvmOverloads constructor(
     private val messageTextView: TextView
     private val reactionsListLayout: FlexBoxLayout
     private var onReactionClickListener: (EmojiReactionCounter.()->Unit)? = null
+    private var reactionsGroup = ReactionsGroup()
 
     init {
         inflate(context, R.layout.message_template_layout, this)
@@ -124,8 +127,21 @@ class MassageViewGroup @JvmOverloads constructor(
             .into(avatarImageView)
     }
 
+    fun setReactions(reactions: ReactionsGroup) {
+        reactionsGroup = reactions
 
-    fun addReaction(codeEmoji: String = "\uD83D\uDE36", count:Int = 1, selected: Boolean = false) {
+        removeAllReactions()
+
+        reactionsGroup.getListCount().forEach {
+            addReactionView(
+                codeEmoji = it.first,
+                count = it.second,
+                selected = reactionsGroup.isSelected(it.first))
+        }
+    }
+
+
+    private fun addReactionView(codeEmoji: String = "\uD83D\uDE36", count:Int = 1, selected: Boolean = false) {
         val emoji = View.inflate(context, R.layout.emoji_view, null) as EmojiReactionCounter
 
         emoji.displayEmoji = codeEmoji
@@ -138,6 +154,10 @@ class MassageViewGroup @JvmOverloads constructor(
         emoji.setOnClickListener {
             onReactionClickListener?.invoke(it as EmojiReactionCounter)
         }
+    }
+
+    fun addReaction(reaction: Reaction) {
+        reactionsGroup.addReaction(reaction)
     }
 
     fun findReactionId(codeEmoji: String): View? {

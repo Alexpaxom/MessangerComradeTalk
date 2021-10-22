@@ -2,6 +2,7 @@ package com.alexpaxom.homework_2.data.repositories
 
 import com.alexpaxom.homework_2.data.models.Message
 import com.alexpaxom.homework_2.data.models.Reaction
+import com.alexpaxom.homework_2.data.models.ReactionsGroup
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
@@ -50,10 +51,11 @@ class TestMessagesRepository {
                 Message(
                     id = it,
                     userName = user[0],
+                    userId = user[0].hashCode(),
                     avatarUrl = user[1],
                     text = messages.random(),
                     datetime = Date(date.time),
-                    reactionList = reactionsList(100)
+                    reactionsGroup = ReactionsGroup(reactionsList(100))
                 )
             )
             date.time += 1000*60*60*6

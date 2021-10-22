@@ -56,9 +56,10 @@ class MainActivity : AppCompatActivity() {
         val decorator = ChatDateDecorator(binding.chatingHistory)
         binding.chatingHistory.addItemDecoration(decorator)
 
-        chatHistoryAdapter.setOnReactionClickListener { parentMessage, message ->
+        chatHistoryAdapter.setOnReactionClickListener { message ->
             if(isSelected) {
-                message.reactionList.add(
+                chatHistoryAdapter.addReactionByMessageID(
+                    message.id,
                     Reaction(
                         MY_USER_ID,
                         this.displayEmoji
@@ -66,15 +67,13 @@ class MainActivity : AppCompatActivity() {
                 )
             }
             else {
-                message.reactionList.remove(Reaction(
-                    MY_USER_ID,
-                    this.displayEmoji
-                ))
-
-                // это вынесено на случай ошибки сервера, если например нет связи
-                // что бы не удалять реакцию раньше времени, но возможно нужно перенести в MassageViewGroup
-                if(countReaction == 0)
-                    parentMessage.removeReaction(this)
+                chatHistoryAdapter.removeReactionByMessageID(
+                    message.id,
+                    Reaction(
+                        MY_USER_ID,
+                        this.displayEmoji
+                    )
+                )
             }
         }
 
@@ -98,6 +97,7 @@ class MainActivity : AppCompatActivity() {
                 if (it.isNotEmpty()) {
                     chatHistoryAdapter.addItem(Message(
                         MESSAGE_ID++,
+                        MY_USER_ID,
                         "My message",
                         binding.messageEnterEdit.text.toString(),
                         Date(),

@@ -3,19 +3,20 @@ package com.alexpaxom.homework_2.app.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.app.adapters.decorators.DecorationCondition
+import com.alexpaxom.homework_2.app.adapters.decorators.ItemDecorationCondition
 import com.alexpaxom.homework_2.customview.EmojiReactionCounter
 import com.alexpaxom.homework_2.customview.MassageViewGroup
 import com.alexpaxom.homework_2.data.models.Message
 import com.alexpaxom.homework_2.data.models.Reaction
 import com.alexpaxom.homework_2.databinding.MessageItemBinding
 import com.alexpaxom.homework_2.databinding.MyMessageItemBinding
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class ChatHistoryAdapter: BaseAdapter<Message>(), DecorationCondition {
+class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String> {
 
-    private var onReactionClickListener: (EmojiReactionCounter.(parentMessage: MassageViewGroup, model: Message)->Unit)? = null
+    private var onReactionClickListener: (EmojiReactionCounter.(message: Message)->Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<Message> {
         return when(viewType) {
@@ -33,81 +34,69 @@ class ChatHistoryAdapter: BaseAdapter<Message>(), DecorationCondition {
                     false
                 ))
             }
-            else -> throw Exception("Bed Type")
+            else -> throw Exception("Bad Type")
         }
     }
 
-    fun getItemAt(index: Int): Message {
-        return dataList[index]
-    }
-
     override fun getItemViewType(position: Int): Int {
-        return when(dataList[position].id) {
-            in 0..999 -> R.layout.message_item
-            in 1000..2000 -> R.layout.my_message_item
-            else -> throw Exception("Bed Type")
+        return when(dataList[position].userId) {
+            MY_USER_ID -> R.layout.my_message_item
+            else -> R.layout.message_item
         }
     }
 
 
     fun addReactionByMessageID(messageId: Int, reaction: Reaction) {
-        dataList.indexOfLast {
-            it.id == messageId
-        }.let {
-            if(it != -1) {
-                if(dataList[it].reactionList.findLast { r -> r == reaction } == null) {
-                    dataList[it].reactionList.add(reaction)
-                    notifyItemChanged(it)
-                }
+        dataList.indexOfLast { it.id == messageId }.let { messageId ->
+            if(messageId != -1) {
+                dataList[messageId] = Message(
+                    dataList[messageId],
+                    dataList[messageId].reactionsGroup.addReaction(reaction)
+                )
+                notifyItemChanged(messageId)
             }
         }
     }
 
-    fun setOnReactionClickListener(onClickListener:(EmojiReactionCounter.(parentMessage: MassageViewGroup, model: Message)->Unit)?  = null) {
+    fun removeReactionByMessageID(messageId: Int, reaction: Reaction) {
+        dataList.indexOfLast { it.id == messageId }.let { messageId ->
+            if(messageId != -1) {
+                dataList[messageId] = Message(
+                    dataList[messageId],
+                    dataList[messageId].reactionsGroup.removeReaction(reaction)
+                )
+                notifyItemChanged(messageId)
+            }
+        }
+    }
+
+    fun setOnReactionClickListener(onClickListener:(EmojiReactionCounter.(message: Message)->Unit)?  = null) {
         onReactionClickListener = onClickListener
     }
 
 
     inner class MessageViewHolder(private val messageItemBinding: MessageItemBinding): BaseViewHolder<Message>(messageItemBinding) {
         override fun bind(model: Message) {
-            messageItemBinding.messageItem.removeAllReactions()
-            model.reactionList.groupingBy { it.emojiUnicode }.eachCount().forEach {
-                messageItemBinding.messageItem.addReaction(it.key, it.value, model.reactionList.contains(
-                    Reaction(
-                        MY_USER_ID,
-                        it.key
-                    )
-                ))
-            }
-
+            model.reactionsGroup.userIdOwner = MY_USER_ID
+            messageItemBinding.messageItem.setReactions(model.reactionsGroup)
             messageItemBinding.messageItem.userName = model.userName
             messageItemBinding.messageItem.messageText = model.text
             messageItemBinding.messageItem.setAvatarByUrl(model.avatarUrl ?: "")
 
             messageItemBinding.messageItem.setOnReactionClickListener {
-                onReactionClickListener?.invoke(this, messageItemBinding.messageItem, model)
+                onReactionClickListener?.invoke(this, model)
             }
         }
     }
 
     inner class MyMessageViewHolder(private val myMessageItemBinding: MyMessageItemBinding): BaseViewHolder<Message>(myMessageItemBinding) {
         override fun bind(model: Message) {
-            myMessageItemBinding.myMessageItem.removeAllReactions()
-            model.reactionList.groupingBy { it.emojiUnicode }.eachCount().forEach {
-                myMessageItemBinding.myMessageItem.addReaction(it.key, it.value, model.reactionList.contains(
-                    Reaction(
-                        MY_USER_ID,
-                        it.key
-                    )
-                ))
-            }
-
-            myMessageItemBinding.myMessageItem.userName = model.userName
+            model.reactionsGroup.userIdOwner = MY_USER_ID
+            myMessageItemBinding.myMessageItem.setReactions(model.reactionsGroup)
             myMessageItemBinding.myMessageItem.messageText = model.text
-            myMessageItemBinding.myMessageItem.setAvatarByUrl(model.avatarUrl ?: "")
 
             myMessageItemBinding.myMessageItem.setOnReactionClickListener {
-                onReactionClickListener?.invoke(this, myMessageItemBinding.myMessageItem, model)
+                onReactionClickListener?.invoke(this, model)
             }
         }
     }
@@ -127,5 +116,10 @@ class ChatHistoryAdapter: BaseAdapter<Message>(), DecorationCondition {
         val diffDays = TimeUnit.MILLISECONDS.toDays(date.timeInMillis - prevDate.timeInMillis)
 
         return (diffDays > 1 || prevDate.get(Calendar.DAY_OF_MONTH) !=  date.get(Calendar.DAY_OF_MONTH))
+    }
+
+    override fun getDecorateParam(itemPosition: Int): String {
+        val sf = SimpleDateFormat("E, dd MMM")
+        return "${sf.format(dataList[itemPosition].datetime)}"
     }
 }

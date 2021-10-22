@@ -127,12 +127,13 @@ class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String
     }
 
     override fun getDecorateParam(itemPosition: Int): String {
-        val sf = SimpleDateFormat("E, dd MMM")
-        return "${sf.format(dataList[itemPosition].datetime)}"
+        val sf = SimpleDateFormat(DATA_DELIMITER_FORMAT, Locale.ROOT)
+        return sf.format(dataList[itemPosition].datetime)
     }
 
     companion object {
         private const val MY_USER_ID = 99999
+        private const val DATA_DELIMITER_FORMAT = "E, dd MMM"
     }
 
 }

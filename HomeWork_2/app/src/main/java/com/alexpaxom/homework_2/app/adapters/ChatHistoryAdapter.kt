@@ -2,6 +2,8 @@ package com.alexpaxom.homework_2.app.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.decorators.ItemDecorationCondition
@@ -15,10 +17,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String> {
+class ChatHistoryAdapter(): BaseDiffUtilAdapter<Message>(), ItemDecorationCondition<String> {
 
     private var onReactionClickListener: (EmojiReactionCounter.(message: Message)->Unit)? = null
     private var parentRecycler: RecyclerView? = null
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<Message> {
         return when(viewType) {
@@ -41,7 +44,7 @@ class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when(dataList[position].userId) {
+        return when(diffUtil.currentList[position].userId) {
             MY_USER_ID -> R.layout.my_message_item
             else -> R.layout.message_item
         }
@@ -49,25 +52,26 @@ class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String
 
 
     fun addReactionByMessageID(messageId: Int, reaction: Reaction) {
-        dataList.indexOfLast { it.id == messageId }.let { messageId ->
+        diffUtil.currentList.indexOfLast { it.id == messageId }.let { messageId ->
             if(messageId != -1) {
-                dataList[messageId] = Message(
-                    dataList[messageId],
-                    dataList[messageId].reactionsGroup.addReaction(reaction)
+                    updateItem(messageId, Message(
+                        diffUtil.currentList[messageId],
+                        diffUtil.currentList[messageId].reactionsGroup.addReaction(reaction)
+                    )
                 )
-                notifyItemChanged(messageId)
             }
         }
     }
 
     fun removeReactionByMessageID(messageId: Int, reaction: Reaction) {
-        dataList.indexOfLast { it.id == messageId }.let { messageId ->
+        diffUtil.currentList.indexOfLast { it.id == messageId }.let { messageId ->
             if(messageId != -1) {
-                dataList[messageId] = Message(
-                    dataList[messageId],
-                    dataList[messageId].reactionsGroup.removeReaction(reaction)
+                updateItem(messageId,
+                    Message(
+                        diffUtil.currentList[messageId],
+                        diffUtil.currentList[messageId].reactionsGroup.removeReaction(reaction)
+                    )
                 )
-                notifyItemChanged(messageId)
             }
         }
     }
@@ -76,6 +80,10 @@ class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String
         onReactionClickListener = onClickListener
     }
 
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        parentRecycler = recyclerView
+        super.onAttachedToRecyclerView(recyclerView)
+    }
 
     inner class MessageViewHolder(private val messageItemBinding: MessageItemBinding): BaseViewHolder<Message>(messageItemBinding) {
         override fun bind(model: Message) {
@@ -91,16 +99,6 @@ class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String
         }
     }
 
-    override fun addItem(newItem: Message) {
-        super.addItem(newItem)
-        parentRecycler?.smoothScrollToPosition(dataList.size-1)
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        parentRecycler = recyclerView
-        super.onAttachedToRecyclerView(recyclerView)
-    }
-
     inner class MyMessageViewHolder(private val myMessageItemBinding: MyMessageItemBinding): BaseViewHolder<Message>(myMessageItemBinding) {
         override fun bind(model: Message) {
             model.reactionsGroup.userIdOwner = MY_USER_ID
@@ -113,14 +111,25 @@ class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String
         }
     }
 
+    class MessagesDiffUtil: DiffUtil.ItemCallback<Message>() {
+        override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
+            return oldItem == newItem
+        }
+
+    }
+
     override fun isDecorate(itemPosition: Int): Boolean {
         if(itemPosition == 0)
             return true
 
         val prevDate = GregorianCalendar()
         val date = GregorianCalendar()
-        prevDate.timeInMillis = dataList[itemPosition-1].datetime.time
-        date.timeInMillis = dataList[itemPosition].datetime.time
+        prevDate.timeInMillis = diffUtil.currentList[itemPosition-1].datetime.time
+        date.timeInMillis = diffUtil.currentList[itemPosition].datetime.time
         val diffDays = TimeUnit.MILLISECONDS.toDays(date.timeInMillis - prevDate.timeInMillis)
 
         return (diffDays > 1 || prevDate.get(Calendar.DAY_OF_MONTH) !=  date.get(Calendar.DAY_OF_MONTH))
@@ -128,12 +137,25 @@ class ChatHistoryAdapter: BaseAdapter<Message>(), ItemDecorationCondition<String
 
     override fun getDecorateParam(itemPosition: Int): String {
         val sf = SimpleDateFormat(DATA_DELIMITER_FORMAT, Locale.ROOT)
-        return sf.format(dataList[itemPosition].datetime)
+        return sf.format(diffUtil.currentList[itemPosition].datetime)
     }
 
     companion object {
         private const val MY_USER_ID = 99999
         private const val DATA_DELIMITER_FORMAT = "E, dd MMM"
+    }
+
+    override fun createDiffUtil(): AsyncListDiffer<Message> {
+        val differ = AsyncListDiffer(this, MessagesDiffUtil())
+
+        differ.addListListener { previousList, currentList ->
+            if(currentList[currentList.size-1].userId == MY_USER_ID &&
+                previousList[previousList.size-1].id != currentList[currentList.size-1].id
+            )
+                parentRecycler?.scrollToPosition(currentList.size-1)
+        }
+
+        return differ
     }
 
 }

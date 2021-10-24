@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class ReactionsGroup(
+data class ReactionsGroup(
     val reactionList: List<Reaction> = listOf(),
     var userIdOwner: Int = 0,
 ): Parcelable {

@@ -147,12 +147,14 @@ class ChatHistoryAdapter(): BaseDiffUtilAdapter<Message>(), ItemDecorationCondit
 
     override fun createDiffUtil(): AsyncListDiffer<Message> {
         val differ = AsyncListDiffer(this, MessagesDiffUtil())
-
         differ.addListListener { previousList, currentList ->
-            if(currentList[currentList.size-1].userId == MY_USER_ID &&
-                previousList[previousList.size-1].id != currentList[currentList.size-1].id
-            )
-                parentRecycler?.scrollToPosition(currentList.size-1)
+            if(previousList.size != 0 && currentList.size != 0 ) {
+                // Передвигаем список в конец при добавлении сообщения пользователем
+                if(currentList[currentList.size-1].userId == MY_USER_ID &&
+                    previousList[previousList.size-1].id != currentList[currentList.size-1].id
+                )
+                    parentRecycler?.scrollToPosition(currentList.size-1)
+            }
         }
 
         return differ

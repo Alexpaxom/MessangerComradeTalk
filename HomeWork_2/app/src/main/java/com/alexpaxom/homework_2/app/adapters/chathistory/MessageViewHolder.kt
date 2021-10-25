@@ -19,7 +19,7 @@ class MessageViewHolder(
     override fun bind(model: Message) {
         messageItemBinding.messageItem.userName = model.userName
         messageItemBinding.messageItem.messageText = model.text
-        messageItemBinding.messageItem.setAvatarByUrl(model.avatarUrl?:"")
+        messageItemBinding.messageItem.setAvatarByUrl(model.avatarUrl.orEmpty())
         messageItemBinding.messageItem.setReactions(model.reactionsGroup)
     }
 

@@ -17,8 +17,7 @@ import java.util.concurrent.TimeUnit
 class ChatHistoryAdapter(
     holdersFactory: BaseHolderFactory
 ): BaseDiffUtilAdapter<Message>(holdersFactory), ItemDecorationCondition<String> {
-
-    private var parentRecycler: RecyclerView? = null
+    private var addMessageClickListener: ((messagePos: Int) -> Unit)? = null
 
     init {
         diffUtil = createDiffUtil()
@@ -48,11 +47,6 @@ class ChatHistoryAdapter(
                 )
             }
         }
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        parentRecycler = recyclerView
-        super.onAttachedToRecyclerView(recyclerView)
     }
 
 
@@ -90,6 +84,10 @@ class ChatHistoryAdapter(
         private const val MY_USER_ID = 99999
     }
 
+    fun setClickListenerOnAddMessage(listener: (messagePos: Int) -> Unit ){
+        addMessageClickListener = listener
+    }
+
     fun createDiffUtil(): AsyncListDiffer<Message> {
         val differ = AsyncListDiffer(this, MessagesDiffUtil())
         differ.addListListener { previousList, currentList ->
@@ -97,8 +95,10 @@ class ChatHistoryAdapter(
                 // Передвигаем список в конец при добавлении сообщения пользователем
                 if(currentList[currentList.size-1].userId == MY_USER_ID &&
                     previousList[previousList.size-1].id != currentList[currentList.size-1].id
-                )
-                    parentRecycler?.scrollToPosition(currentList.size-1)
+                ){
+                    addMessageClickListener?.invoke(currentList.size-1)
+                }
+
             }
         }
 

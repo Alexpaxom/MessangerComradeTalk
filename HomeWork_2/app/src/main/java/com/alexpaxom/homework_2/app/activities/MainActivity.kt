@@ -72,6 +72,11 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
+        // Колбек после добавления нового сообщения в список
+        chatHistoryAdapter.setClickListenerOnAddMessage {
+            binding.chatingHistory.scrollToPosition(it)
+        }
+
 
         // Обработка нажатия на кнопку отправки сообщения
         binding.messageSendBtn.setOnClickListener() {

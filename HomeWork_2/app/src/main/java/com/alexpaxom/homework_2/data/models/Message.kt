@@ -6,6 +6,7 @@ import java.util.*
 
 @Parcelize
 data class Message(
+    override val typeId: Int = 0,
     val id: Int,
     val userId: Int,
     val userName: String,
@@ -13,8 +14,9 @@ data class Message(
     val datetime: Date,
     val avatarUrl: String?,
     val reactionsGroup: ReactionsGroup = ReactionsGroup()
-): Parcelable {
+): Parcelable, ListItem {
     constructor(old: Message, newReactionsGroup: ReactionsGroup) : this(
+        old.typeId,
         old.id,
         old.userId,
         old.userName,

@@ -8,9 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.viewbinding.ViewBinding
-import com.alexpaxom.homework_2.app.adapters.BaseAdapterCallback
-import com.alexpaxom.homework_2.app.adapters.EmojiSelectorAdapter
+import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.adapters.emojiselector.EmojiHoldersFactory
+import com.alexpaxom.homework_2.app.adapters.emojiselector.EmojiSelectorAdapter
+import com.alexpaxom.homework_2.data.models.Reaction
 import com.alexpaxom.homework_2.databinding.EmojiSelectorBottomDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -19,14 +20,16 @@ class FragmentEmojiSelector : BottomSheetDialogFragment() {
     private var _binding: EmojiSelectorBottomDialogBinding? = null
     private val binding get() = _binding!!
 
-    private val emojiSelectorAdapter = EmojiSelectorAdapter()
+    private val emojiHoldersFactory = EmojiHoldersFactory { returnResult(it) }
+
+    private val emojiSelectorAdapter = EmojiSelectorAdapter(emojiHoldersFactory)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle? ): View {
         _binding = EmojiSelectorBottomDialogBinding.inflate(inflater, container, false)
 
-        emojiSelectorAdapter.updateItems(listOf(
+        emojiSelectorAdapter.dataList = listOf(
             "\uD83D\uDE00",
             "\uD83D\uDE05",
             "\uD83E\uDD23",
@@ -39,18 +42,8 @@ class FragmentEmojiSelector : BottomSheetDialogFragment() {
             "\uD83E\uDD29",
             "\uD83D\uDE37",
             "\uD83E\uDD22",
-        ))
+        ).map { Reaction(R.layout.emoji_for_select_view, 0, it) }
 
-        emojiSelectorAdapter.attachCallback(object :BaseAdapterCallback<String> {
-            override fun onItemClick(model: String, view: ViewBinding) {
-                returnResult(model)
-            }
-
-            override fun onLongClick(model: String, view: ViewBinding): Boolean {
-                return true
-            }
-
-        })
 
         binding.selectorEmojiList.adapter = emojiSelectorAdapter
 
@@ -77,13 +70,13 @@ class FragmentEmojiSelector : BottomSheetDialogFragment() {
 
 
 
-    private fun returnResult(emojiUnicode: String) {
+    private fun returnResult(adapterPos: Int) {
         val resultId = arguments?.getInt(RESULT_ID)
         requireNotNull(resultId)
 
         val result = Bundle()
         result.putInt(RESULT_ID, resultId)
-        result.putString(EMOJI_UNICODE, emojiUnicode)
+        result.putString(EMOJI_UNICODE, emojiSelectorAdapter.dataList[adapterPos].emojiUnicode)
         parentFragmentManager.setFragmentResult(EMOJI_SELECT_RESULT_DIALOG_ID, result)
 
         dismiss()

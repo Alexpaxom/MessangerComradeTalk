@@ -1,5 +1,6 @@
 package com.alexpaxom.homework_2.data.repositories
 
+import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.Message
 import com.alexpaxom.homework_2.data.models.Reaction
 import com.alexpaxom.homework_2.data.models.ReactionsGroup
@@ -49,13 +50,14 @@ class TestMessagesRepository {
             val user = names.random().split(">")
             ret.add (
                 Message(
+                    typeId = R.layout.message_item,
                     id = it,
                     userName = user[0],
                     userId = user[0].hashCode(),
                     avatarUrl = user[1],
                     text = messages.random(),
                     datetime = Date(date.time),
-                    reactionsGroup = ReactionsGroup(reactionsList(100))
+                    reactionsGroup = ReactionsGroup(reactionsList(100), MY_USER_ID)
                 )
             )
             date.time += 1000*60*60*6
@@ -85,6 +87,10 @@ class TestMessagesRepository {
         }
 
         return reactionList
+    }
+
+    companion object {
+        private const val MY_USER_ID = 99999
     }
 
 }

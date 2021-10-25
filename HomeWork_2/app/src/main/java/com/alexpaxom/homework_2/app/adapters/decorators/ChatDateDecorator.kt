@@ -8,7 +8,6 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.app.adapters.ChatHistoryAdapter
 import com.alexpaxom.homework_2.databinding.DateDelimeterBinding
 
 class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoration(){

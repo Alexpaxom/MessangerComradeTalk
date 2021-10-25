@@ -4,13 +4,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.viewbinding.ViewBinding
-import com.alexpaxom.homework_2.app.adapters.BaseAdapterCallback
-import com.alexpaxom.homework_2.app.adapters.ChatHistoryAdapter
+import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.adapters.chathistory.ChatHistoryAdapter
+import com.alexpaxom.homework_2.app.adapters.chathistory.ChatMessageFactory
 import com.alexpaxom.homework_2.app.adapters.decorators.ChatDateDecorator
 import com.alexpaxom.homework_2.app.fragments.FragmentEmojiSelector
+import com.alexpaxom.homework_2.customview.EmojiReactionCounter
 import com.alexpaxom.homework_2.data.models.Message
 import com.alexpaxom.homework_2.data.models.Reaction
+import com.alexpaxom.homework_2.data.models.ReactionsGroup
 import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
 import com.alexpaxom.homework_2.databinding.FragmentChatBinding
 import java.util.*
@@ -21,7 +23,12 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var binding: FragmentChatBinding
 
-    private val chatHistoryAdapter = ChatHistoryAdapter()
+    private val chatMessageFactory = ChatMessageFactory(
+        { selectNewReaction(it) },
+        { adapterPos, emojiView -> clickOnReaction(adapterPos, emojiView) }
+    )
+
+    private val chatHistoryAdapter = ChatHistoryAdapter(chatMessageFactory)
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -30,23 +37,13 @@ class MainActivity : AppCompatActivity() {
 
         // Обрабочики нажатий на элементы списка сообщений
 
-        chatHistoryAdapter.attachCallback(object: BaseAdapterCallback<Message> {
-            override fun onItemClick(model: Message, view: ViewBinding){}
-
-            override fun onLongClick(model: Message, view: ViewBinding): Boolean {
-                val fragmentEmojiSelector = FragmentEmojiSelector.newInstance(model.id)
-                fragmentEmojiSelector.show(supportFragmentManager, FragmentEmojiSelector.EMOJI_SELECT_RESULT_DIALOG_ID)
-                return true
-            }
-        })
-
         if(savedInstanceState == null) {
-            chatHistoryAdapter.updateItems(TestMessagesRepository().getMessages(30))
+            chatHistoryAdapter.dataList = TestMessagesRepository().getMessages(30)
         }
         else {
 
             val arr = savedInstanceState.getParcelableArrayList<Message>(SAVED_BUNDLE_MESSAGES)
-            chatHistoryAdapter.updateItems(arr?: listOf())
+            chatHistoryAdapter.dataList = arr?: listOf()
         }
 
         binding.chatingHistory.layoutManager = LinearLayoutManager(this)
@@ -57,52 +54,38 @@ class MainActivity : AppCompatActivity() {
         val decorator = ChatDateDecorator(binding.chatingHistory)
         binding.chatingHistory.addItemDecoration(decorator)
 
-        chatHistoryAdapter.setOnReactionClickListener { message ->
-            if(isSelected) {
-                chatHistoryAdapter.addReactionByMessageID(
-                    message.id,
-                    Reaction(
-                        MY_USER_ID,
-                        this.displayEmoji
-                    )
-                )
-            }
-            else {
-                chatHistoryAdapter.removeReactionByMessageID(
-                    message.id,
-                    Reaction(
-                        MY_USER_ID,
-                        this.displayEmoji
-                    )
-                )
-            }
-        }
-
 
         // Обработка результата выбора эмоджи через диалог
-
         supportFragmentManager.setFragmentResultListener(FragmentEmojiSelector.EMOJI_SELECT_RESULT_DIALOG_ID, this,
             { _, resultBundle ->
                 val emojiUnicode = resultBundle.getString(FragmentEmojiSelector.EMOJI_UNICODE)
                 val messageId = resultBundle.getInt(FragmentEmojiSelector.RESULT_ID)
                 emojiUnicode?.let { emojiUnicode ->
-                    chatHistoryAdapter.addReactionByMessageID(messageId, Reaction(MY_USER_ID, emojiUnicode))
+                    chatHistoryAdapter.addReactionByMessageID(
+                        messageId,
+                        Reaction(
+                            R.layout.emoji_for_select_view,
+                            MY_USER_ID,
+                            emojiUnicode
+                        )
+                    )
                 }
             })
 
 
         // Обработка нажатия на кнопку отправки сообщения
-
         binding.messageSendBtn.setOnClickListener() {
             binding.messageEnterEdit.text?.let {
                 if (it.isNotEmpty()) {
                     chatHistoryAdapter.addItem(Message(
-                        MESSAGE_ID++,
-                        MY_USER_ID,
-                        "My message",
-                        binding.messageEnterEdit.text.toString(),
-                        Date(),
-                        null
+                        typeId = R.layout.my_message_item,
+                        id = MESSAGE_ID++,
+                        userId = MY_USER_ID,
+                        userName = "My message",
+                        text = binding.messageEnterEdit.text.toString(),
+                        datetime = Date(),
+                        avatarUrl = null,
+                        reactionsGroup = ReactionsGroup(listOf(), MY_USER_ID)
                     ))
                     binding.messageEnterEdit.text?.clear()
                 }
@@ -129,6 +112,36 @@ class MainActivity : AppCompatActivity() {
         val list: ArrayList<Message> = ArrayList(chatHistoryAdapter.dataList)
         outState.putParcelableArrayList(SAVED_BUNDLE_MESSAGES, list)
         super.onSaveInstanceState(outState)
+    }
+
+    private fun selectNewReaction(adapterPos: Int) {
+        val fragmentEmojiSelector = FragmentEmojiSelector.newInstance(
+            chatHistoryAdapter.dataList[adapterPos].id
+        )
+        fragmentEmojiSelector.show(supportFragmentManager, FragmentEmojiSelector.EMOJI_SELECT_RESULT_DIALOG_ID)
+    }
+
+    private fun clickOnReaction(adapterPos: Int, emojiView: EmojiReactionCounter) {
+        if(emojiView.isSelected) {
+            chatHistoryAdapter.addReactionByMessageID(
+                chatHistoryAdapter.dataList[adapterPos].id,
+                Reaction(
+                    R.layout.emoji_for_select_view,
+                    MY_USER_ID,
+                    emojiView.displayEmoji
+                )
+            )
+        }
+        else {
+            chatHistoryAdapter.removeReactionByMessageID(
+                chatHistoryAdapter.dataList[adapterPos].id,
+                Reaction(
+                    R.layout.emoji_for_select_view,
+                    MY_USER_ID,
+                    emojiView.displayEmoji
+                )
+            )
+        }
     }
 
     companion object {

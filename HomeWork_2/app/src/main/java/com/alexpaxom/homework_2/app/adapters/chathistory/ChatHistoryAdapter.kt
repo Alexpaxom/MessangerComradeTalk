@@ -75,7 +75,7 @@ class ChatHistoryAdapter(
         date.timeInMillis = diffUtil.currentList[itemPosition].datetime.time
         val diffDays = TimeUnit.MILLISECONDS.toDays(date.timeInMillis - prevDate.timeInMillis)
 
-        return (diffDays > 1 || prevDate.get(Calendar.DAY_OF_MONTH) !=  date.get(Calendar.DAY_OF_MONTH))
+        return diffDays > 1 || prevDate.get(Calendar.DAY_OF_MONTH) !=  date.get(Calendar.DAY_OF_MONTH)
     }
 
     override fun getDecorateParam(itemPosition: Int): String {

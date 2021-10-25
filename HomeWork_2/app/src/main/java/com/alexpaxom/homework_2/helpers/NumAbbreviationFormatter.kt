@@ -1,6 +1,5 @@
 package com.alexpaxom.homework_2.helpers
 
-import kotlin.math.log10
 import kotlin.math.pow
 
 class NumAbbreviationFormatter {

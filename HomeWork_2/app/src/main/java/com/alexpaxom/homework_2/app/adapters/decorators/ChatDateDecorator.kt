@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
+import androidx.core.view.children
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +15,7 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
     val drawableLayer = DateDelimeterBinding.inflate(LayoutInflater.from(recyclerView.context), recyclerView, false)
     val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
     val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-
+    val spaceBetweenElements = recyclerView.context.resources.getDimensionPixelSize(R.dimen.chat_delimiter_messages)
 
     override fun getItemOffsets(
         outRect: Rect,
@@ -24,7 +25,7 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
     ) {
         val adapter = parent.adapter as ItemDecorationCondition<String>
 
-        outRect.top = view.context.resources.getDimensionPixelSize(R.dimen.chat_delimiter_messages)
+        outRect.top = spaceBetweenElements
 
         if(adapter.isDecorate(parent.getChildAdapterPosition(view))) {
             drawableLayer.textDate.let {
@@ -43,26 +44,21 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
         val right = parent.width - parent.paddingLeft
         val x = left + (right-left)/2f
 
+        parent.children.forEach { child ->
+            if (adapter.isDecorate(parent.getChildAdapterPosition(child))) {
+                drawableLayer.textDate.text = adapter.getDecorateParam(parent.getChildAdapterPosition(child))
+                val y = child.top.toFloat()-drawableLayer.textDate.height - drawableLayer.textDate.marginBottom
 
-        for(i in 0 until parent.childCount) {
-            val child = parent.getChildAt(i)
-            if(!adapter.isDecorate(parent.getChildAdapterPosition(child)))
-                continue
-
-
-            drawableLayer.textDate.text = adapter.getDecorateParam(parent.getChildAdapterPosition(child))
-            val y = child.top.toFloat()-drawableLayer.textDate.height - drawableLayer.textDate.marginBottom
-            drawView(c, x-drawableLayer.textDate.width/2, y)
+                // измеряем и отрисовываем TextView
+                measureView()
+                c.save()
+                c.translate(x-drawableLayer.textDate.width/2, y)
+                drawableLayer.root.draw(c)
+                c.restore()
+            }
         }
     }
 
-    private fun drawView(c: Canvas, x: Float, y: Float) {
-        measureView()
-        c.save()
-        c.translate(x, y)
-        drawableLayer.root.draw(c)
-        c.restore()
-    }
 
     private fun measureView() {
         drawableLayer.root.measure(widthSpec, heightSpec)

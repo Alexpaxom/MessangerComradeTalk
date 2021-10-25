@@ -3,11 +3,13 @@ package com.alexpaxom.homework_2.app.adapters.chathistory
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseDiffUtilAdapter
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseHolderFactory
 import com.alexpaxom.homework_2.app.adapters.decorators.ItemDecorationCondition
 import com.alexpaxom.homework_2.data.models.Message
 import com.alexpaxom.homework_2.data.models.Reaction
+import com.alexpaxom.homework_2.helpers.DateFormatter
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -79,13 +81,13 @@ class ChatHistoryAdapter(
     }
 
     override fun getDecorateParam(itemPosition: Int): String {
-        val sf = SimpleDateFormat(DATA_DELIMITER_FORMAT, Locale.ROOT)
-        return sf.format(diffUtil.currentList[itemPosition].datetime)
+        return DateFormatter.formatDate (
+            diffUtil.currentList[itemPosition].datetime, DateFormatter.DATA_DELIMITER_FORMAT
+        )
     }
 
     companion object {
         private const val MY_USER_ID = 99999
-        private const val DATA_DELIMITER_FORMAT = "E, dd MMM"
     }
 
     fun createDiffUtil(): AsyncListDiffer<Message> {

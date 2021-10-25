@@ -2,21 +2,17 @@ package com.alexpaxom.homework_2.app.adapters.chathistory
 
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseDiffUtilAdapter
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseHolderFactory
-import com.alexpaxom.homework_2.app.adapters.decorators.ItemDecorationCondition
 import com.alexpaxom.homework_2.data.models.Message
 import com.alexpaxom.homework_2.data.models.Reaction
 import com.alexpaxom.homework_2.helpers.DateFormatter
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class ChatHistoryAdapter(
     holdersFactory: BaseHolderFactory
-): BaseDiffUtilAdapter<Message>(holdersFactory), ItemDecorationCondition<String> {
+): BaseDiffUtilAdapter<Message>(holdersFactory) {
     private var addMessageClickListener: ((messagePos: Int) -> Unit)? = null
 
     init {
@@ -61,7 +57,7 @@ class ChatHistoryAdapter(
 
     }
 
-    override fun isDecorate(itemPosition: Int): Boolean {
+    fun isDecorate(itemPosition: Int): Boolean {
         if(itemPosition == 0)
             return true
 
@@ -74,7 +70,7 @@ class ChatHistoryAdapter(
         return diffDays > 1 || prevDate.get(Calendar.DAY_OF_MONTH) !=  date.get(Calendar.DAY_OF_MONTH)
     }
 
-    override fun getDecorateParam(itemPosition: Int): String {
+    fun getDecorateParam(itemPosition: Int): String {
         return DateFormatter.formatDate (
             diffUtil.currentList[itemPosition].datetime, DateFormatter.DATA_DELIMITER_FORMAT
         )

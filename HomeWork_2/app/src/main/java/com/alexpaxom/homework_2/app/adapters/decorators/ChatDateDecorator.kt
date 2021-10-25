@@ -9,6 +9,7 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.adapters.chathistory.ChatHistoryAdapter
 import com.alexpaxom.homework_2.databinding.DateDelimeterBinding
 
 class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoration(){
@@ -23,7 +24,7 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
         parent: RecyclerView,
         state: RecyclerView.State
     ) {
-        val adapter = parent.adapter as ItemDecorationCondition<String>
+        val adapter = parent.adapter as ChatHistoryAdapter
 
         outRect.top = spaceBetweenElements
 
@@ -38,7 +39,7 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         super.onDrawOver(c, parent, state)
-        val adapter = parent.adapter as ItemDecorationCondition<String>
+        val adapter = parent.adapter as ChatHistoryAdapter
 
         val left = parent.paddingLeft
         val right = parent.width - parent.paddingLeft

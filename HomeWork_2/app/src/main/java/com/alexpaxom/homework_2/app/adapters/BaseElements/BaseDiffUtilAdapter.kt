@@ -60,6 +60,10 @@ abstract class BaseDiffUtilAdapter<P: ListItem>(
         diffUtil.submitList(list)
     }
 
+    open fun removeAll() {
+        diffUtil.submitList(listOf())
+    }
+
     override fun onBindViewHolder(holder: BaseViewHolder<ListItem>, position: Int) {
         holder.bind(diffUtil.currentList[position])
     }

@@ -1,9 +1,7 @@
 package com.alexpaxom.homework_2.data.repositories
 
 import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.data.models.Message
-import com.alexpaxom.homework_2.data.models.Reaction
-import com.alexpaxom.homework_2.data.models.ReactionsGroup
+import com.alexpaxom.homework_2.data.models.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
@@ -68,6 +66,46 @@ class TestMessagesRepository {
 
     }
 
+    fun getChannels(countChannels: Int, maxCountTopics: Int = 0): List<ExpandedChanelGroup> {
+        val random = Random(100)
+
+
+        val channelsList: ArrayList<ExpandedChanelGroup> = arrayListOf()
+
+        var nextChannelId = 0
+
+        repeat(countChannels) {
+            val countTopics = random.nextInt(maxCountTopics)
+            val channelId = nextChannelId
+            channelsList.add(
+                ExpandedChanelGroup(
+                    channel = Channel(
+                        id = nextChannelId,
+                        name = "Channel $it"
+                    ),
+                    topics = getTopics(countTopics)
+                )
+            )
+            nextChannelId += countTopics + 1
+        }
+
+        return channelsList
+    }
+
+    fun getTopics(count: Int, channelId: Int = 0): List<Topic> {
+        val topicsResult = arrayListOf<Topic>()
+        repeat(count) {
+            topicsResult.add(
+                Topic(
+                    id = channelId + it,
+                    channelId = channelId,
+                    name = "Topic №${channelId + it}",
+                )
+            )
+        }
+        return topicsResult
+    }
+
     private fun reactionsList(maxCount: Int): ArrayList<Reaction>{
         val random = Random(100)
 
@@ -88,6 +126,8 @@ class TestMessagesRepository {
 
         return reactionList
     }
+
+
 
     companion object {
         private const val MY_USER_ID = 99999

@@ -14,5 +14,8 @@
     <color name="color_reaction_unselected">#1C1C1C</color>
     <color name="my_massage_text_background">#2A9D8F</color>
     <color name="delimiter_date_text_color">#999999</color>
+    <color name="ic_color_gray">#919191</color>
     <color name="bg_date_delimiter_color">#070707</color>
+    <color name="channels_list_divider_color">#282828</color>
+    <color name="green_topic_color">#2A9D8F</color>
 </resources>

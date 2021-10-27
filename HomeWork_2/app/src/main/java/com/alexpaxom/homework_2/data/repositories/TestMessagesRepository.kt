@@ -39,6 +39,24 @@ class TestMessagesRepository {
         "\uD83D\uDE11",
     )
 
+    fun getUsers(): List<User> {
+        val retUsersList = arrayListOf<User>()
+        for(user in names) {
+            val userParam = user.split(">")
+            retUsersList.add(
+                User(
+                    typeId = R.layout.user_info_item,
+                    id = userParam[0].hashCode(),
+                    name = userParam[0],
+                    email = "test@test.com",
+                    avatarUrl = userParam[1],
+                )
+            )
+        }
+
+        return retUsersList
+    }
+
     fun getMessages(count: Int): ArrayList<Message> {
         val ret = arrayListOf<Message>()
         val date = Date()

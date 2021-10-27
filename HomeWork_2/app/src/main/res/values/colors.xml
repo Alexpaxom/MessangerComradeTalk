@@ -18,4 +18,6 @@
     <color name="bg_date_delimiter_color">#070707</color>
     <color name="channels_list_divider_color">#282828</color>
     <color name="green_topic_color">#2A9D8F</color>
+    <color name="user_info_name_color">#FAFAFA</color>
+    <color name="user_info_email_color">#A2A2A2</color>
 </resources>

@@ -1,8 +1,11 @@
 package com.alexpaxom.homework_2.data.repositories
 
+import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.Message
 import com.alexpaxom.homework_2.data.models.Reaction
-import java.sql.Time
+import com.alexpaxom.homework_2.data.models.ReactionsGroup
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 class TestMessagesRepository {
@@ -32,9 +35,7 @@ class TestMessagesRepository {
         "\uD83D\uDE00",
         "\uD83D\uDE05",
         "\uD83E\uDD23",
-        "\uD83E\uDD23",
         "\uD83D\uDE07",
-        "\uD83E\uDD72",
         "\uD83D\uDE1B",
         "\uD83E\uDD2A",
         "\uD83D\uDE11",
@@ -42,22 +43,24 @@ class TestMessagesRepository {
 
     fun getMessages(count: Int): ArrayList<Message> {
         val ret = arrayListOf<Message>()
-
+        val date = Date()
+        date.time -= 1000*60*60*12*count
 
         repeat(count) {
             val user = names.random().split(">")
-
-
-
             ret.add (
                 Message(
+                    typeId = R.layout.message_item,
                     id = it,
                     userName = user[0],
+                    userId = user[0].hashCode(),
                     avatarUrl = user[1],
                     text = messages.random(),
-                    reactionList = reactionsList(100)
+                    datetime = Date(date.time),
+                    reactionsGroup = ReactionsGroup(reactionsList(100), MY_USER_ID)
                 )
             )
+            date.time += 1000*60*60*6
         }
 
 
@@ -84,6 +87,10 @@ class TestMessagesRepository {
         }
 
         return reactionList
+    }
+
+    companion object {
+        private const val MY_USER_ID = 99999
     }
 
 }

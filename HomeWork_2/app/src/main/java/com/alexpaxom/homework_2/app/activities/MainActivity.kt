@@ -2,10 +2,9 @@ package com.alexpaxom.homework_2.app.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.app.fragments.ChannelsFragment
-import com.alexpaxom.homework_2.app.fragments.ChatFragment
 import com.alexpaxom.homework_2.app.fragments.ProfileFragment
+import com.alexpaxom.homework_2.app.fragments.UsersFragment
+import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
 import com.alexpaxom.homework_2.databinding.ActivityMainBinding
 
 
@@ -19,11 +18,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         super.onCreate(savedInstanceState)
 
+        val user = TestMessagesRepository().getUsers().first()
+
         if(savedInstanceState == null) {
             supportFragmentManager.beginTransaction().replace(
                binding.mainFragmentContainer.id,
-                ChannelsFragment.newInstance(),
-                ChannelsFragment.FRAGMENT_ID
+                ProfileFragment.newInstance(user),
+                ProfileFragment.FRAGMENT_ID
             ).commit()
         }
     }

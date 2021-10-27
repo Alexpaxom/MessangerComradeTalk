@@ -10,4 +10,6 @@ class User(
     val name: String,
     val email: String,
     val avatarUrl: String,
+    val status: String = "",
+    val online: Boolean = false
 ): Parcelable, ListItem

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">HomeWork_2</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="massage_enter">Message</string>
+    <string name="profile_user_online_status">online</string>
+    <string name="profile_logout_btn_text">Log out</string>
 </resources>

@@ -23,16 +23,6 @@ class MainActivity : AppCompatActivity() {
 
         val user = TestMessagesRepository().getUsers().first()
 
-        if(savedInstanceState == null) {
-            // Выбираем пункт основного нижнего меню по умолчанию и открываем переходим
-            binding.mainBottomNavMenu.selectedItemId = R.id.bottom_menu_item_channels
-            navigate(
-                ChannelsFragment.newInstance(),
-                ChannelsFragment.FRAGMENT_ID
-            )
-        }
-
-
         // Обработчик нажатий основного нижнего меню
         binding.mainBottomNavMenu.setOnItemSelectedListener {
             when(it.itemId) {
@@ -41,31 +31,35 @@ class MainActivity : AppCompatActivity() {
                     ChannelsFragment.FRAGMENT_ID
                 )
 
-
                 R.id.bottom_menu_item_people -> navigate(
                     UsersFragment.newInstance(),
                     UsersFragment.FRAGMENT_ID
                 )
 
                 R.id.bottom_menu_item_profile -> navigate(
-                    ProfileFragment.newInstance(user),
+                    ProfileFragment.newInstance(user.id, true),
                     ProfileFragment.FRAGMENT_ID
                 )
             }
 
             true
         }
+
+        if(savedInstanceState == null) {
+            // Выбираем пункт основного нижнего меню по умолчанию и открываем переходим
+            binding.mainBottomNavMenu.selectedItemId = R.id.bottom_menu_item_channels
+        }
     }
 
-    fun navigate(fragment: Fragment, fragmentId: String, addToBackStack:Boolean = false) {
+    fun navigate(fragment: Fragment, backstackId: String, addToBackStack:Boolean = false) {
         val transition = supportFragmentManager.beginTransaction().replace(
             binding.mainFragmentContainer.id,
             fragment,
-            fragmentId
+            backstackId
         )
 
         if(addToBackStack) {
-            transition.addToBackStack(fragmentId)
+            transition.addToBackStack(backstackId)
         }
 
         transition.commit()

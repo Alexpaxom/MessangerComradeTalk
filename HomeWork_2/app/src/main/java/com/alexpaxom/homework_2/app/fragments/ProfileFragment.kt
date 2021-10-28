@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.User
+import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
 import com.alexpaxom.homework_2.databinding.FragmentProfileBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -27,15 +28,19 @@ class ProfileFragment : Fragment() {
 
         arguments?.let { bundle ->
             val glide = Glide.with(this)
-            bundle.getParcelable<User>(ARGUMENT_USER_PARAMETER)?.let { user ->
-                binding.userName.text = user.name
-                glide.load(user.avatarUrl)
-                    .transform(CenterCrop(),
-                        RoundedCorners(this.resources.getDimensionPixelOffset(R.dimen.profile_avatar_rounded_corners)))
-                    .into(binding.userAvatar)
-                binding.status.text = user.status
-                binding.onlineStatus.isVisible = user.online
-            }
+            val user = TestMessagesRepository().getUserById(bundle.getInt(ARGUMENT_USER_ID))
+            val ownerFlag = bundle.getBoolean(ARGUMENT_OWNER_PARAMETER)
+
+
+            binding.onlineStatus.isVisible = user.online
+            binding.userName.text = user.name
+            binding.status.text = user.status
+            binding.profileLogoutBtn.isVisible = ownerFlag
+
+            glide.load(user.avatarUrl)
+                .transform(CenterCrop(),
+                    RoundedCorners(this.resources.getDimensionPixelOffset(R.dimen.profile_avatar_rounded_corners)))
+                .into(binding.userAvatar)
         }
 
         return binding.root
@@ -47,16 +52,16 @@ class ProfileFragment : Fragment() {
     }
 
     companion object {
-        private const val ARGUMENT_USER_PARAMETER = "com.alexpaxom.ARGUMENT_USER_PARAMETER"
+        private const val ARGUMENT_USER_ID = "com.alexpaxom.ARGUMENT_USER_ID"
         private const val ARGUMENT_OWNER_PARAMETER = "com.alexpaxom.ARGUMENT_OWNER_PARAMETER"
         const val FRAGMENT_ID = "com.alexpaxom.PROFILE_FRAGMENT_ID"
 
         @JvmStatic
-        fun newInstance(user: User, ownerFlag: Boolean = false) =
+        fun newInstance(userId: Int, ownerFlag: Boolean = false) =
             ProfileFragment().apply {
 
                 val params = Bundle()
-                params.putParcelable(ARGUMENT_USER_PARAMETER, user)
+                params.putInt(ARGUMENT_USER_ID, userId)
                 params.putBoolean(ARGUMENT_OWNER_PARAMETER, ownerFlag)
 
                 arguments = params

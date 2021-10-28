@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.activities.MainActivity
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListAdapter
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListFactoryHolders
 import com.alexpaxom.homework_2.data.models.User
@@ -19,14 +20,11 @@ class UsersFragment : Fragment() {
 
     private var _binding: FragmentUsersBinding? = null
     private val binding get() = _binding!!
-    private val usersListFactoryHolders = UsersListFactoryHolders()
+    private val usersListFactoryHolders = UsersListFactoryHolders{ onUserClickListener(it) }
     private val usersListAdapter = UsersListAdapter(usersListFactoryHolders)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentUsersBinding.inflate(inflater, container, false)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         // Инициализация списка
         usersListAdapter.dataList = if(savedInstanceState == null)
@@ -34,6 +32,13 @@ class UsersFragment : Fragment() {
         else
             savedInstanceState.getParcelableArrayList<User>(SAVED_BUNDLE_USERS)?.toList() ?: listOf()
 
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentUsersBinding.inflate(inflater, container, false)
 
         binding.usersList.layoutManager = LinearLayoutManager(context)
         binding.usersList.adapter = usersListAdapter
@@ -58,6 +63,14 @@ class UsersFragment : Fragment() {
             savedListUsers
         )
         super.onSaveInstanceState(outState)
+    }
+
+    fun onUserClickListener(adapterPos: Int) {
+        (activity as MainActivity).navigate(
+            ProfileFragment.newInstance(usersListAdapter.dataList[adapterPos].id),
+            ProfileFragment.FRAGMENT_ID,
+            true
+        )
     }
 
     override fun onDestroy() {

@@ -25,12 +25,8 @@ class ChannelsFragment : Fragment() {
         .build()
     private val channelsListConcatAdapter = ConcatAdapter(concatAdapterConfig, arrayListOf<ChannelsListAdapter>())
 
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentChannelsBinding.inflate(inflater, container, false)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         // Иннициализация адаптера и восстановление его состояния
         val channelsListHoldersFactory = ChannelsListHoldersFactory()
@@ -46,6 +42,13 @@ class ChannelsFragment : Fragment() {
             adapter.addItem(expandableChannel)
             channelsListConcatAdapter.addAdapter(adapter)
         }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentChannelsBinding.inflate(inflater, container, false)
 
 
         binding.channelsList.layoutManager = LinearLayoutManager(context)

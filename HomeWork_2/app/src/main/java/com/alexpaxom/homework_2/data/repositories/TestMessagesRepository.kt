@@ -39,6 +39,27 @@ class TestMessagesRepository {
         "\uD83D\uDE11",
     )
 
+    fun getUserById(userId: Int): User {
+        for(user in names) {
+
+            if(user.hashCode() == userId) {
+                val userParam = user.split(">")
+                return User(
+                    typeId = R.layout.user_info_item,
+                    id = user.hashCode(),
+                    name = userParam[0],
+                    email = "test@test.com",
+                    avatarUrl = userParam[1],
+                    status = "On meeting",
+                    online = true
+                )
+            }
+
+        }
+
+        error("cant find user with id $userId")
+    }
+
     fun getUsers(): List<User> {
         val retUsersList = arrayListOf<User>()
         for(user in names) {
@@ -46,7 +67,7 @@ class TestMessagesRepository {
             retUsersList.add(
                 User(
                     typeId = R.layout.user_info_item,
-                    id = userParam[0].hashCode(),
+                    id = user.hashCode(),
                     name = userParam[0],
                     email = "test@test.com",
                     avatarUrl = userParam[1],

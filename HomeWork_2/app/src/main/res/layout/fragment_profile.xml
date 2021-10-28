@@ -1,53 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/main_background"
-    android:id="@+id/profile_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".app.fragments.ProfileFragment" >
+    android:fillViewport="true">
 
-    <ImageView
-        android:id="@+id/user_avatar"
-        android:layout_width="185dp"
-        android:layout_height="185dp"
-        android:layout_marginBottom="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/user_name"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:src="@tools:sample/avatars" />
-
-    <TextView
-        android:id="@+id/user_name"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/profile_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="Иванов Иван"
-        android:textSize="32sp"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_weight="1.0"
+        android:background="@color/main_background"
+        tools:context=".app.fragments.ProfileFragment">
 
-    <LinearLayout
-        android:id="@+id/status_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_name">
+        <ImageView
+            android:id="@+id/user_avatar"
+            android:layout_width="185dp"
+            android:layout_height="185dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/user_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            tools:src="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Иванов Иван" />
 
         <TextView
             android:id="@+id/status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
             android:padding="5dp"
             android:textColor="@color/profile_status_color"
-            tools:text="In a meeting"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@+id/online_status"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/user_name"
+            tools:text="In a meeting" />
 
         <TextView
             android:id="@+id/online_status"
@@ -56,21 +61,23 @@
             android:padding="5dp"
             android:text="@string/profile_user_online_status"
             android:textColor="@color/profile_online_status_color"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            app:layout_constraintBaseline_toBaselineOf="@id/status"
+            app:layout_constraintEnd_toEndOf="@+id/user_name" />
 
-    </LinearLayout>
+        <Button
+            android:id="@+id/profile_logout_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/profile_logout_btn_back_color"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="15dp"
+            android:text="@string/profile_logout_btn_text"
+            android:textColor="@color/profile_logout_btn_text_color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/status" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
-        android:id="@+id/profile_logout_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingVertical="15dp"
-        android:paddingHorizontal="30dp"
-        android:text="@string/profile_logout_btn_text"
-        android:backgroundTint="@color/profile_logout_btn_back_color"
-        android:textColor="@color/profile_logout_btn_text_color"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/status_layout" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

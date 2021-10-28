@@ -2,6 +2,9 @@ package com.alexpaxom.homework_2.app.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.fragment.app.Fragment
+import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.fragments.ChannelsFragment
 import com.alexpaxom.homework_2.app.fragments.ProfileFragment
 import com.alexpaxom.homework_2.app.fragments.UsersFragment
 import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
@@ -21,11 +24,50 @@ class MainActivity : AppCompatActivity() {
         val user = TestMessagesRepository().getUsers().first()
 
         if(savedInstanceState == null) {
-            supportFragmentManager.beginTransaction().replace(
-               binding.mainFragmentContainer.id,
-                ProfileFragment.newInstance(user),
-                ProfileFragment.FRAGMENT_ID
-            ).commit()
+            // Выбираем пункт основного нижнего меню по умолчанию и открываем переходим
+            binding.mainBottomNavMenu.selectedItemId = R.id.bottom_menu_item_channels
+            navigate(
+                ChannelsFragment.newInstance(),
+                ChannelsFragment.FRAGMENT_ID
+            )
         }
+
+
+        // Обработчик нажатий основного нижнего меню
+        binding.mainBottomNavMenu.setOnItemSelectedListener {
+            when(it.itemId) {
+                R.id.bottom_menu_item_channels -> navigate(
+                    ChannelsFragment.newInstance(),
+                    ChannelsFragment.FRAGMENT_ID
+                )
+
+
+                R.id.bottom_menu_item_people -> navigate(
+                    UsersFragment.newInstance(),
+                    UsersFragment.FRAGMENT_ID
+                )
+
+                R.id.bottom_menu_item_profile -> navigate(
+                    ProfileFragment.newInstance(user),
+                    ProfileFragment.FRAGMENT_ID
+                )
+            }
+
+            true
+        }
+    }
+
+    fun navigate(fragment: Fragment, fragmentId: String, addToBackStack:Boolean = false) {
+        val transition = supportFragmentManager.beginTransaction().replace(
+            binding.mainFragmentContainer.id,
+            fragment,
+            fragmentId
+        )
+
+        if(addToBackStack) {
+            transition.addToBackStack(fragmentId)
+        }
+
+        transition.commit()
     }
 }

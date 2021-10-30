@@ -6,6 +6,7 @@
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/Theme.HomeWork_2"
     android:background="@color/main_background"
     tools:context=".app.activities.MainActivity">
 

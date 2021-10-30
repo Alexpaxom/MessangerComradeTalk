@@ -5,7 +5,15 @@
     android:id="@+id/channels_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:background="@color/main_background"
     tools:context=".app.fragments.ChannelsFragment">
+
+    <include
+        android:id="@+id/search_channels"
+        layout="@layout/fragment_search"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/channels_list"
@@ -14,6 +22,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_channels"
         tools:listitem="@layout/channel_info_item" />
 </androidx.constraintlayout.widget.ConstraintLayout>

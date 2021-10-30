@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1.0"
-        android:background="@color/main_background"
+        tools:background="@color/main_background"
         tools:context=".app.fragments.ProfileFragment">
 
         <ImageView

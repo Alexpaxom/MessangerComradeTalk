@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.app.activities.MainActivity
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListAdapter
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListFactoryHolders
 import com.alexpaxom.homework_2.data.models.User
@@ -66,11 +65,14 @@ class UsersFragment : Fragment() {
     }
 
     fun onUserClickListener(adapterPos: Int) {
-        (activity as MainActivity).navigate(
+
+        parentFragmentManager.beginTransaction().replace(
+            R.id.wrap_container,
             ProfileFragment.newInstance(usersListAdapter.dataList[adapterPos].id),
-            ProfileFragment.FRAGMENT_ID,
-            true
+            ProfileFragment.FRAGMENT_ID
         )
+            .addToBackStack(ProfileFragment.FRAGMENT_ID)
+            .commit()
     }
 
     override fun onDestroy() {

@@ -5,7 +5,7 @@
     android:id="@+id/chat_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="15dp"
+    android:paddingHorizontal="15dp"
     tools:background="@color/main_background"
     tools:context=".app.fragments.ChatFragment">
 
@@ -13,7 +13,6 @@
         android:id="@+id/chating_history"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toTopOf="@+id/massage_enter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

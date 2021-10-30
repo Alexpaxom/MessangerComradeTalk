@@ -6,8 +6,8 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class Topic(
     override val typeId: Int = 0,
-    val id: Int,
+    override val id: Int,
     val channelId: Int,
     val name: String,
     val countMessages: Int = 0,
-): Parcelable, ListItem
+): Parcelable, ExpandedChannelItem

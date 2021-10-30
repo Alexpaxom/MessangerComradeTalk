@@ -1,6 +1,7 @@
 package com.alexpaxom.homework_2.app.fragments
 
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelExpandAdapterWrapper
 import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListAdapter
 import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListHoldersFactory
 import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
@@ -20,21 +22,21 @@ class ChannelsFragment : Fragment() {
 
     private var _binding: FragmentChannelsBinding? = null
     private val binding get() = _binding!!
-    private val concatAdapterConfig = ConcatAdapter.Config.Builder()
-        .setIsolateViewTypes(false)
-        .build()
-    private val channelsListConcatAdapter = ConcatAdapter(concatAdapterConfig, arrayListOf<ChannelsListAdapter>())
+
+    val channelsListHoldersFactory = ChannelsListHoldersFactory { _ ->
+        parentFragmentManager.beginTransaction().replace(
+            R.id.wrap_container, ChatFragment.newInstance(), ChatFragment.FRAGMENT_ID
+        )
+            .addToBackStack(ChatFragment.FRAGMENT_ID).commit()
+    }
+
+    private val adapterWrapper = ChannelExpandAdapterWrapper(channelsListHoldersFactory)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Иннициализация адаптера и восстановление его состояния
-        val channelsListHoldersFactory = ChannelsListHoldersFactory { _ ->
-            parentFragmentManager.beginTransaction().replace(
-                R.id.wrap_container, ChatFragment.newInstance(), ChatFragment.FRAGMENT_ID
-            )
-                .addToBackStack(ChatFragment.FRAGMENT_ID).commit()
-        }
+
 
         val expandableListChannels = if(savedInstanceState == null)
                 TestMessagesRepository().getChannels(10, 100)
@@ -42,11 +44,7 @@ class ChannelsFragment : Fragment() {
                 savedInstanceState.getParcelableArrayList<ExpandedChanelGroup>(SAVED_BUNDLE_CHANNELS)
                     ?.toList() ?: listOf()
 
-        for (expandableChannel in expandableListChannels) {
-            val adapter = ChannelsListAdapter(channelsListHoldersFactory)
-            adapter.addItem(expandableChannel)
-            channelsListConcatAdapter.addAdapter(adapter)
-        }
+        adapterWrapper.dataList = expandableListChannels
     }
 
     override fun onCreateView(
@@ -57,7 +55,7 @@ class ChannelsFragment : Fragment() {
 
 
         binding.channelsList.layoutManager = LinearLayoutManager(context)
-        binding.channelsList.adapter = channelsListConcatAdapter
+        binding.channelsList.adapter = adapterWrapper.innerAdapter
 
         // Устанавливаем декоратор
         val channelsDividerItemDecoration = DividerItemDecoration(
@@ -74,16 +72,10 @@ class ChannelsFragment : Fragment() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        val listForSave = arrayListOf<ExpandedChanelGroup>()
-        for(adapter in channelsListConcatAdapter.adapters) {
-            when(adapter) {
-                is ChannelsListAdapter -> listForSave.add(adapter.dataList.first())
-                else -> error("Wrong type adapter expected ChannelsListAdapter")
-            }
-
-        }
-
-        outState.putParcelableArrayList(SAVED_BUNDLE_CHANNELS, listForSave)
+        outState.putParcelableArrayList(
+            SAVED_BUNDLE_CHANNELS,
+            arrayListOf<ExpandedChanelGroup>().apply { addAll(adapterWrapper.dataList) }
+        )
 
         super.onSaveInstanceState(outState)
     }

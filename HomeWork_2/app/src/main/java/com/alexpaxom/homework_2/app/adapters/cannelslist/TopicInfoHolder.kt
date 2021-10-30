@@ -5,8 +5,15 @@ import com.alexpaxom.homework_2.data.models.Topic
 import com.alexpaxom.homework_2.databinding.TopicInfoItemBinding
 
 class TopicInfoHolder(
-    val topicInfoItemBinding: TopicInfoItemBinding
+    val topicInfoItemBinding: TopicInfoItemBinding,
+    val onTopicClickListener: (topicPos: Int) -> Unit
 ): BaseViewHolder<Topic>(topicInfoItemBinding) {
+
+    init {
+        itemView.setOnClickListener {
+            onTopicClickListener(bindingAdapterPosition)
+        }
+    }
 
     override fun bind(model: Topic) {
         topicInfoItemBinding.topicInfoName.text = model.name

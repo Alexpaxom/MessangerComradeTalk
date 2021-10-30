@@ -8,7 +8,9 @@ import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseViewHolder
 import com.alexpaxom.homework_2.databinding.ChannelInfoItemBinding
 import com.alexpaxom.homework_2.databinding.TopicInfoItemBinding
 
-class ChannelsListHoldersFactory: BaseHolderFactory() {
+class ChannelsListHoldersFactory(
+    val onTopicClickListener: (topicPos: Int) -> Unit
+): BaseHolderFactory() {
     override fun createViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> {
         return when(viewType) {
             R.layout.topic_info_item -> TopicInfoHolder(
@@ -16,7 +18,8 @@ class ChannelsListHoldersFactory: BaseHolderFactory() {
                     LayoutInflater.from(viewGroup.context),
                     viewGroup,
                     false
-                )
+                ),
+                onTopicClickListener
             )
             R.layout.channel_info_item -> ChannelInfoHolder(
                 ChannelInfoItemBinding.inflate(

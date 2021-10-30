@@ -29,7 +29,12 @@ class ChannelsFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         // Иннициализация адаптера и восстановление его состояния
-        val channelsListHoldersFactory = ChannelsListHoldersFactory()
+        val channelsListHoldersFactory = ChannelsListHoldersFactory { _ ->
+            parentFragmentManager.beginTransaction().replace(
+                R.id.wrap_container, ChatFragment.newInstance(), ChatFragment.FRAGMENT_ID
+            )
+                .addToBackStack(ChatFragment.FRAGMENT_ID).commit()
+        }
 
         val expandableListChannels = if(savedInstanceState == null)
                 TestMessagesRepository().getChannels(10, 100)

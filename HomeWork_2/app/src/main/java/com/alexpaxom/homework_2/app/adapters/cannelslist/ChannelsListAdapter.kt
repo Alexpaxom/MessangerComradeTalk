@@ -6,10 +6,8 @@ import androidx.recyclerview.widget.DiffUtil
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseDiffUtilAdapter
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseViewHolder
-import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
 import com.alexpaxom.homework_2.data.models.ExpandedChannelItem
 import com.alexpaxom.homework_2.data.models.ListItem
-import com.alexpaxom.homework_2.data.models.Message
 
 class ChannelsListAdapter(
     val channelsListHoldersFactory: ChannelsListHoldersFactory,
@@ -56,7 +54,7 @@ class ChannelsListAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if(position == 0)
+        return if(dataList[position].typeId == R.layout.channel_info_item)
             HEADER_TYPE
         else
             LIST_TYPE
@@ -71,7 +69,7 @@ class ChannelsListAdapter(
 
     class ExpandedChannelItemItemsDiffUtil: DiffUtil.ItemCallback<ExpandedChannelItem>() {
         override fun areItemsTheSame(oldItem: ExpandedChannelItem, newItem: ExpandedChannelItem): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.id == newItem.id && oldItem.typeId == newItem.typeId
         }
 
         override fun areContentsTheSame(oldItem: ExpandedChannelItem, newItem: ExpandedChannelItem): Boolean {

@@ -1,6 +1,6 @@
 package com.alexpaxom.homework_2.data.models
 
 sealed interface ExpandedChannelItem: ListItem {
-    val id: Int
+    val id: Int // вынесен сюда для diffutil
 }
 

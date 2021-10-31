@@ -121,6 +121,7 @@ class TestMessagesRepository {
             channelsList.add(
                 ExpandedChanelGroup(
                     channel = Channel(
+                        typeId = R.layout.channel_info_item,
                         id = nextChannelId,
                         name = "Channel $it"
                     ),
@@ -138,6 +139,7 @@ class TestMessagesRepository {
         repeat(count) {
             topicsResult.add(
                 Topic(
+                    typeId = R.layout.topic_info_item,
                     id = channelId + it,
                     channelId = channelId,
                     name = "Topic №${channelId + it}",

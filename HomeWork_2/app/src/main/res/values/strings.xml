@@ -4,4 +4,6 @@
     <string name="massage_enter">Message</string>
     <string name="profile_user_online_status">online</string>
     <string name="profile_logout_btn_text">Log out</string>
+    <string name="channels_tab_subscribed">Subscribed</string>
+    <string name="channels_tab_all_streams">All Streams</string>
 </resources>

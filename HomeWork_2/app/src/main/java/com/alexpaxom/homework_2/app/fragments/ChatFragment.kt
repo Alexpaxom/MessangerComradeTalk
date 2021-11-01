@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.chathistory.ChatHistoryAdapter
@@ -20,7 +21,7 @@ import com.alexpaxom.homework_2.databinding.FragmentChatBinding
 import java.util.*
 
 
-class ChatFragment : Fragment() {
+class ChatFragment : DialogFragment() {
 
     private var _binding: FragmentChatBinding? = null
     private val binding get() = _binding!!
@@ -155,6 +156,11 @@ class ChatFragment : Fragment() {
             )
         }
     }
+
+    override fun getTheme(): Int {
+        return R.style.Theme_DialogFragment
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()

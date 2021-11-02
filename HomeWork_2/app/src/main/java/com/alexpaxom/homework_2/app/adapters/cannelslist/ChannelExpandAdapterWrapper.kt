@@ -33,6 +33,10 @@ class ChannelExpandAdapterWrapper(
             return retDataList
         }
         set(value) {
+            innerAdapter.adapters.forEach {
+                innerAdapter.removeAdapter(it)
+            }
+
             for (expandableChannel in value) {
                 val adapter = ChannelsListAdapter(channelsListHoldersFactory)
                 adapter.dataList = convertFromExpandedGroup(expandableChannel)

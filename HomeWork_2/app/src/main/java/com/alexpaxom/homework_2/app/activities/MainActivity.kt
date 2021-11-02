@@ -7,7 +7,7 @@ import com.alexpaxom.homework_2.app.fragments.ChannelsFragment
 import com.alexpaxom.homework_2.app.fragments.FragmentWrapperContainer
 import com.alexpaxom.homework_2.app.fragments.ProfileFragment
 import com.alexpaxom.homework_2.app.fragments.UsersFragment
-import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
+import com.alexpaxom.homework_2.data.repositories.TestRepositoryImpl
 import com.alexpaxom.homework_2.databinding.ActivityMainBinding
 
 
@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
 
         if(savedInstanceState == null) {
-            val userId = TestMessagesRepository().getUsers().first().id
+            val userId = TestRepositoryImpl().getUsers().first().id
 
             val channelFragment = FragmentWrapperContainer.newInstance(ChannelsFragment.FRAGMENT_ID)
             val usersFragment = FragmentWrapperContainer.newInstance(UsersFragment.FRAGMENT_ID)

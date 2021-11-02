@@ -2,11 +2,12 @@ package com.alexpaxom.homework_2.data.repositories
 
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.*
+import io.reactivex.Single
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
 
-class TestMessagesRepository {
+class TestRepositoryImpl {
 
     private val names = listOf(
         "Иванов Сергей>https://ichef.bbci.co.uk/news/640/cpsprodpb/14A82/production/_116301648_gettyimages-1071204136.jpg",
@@ -107,7 +108,7 @@ class TestMessagesRepository {
 
     }
 
-    fun getChannels(countChannels: Int, maxCountTopics: Int = 0): List<ExpandedChanelGroup> {
+    fun getChannels(countChannels: Int, maxCountTopics: Int = 0): Single<List<ExpandedChanelGroup>> {
         val random = Random(100)
 
 
@@ -117,7 +118,6 @@ class TestMessagesRepository {
 
         repeat(countChannels) {
             val countTopics = random.nextInt(maxCountTopics)
-            val channelId = nextChannelId
             channelsList.add(
                 ExpandedChanelGroup(
                     channel = Channel(
@@ -131,7 +131,7 @@ class TestMessagesRepository {
             nextChannelId += countTopics + 1
         }
 
-        return channelsList
+        return Single.just(channelsList)
     }
 
     fun getTopics(count: Int, channelId: Int = 0): List<Topic> {

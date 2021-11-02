@@ -7,8 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.data.models.User
-import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
+import com.alexpaxom.homework_2.data.repositories.TestRepositoryImpl
 import com.alexpaxom.homework_2.databinding.FragmentProfileBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -28,7 +27,7 @@ class ProfileFragment : Fragment() {
 
         arguments?.let { bundle ->
             val glide = Glide.with(this)
-            val user = TestMessagesRepository().getUserById(bundle.getInt(ARGUMENT_USER_ID))
+            val user = TestRepositoryImpl().getUserById(bundle.getInt(ARGUMENT_USER_ID))
             val ownerFlag = bundle.getBoolean(ARGUMENT_OWNER_PARAMETER)
 
 

@@ -16,7 +16,7 @@ import com.alexpaxom.homework_2.customview.EmojiReactionCounter
 import com.alexpaxom.homework_2.data.models.Message
 import com.alexpaxom.homework_2.data.models.Reaction
 import com.alexpaxom.homework_2.data.models.ReactionsGroup
-import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
+import com.alexpaxom.homework_2.data.repositories.TestRepositoryImpl
 import com.alexpaxom.homework_2.databinding.FragmentChatBinding
 import java.util.*
 
@@ -44,7 +44,7 @@ class ChatFragment : DialogFragment() {
         // Обрабочики нажатий на элементы списка сообщений
 
         if(savedInstanceState == null) {
-            chatHistoryAdapter.dataList = TestMessagesRepository().getMessages(30)
+            chatHistoryAdapter.dataList = TestRepositoryImpl().getMessages(30)
         }
         else {
 

@@ -12,7 +12,7 @@ import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListAdapter
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListFactoryHolders
 import com.alexpaxom.homework_2.data.models.User
-import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
+import com.alexpaxom.homework_2.data.repositories.TestRepositoryImpl
 import com.alexpaxom.homework_2.databinding.FragmentUsersBinding
 
 class UsersFragment : Fragment() {
@@ -27,7 +27,7 @@ class UsersFragment : Fragment() {
 
         // Инициализация списка
         usersListAdapter.dataList = if(savedInstanceState == null)
-            TestMessagesRepository().getUsers()
+            TestRepositoryImpl().getUsers()
         else
             savedInstanceState.getParcelableArrayList<User>(SAVED_BUNDLE_USERS)?.toList() ?: listOf()
 

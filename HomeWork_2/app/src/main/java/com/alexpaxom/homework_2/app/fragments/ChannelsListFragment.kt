@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,11 +23,12 @@ class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>() 
         CnannelsListFragmentBinding.inflate(layoutInflater)
     }
 
-    val channelsListHoldersFactory = ChannelsListHoldersFactory { _ ->
+    private val channelsListHoldersFactory = ChannelsListHoldersFactory {
 
         val chatFragment = ChatFragment.newInstance()
         chatFragment.show(parentFragmentManager, ChatFragment.FRAGMENT_ID)
     }
+
 
     private val adapterWrapper = ChannelExpandAdapterWrapper(channelsListHoldersFactory)
 
@@ -57,7 +59,10 @@ class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>() 
             RecyclerView.VERTICAL
         )
 
-        channelsDividerItemDecoration.setDrawable(resources.getDrawable(R.drawable.channels_list_decoration_divider))
+        channelsDividerItemDecoration.setDrawable(
+            ResourcesCompat.getDrawable(resources, R.drawable.channels_list_decoration_divider, activity?.theme) ?:
+            error("Not found R.drawable.channels_list_decoration_divider")
+        )
 
         binding.channelsList.addItemDecoration(channelsDividerItemDecoration)
 

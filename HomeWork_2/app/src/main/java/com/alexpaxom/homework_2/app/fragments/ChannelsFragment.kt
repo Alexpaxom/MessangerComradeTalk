@@ -10,17 +10,17 @@ import com.alexpaxom.homework_2.app.adapters.ChannelsTabAdapter
 import com.alexpaxom.homework_2.databinding.FragmentChannelsBinding
 import com.google.android.material.tabs.TabLayoutMediator
 
-class ChannelsFragment: Fragment() {
-    private var _binding: FragmentChannelsBinding? = null
-    private val binding get() = _binding!!
+class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
+
+    override var _binding: Lazy<FragmentChannelsBinding>? = lazy {
+        FragmentChannelsBinding.inflate(layoutInflater)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentChannelsBinding.inflate(inflater, container, false)
-
         val channelsTabAdapter = ChannelsTabAdapter(
             fragment = this,
             tabsNames = mapOf(
@@ -46,4 +46,6 @@ class ChannelsFragment: Fragment() {
         @JvmStatic
         fun newInstance() = ChannelsFragment()
     }
+
+
 }

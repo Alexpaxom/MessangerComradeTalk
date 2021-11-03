@@ -14,11 +14,13 @@ import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListHoldersFact
 import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
 import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
 import com.alexpaxom.homework_2.databinding.CnannelsListFragmentBinding
+import com.alexpaxom.homework_2.databinding.FragmentChannelsBinding
 
-class ChannelsListFragment() : Fragment() {
+class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>() {
 
-    private var _binding: CnannelsListFragmentBinding? = null
-    private val binding get() = _binding!!
+    override var _binding: Lazy<CnannelsListFragmentBinding>? = lazy {
+        CnannelsListFragmentBinding.inflate(layoutInflater)
+    }
 
     val channelsListHoldersFactory = ChannelsListHoldersFactory { _ ->
 
@@ -32,8 +34,6 @@ class ChannelsListFragment() : Fragment() {
         super.onCreate(savedInstanceState)
 
         // Иннициализация адаптера и восстановление его состояния
-
-
         val expandableListChannels = if(savedInstanceState == null)
                 TestMessagesRepository().getChannels(10, 100)
             else
@@ -47,7 +47,6 @@ class ChannelsListFragment() : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = CnannelsListFragmentBinding.inflate(inflater, container, false)
 
         binding.channelsList.layoutManager = LinearLayoutManager(context)
         binding.channelsList.adapter = adapterWrapper.innerAdapter
@@ -62,7 +61,6 @@ class ChannelsListFragment() : Fragment() {
 
         binding.channelsList.addItemDecoration(channelsDividerItemDecoration)
 
-
         return binding.root
     }
 
@@ -75,11 +73,6 @@ class ChannelsListFragment() : Fragment() {
         super.onSaveInstanceState(outState)
     }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
 
     companion object {
         private const val SAVED_BUNDLE_CHANNELS = "com.alexpaxom.SAVED_BUNDLE_CHANNELS"

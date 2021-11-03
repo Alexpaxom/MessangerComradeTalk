@@ -15,10 +15,10 @@ import com.alexpaxom.homework_2.data.models.User
 import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
 import com.alexpaxom.homework_2.databinding.FragmentUsersBinding
 
-class UsersFragment : Fragment() {
-
-    private var _binding: FragmentUsersBinding? = null
-    private val binding get() = _binding!!
+class UsersFragment : ViewBindingFragment<FragmentUsersBinding>() {
+    override var _binding: Lazy<FragmentUsersBinding>? = lazy {
+        FragmentUsersBinding.inflate(layoutInflater)
+    }
     private val usersListFactoryHolders = UsersListFactoryHolders{ onUserClickListener(it) }
     private val usersListAdapter = UsersListAdapter(usersListFactoryHolders)
 
@@ -37,7 +37,6 @@ class UsersFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentUsersBinding.inflate(inflater, container, false)
 
         binding.usersList.layoutManager = LinearLayoutManager(context)
         binding.usersList.adapter = usersListAdapter
@@ -75,10 +74,6 @@ class UsersFragment : Fragment() {
             .commit()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
 
     companion object {
         private const val SAVED_BUNDLE_USERS = "com.alexpaxom.SAVED_BUNDLE_USERS"

@@ -9,7 +9,7 @@ import com.alexpaxom.homework_2.databinding.ChannelInfoItemBinding
 import com.alexpaxom.homework_2.databinding.TopicInfoItemBinding
 
 class ChannelsListHoldersFactory(
-    val onTopicClickListener: (topicPos: Int) -> Unit
+    private val onMessageClickListener: (topicPos: Int) -> Unit
 ): BaseHolderFactory() {
     override fun createViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> {
         return when(viewType) {
@@ -19,14 +19,15 @@ class ChannelsListHoldersFactory(
                     viewGroup,
                     false
                 ),
-                onTopicClickListener
+                onMessageClickListener
             )
             R.layout.channel_info_item -> ChannelInfoHolder(
                 ChannelInfoItemBinding.inflate(
                     LayoutInflater.from(viewGroup.context),
                     viewGroup,
                     false
-                )
+                ),
+                onMessageClickListener
             )
             else -> error("Bad type channel list holder")
         }

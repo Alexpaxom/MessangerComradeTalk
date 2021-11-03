@@ -1,7 +1,6 @@
 package com.alexpaxom.homework_2.app.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,12 +9,11 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelExpandAdapterWrapper
+import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListAdapter
 import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListHoldersFactory
 import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
 import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
 import com.alexpaxom.homework_2.databinding.CnannelsListFragmentBinding
-import com.alexpaxom.homework_2.databinding.FragmentChannelsBinding
 
 class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>() {
 
@@ -30,7 +28,7 @@ class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>() 
     }
 
 
-    private val adapterWrapper = ChannelExpandAdapterWrapper(channelsListHoldersFactory)
+    private val channelsListAdapter = ChannelsListAdapter(channelsListHoldersFactory)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +40,7 @@ class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>() 
                 savedInstanceState.getParcelableArrayList<ExpandedChanelGroup>(SAVED_BUNDLE_CHANNELS)
                     ?.toList() ?: listOf()
 
-        adapterWrapper.dataList = expandableListChannels
+        channelsListAdapter.dataList = expandableListChannels
     }
 
     override fun onCreateView(
@@ -51,7 +49,7 @@ class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>() 
     ): View {
 
         binding.channelsList.layoutManager = LinearLayoutManager(context)
-        binding.channelsList.adapter = adapterWrapper.innerAdapter
+        binding.channelsList.adapter = channelsListAdapter
 
         // Устанавливаем декоратор
         val channelsDividerItemDecoration = DividerItemDecoration(
@@ -72,7 +70,7 @@ class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>() 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putParcelableArrayList(
             SAVED_BUNDLE_CHANNELS,
-            arrayListOf<ExpandedChanelGroup>().apply { addAll(adapterWrapper.dataList) }
+            arrayListOf<ExpandedChanelGroup>().apply { addAll(channelsListAdapter.dataList) }
         )
 
         super.onSaveInstanceState(outState)

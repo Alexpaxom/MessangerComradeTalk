@@ -1,71 +1,76 @@
 package com.alexpaxom.homework_2.app.adapters.cannelslist
 
-import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
-import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseDiffUtilAdapter
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseViewHolder
+import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
 import com.alexpaxom.homework_2.data.models.ExpandedChannelItem
 import com.alexpaxom.homework_2.data.models.ListItem
 
 class ChannelsListAdapter(
-    val channelsListHoldersFactory: ChannelsListHoldersFactory,
-): BaseDiffUtilAdapter<ExpandedChannelItem>(channelsListHoldersFactory) {
+    channelsListHoldersFactory: ChannelsListHoldersFactory,
+): BaseDiffUtilAdapter<ExpandedChanelGroup>(channelsListHoldersFactory) {
 
-    var isExpanded = false
+    override var dataList: List<ExpandedChanelGroup> = listOf()
+        set(list) {
+            field = list
+            innerList = list.flatMap { expandableChannel ->
+                expandableChannel.toExpandableItemList(expandableChannel.channel.isExpanded)
+            }
+        }
 
-    init {
-        diffUtil = AsyncListDiffer(this, ExpandedChannelItemItemsDiffUtil())
-    }
+    internal var innerList: List<ExpandedChannelItem>
+        get() = itemsDiffUtil.currentList
+        set(value) {
+            itemsDiffUtil.submitList(value)
+        }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<ListItem> {
-        return channelsListHoldersFactory(
-            parent,
-            if(viewType == HEADER_TYPE) R.layout.channel_info_item else R.layout.topic_info_item
-        )
-    }
+    var itemsDiffUtil: AsyncListDiffer<ExpandedChannelItem> = AsyncListDiffer(this, ExpandedChannelItemItemsDiffUtil())
+
 
     override fun onBindViewHolder(holder: BaseViewHolder<ListItem>, position: Int) {
-
-        when(getItemViewType(position)){
-            HEADER_TYPE-> {
-                holder.bind(dataList[0])
-                onHeaderClick(holder)
-            }
-            LIST_TYPE->holder.bind(dataList[position])
-        }
+        holder.bind(innerList[position])
     }
 
-    private fun onHeaderClick(holder: BaseViewHolder<ListItem>) {
-
-        holder.itemView.setOnClickListener {
-            isExpanded = !isExpanded
-
-            if (isExpanded) {
-                notifyItemRangeInserted(1, dataList.size-1)
-                notifyItemChanged(0)
-            } else {
-                notifyItemRangeRemoved(1, dataList.size-1)
-                notifyItemChanged(0)
-            }
-        }
-
-    }
 
     override fun getItemViewType(position: Int): Int {
-        return if(dataList[position].typeId == R.layout.channel_info_item)
-            HEADER_TYPE
-        else
-            LIST_TYPE
+        return innerList[position].typeId
     }
 
     override fun getItemCount(): Int {
-        return if(isExpanded)
-            dataList.size-1 // Header and inner list items
-        else
-            1 // Only header
+        return innerList.size
     }
+
+
+    override fun updateItem(pos: Int, newItem: ExpandedChanelGroup) {
+        val list: MutableList<ExpandedChanelGroup> = mutableListOf()
+        list.addAll(dataList)
+        list[pos] = newItem
+
+        dataList = list
+    }
+
+    override fun addItem(newItem: ExpandedChanelGroup) {
+        val list: MutableList<ExpandedChanelGroup> = mutableListOf()
+        list.addAll(dataList)
+        list.add(newItem)
+
+        dataList = list
+    }
+
+    override fun removeItem(pos: Int) {
+        val list: MutableList<ExpandedChanelGroup> = mutableListOf()
+        list.addAll(dataList)
+        list.removeAt(pos)
+
+        dataList = list
+    }
+
+    override fun removeAll() {
+        dataList = listOf()
+    }
+
 
     class ExpandedChannelItemItemsDiffUtil: DiffUtil.ItemCallback<ExpandedChannelItem>() {
         override fun areItemsTheSame(oldItem: ExpandedChannelItem, newItem: ExpandedChannelItem): Boolean {
@@ -76,11 +81,6 @@ class ChannelsListAdapter(
             return oldItem == newItem
         }
 
-    }
-
-    companion object {
-        private const val HEADER_TYPE = 0
-        private const val LIST_TYPE = 1
     }
 
 }

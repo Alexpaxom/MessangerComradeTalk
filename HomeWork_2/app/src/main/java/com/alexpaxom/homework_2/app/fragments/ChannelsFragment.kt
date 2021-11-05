@@ -19,9 +19,11 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 
-class ChannelsFragment: Fragment() {
-    private var _binding: FragmentChannelsBinding? = null
-    private val binding get() = _binding!!
+class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
+
+    override var _binding: Lazy<FragmentChannelsBinding>? = lazy {
+        FragmentChannelsBinding.inflate(layoutInflater)
+    }
 
     private val compositeDisposable = CompositeDisposable()
     private val searchSearchSubject: PublishSubject<String> = PublishSubject.create()
@@ -31,8 +33,6 @@ class ChannelsFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentChannelsBinding.inflate(inflater, container, false)
-
         val channelsTabAdapter = ChannelsTabAdapter(
             fragment = this,
             tabsNames = mapOf(
@@ -70,7 +70,7 @@ class ChannelsFragment: Fragment() {
                     )
 
                     (curFragment as? ChannelsListFragment)?.apply {
-                        searchInChannels(searchString)
+                        //searchInChannels(searchString)
                     }
 
                 },
@@ -92,4 +92,6 @@ class ChannelsFragment: Fragment() {
         @JvmStatic
         fun newInstance() = ChannelsFragment()
     }
+
+
 }

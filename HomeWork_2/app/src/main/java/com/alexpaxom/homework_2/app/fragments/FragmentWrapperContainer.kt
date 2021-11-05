@@ -2,16 +2,14 @@ package com.alexpaxom.homework_2.app.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.databinding.FragmentWrapContainerBinding
 
-class FragmentWrapperContainer : Fragment() {
+class FragmentWrapperContainer : ViewBindingFragment<FragmentWrapContainerBinding>() {
 
-    private var _binding: FragmentWrapContainerBinding? = null
-    private val binding get() = _binding!!
+    override var _binding: Lazy<FragmentWrapContainerBinding>? = lazy {
+        FragmentWrapContainerBinding.inflate(layoutInflater)
+    }
 
     private var innerFragment: Fragment? = null
 
@@ -25,15 +23,6 @@ class FragmentWrapperContainer : Fragment() {
                 }, "innerFragment", true)
         }
         super.onCreate(savedInstanceState)
-    }
-
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentWrapContainerBinding.inflate(inflater, container, false)
-        return binding.root
     }
 
     fun replaceNavigate(fragment: Fragment, nameBackstack: String, addToBackstack: Boolean = false) {

@@ -10,7 +10,7 @@ abstract class BaseDiffUtilAdapter<P: ListItem>(
     val holdersFactory: BaseHolderFactory
 ): RecyclerView.Adapter<BaseViewHolder<ListItem>>() {
 
-    var dataList: List<P>
+    open var dataList: List<P>
         get() = diffUtil.currentList
         set(value) {
             diffUtil.submitList(value)

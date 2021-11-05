@@ -13,17 +13,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
-class ProfileFragment : Fragment() {
-
-    private var _binding: FragmentProfileBinding? = null
-    private val binding get() = _binding!!
+class ProfileFragment() : ViewBindingFragment<FragmentProfileBinding>() {
+    override var _binding: Lazy<FragmentProfileBinding>? = lazy {
+        FragmentProfileBinding.inflate(layoutInflater)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentProfileBinding.inflate(inflater, container, false)
-
 
         arguments?.let { bundle ->
             val glide = Glide.with(this)
@@ -43,11 +41,6 @@ class ProfileFragment : Fragment() {
         }
 
         return binding.root
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 
     companion object {

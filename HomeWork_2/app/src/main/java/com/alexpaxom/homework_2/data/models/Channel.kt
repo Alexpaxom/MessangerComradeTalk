@@ -8,4 +8,5 @@ data class Channel(
     override val typeId: Int = 0,
     override val id: Int,
     val name: String,
+    var isExpanded: Boolean = false,
 ): Parcelable, ExpandedChannelItem

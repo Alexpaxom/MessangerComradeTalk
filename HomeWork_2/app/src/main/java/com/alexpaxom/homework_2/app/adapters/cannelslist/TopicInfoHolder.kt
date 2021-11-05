@@ -5,13 +5,13 @@ import com.alexpaxom.homework_2.data.models.Topic
 import com.alexpaxom.homework_2.databinding.TopicInfoItemBinding
 
 class TopicInfoHolder(
-    val topicInfoItemBinding: TopicInfoItemBinding,
-    val onTopicClickListener: (topicPos: Int) -> Unit
+    private val topicInfoItemBinding: TopicInfoItemBinding,
+    private val onMessageClickListener: (topicPos: Int) -> Unit
 ): BaseViewHolder<Topic>(topicInfoItemBinding) {
 
     init {
         itemView.setOnClickListener {
-            onTopicClickListener(bindingAdapterPosition)
+            onMessageClickListener(bindingAdapterPosition)
         }
     }
 

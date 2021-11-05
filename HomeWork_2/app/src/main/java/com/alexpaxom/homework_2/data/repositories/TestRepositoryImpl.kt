@@ -108,7 +108,7 @@ class TestRepositoryImpl {
 
     }
 
-    fun getChannels(countChannels: Int, maxCountTopics: Int = 0): Single<List<ExpandedChanelGroup>> {
+    fun getChannels(countChannels: Int, maxCountTopics: Int = 0): List<ExpandedChanelGroup> {
         val random = Random(100)
 
 
@@ -131,7 +131,7 @@ class TestRepositoryImpl {
             nextChannelId += countTopics + 1
         }
 
-        return Single.just(channelsList)
+        return channelsList
     }
 
     fun getTopics(count: Int, channelId: Int = 0): List<Topic> {

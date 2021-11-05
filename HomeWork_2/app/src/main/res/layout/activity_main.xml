@@ -11,9 +11,8 @@
     tools:context=".app.activities.MainActivity">
 
 
-    <FrameLayout
-        android:id="@+id/main_fragment_container"
-        android:name="com.alexpaxom.homework_2.app.fragments.ChatFragment"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/main_navigatin_view_pager"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/main_bottom_nav_menu"

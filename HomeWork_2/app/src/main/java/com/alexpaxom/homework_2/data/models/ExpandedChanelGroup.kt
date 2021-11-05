@@ -8,5 +8,12 @@ data class ExpandedChanelGroup(
     override val typeId: Int = 0,
     val channel: Channel,
     val topics: List<Topic> = listOf(),
-    var isExpanded: Boolean = false,
-): Parcelable, ListItem
+): Parcelable, ListItem {
+    fun toExpandableItemList(needExpanded:Boolean) : List<ExpandedChannelItem> {
+        return if(needExpanded)
+            listOf(channel, *topics.toTypedArray())
+        else
+            listOf(channel)
+    }
+
+}

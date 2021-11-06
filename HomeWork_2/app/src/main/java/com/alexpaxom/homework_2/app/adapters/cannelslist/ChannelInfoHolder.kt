@@ -13,12 +13,21 @@ class ChannelInfoHolder(
     init {
         channelInfoItemBinding.channelInfoExpandList.setOnClickListener {
             (bindingAdapter as ChannelsListAdapter).apply {
-                dataList.indexOfLast { it.channel.id == innerList[this@ChannelInfoHolder.bindingAdapterPosition].id }
-                    ?.let{ groupPosition->
-                    dataList[groupPosition].channel.isExpanded = !dataList[groupPosition].channel.isExpanded
-                    updateItem(groupPosition, dataList[groupPosition])
+                val groupItemPosition =
+                dataList.indexOfLast {
+                    it.channel.id == innerList[this@ChannelInfoHolder.bindingAdapterPosition].id
                 }
-                notifyItemChanged(this@ChannelInfoHolder.bindingAdapterPosition)
+
+                if(groupItemPosition != -1) {
+                    dataList[groupItemPosition].let { groupItem ->
+                        val groupItemInvertIsExpanded =  groupItem.copy(
+                            channel = groupItem.channel.copy(
+                                isExpanded = !groupItem.channel.isExpanded
+                            )
+                        )
+                        updateItem(groupItemPosition, groupItemInvertIsExpanded)
+                    }
+                }
             }
         }
 

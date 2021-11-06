@@ -1,13 +1,12 @@
 package com.alexpaxom.homework_2.app.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.data.repositories.TestRepositoryImpl
+import com.alexpaxom.homework_2.domain.repositories.TestRepositoryImpl
 import com.alexpaxom.homework_2.databinding.FragmentProfileBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop

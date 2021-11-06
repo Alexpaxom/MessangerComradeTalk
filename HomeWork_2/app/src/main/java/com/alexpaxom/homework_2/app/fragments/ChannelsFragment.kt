@@ -5,46 +5,37 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.ChannelsTabAdapter
 import com.alexpaxom.homework_2.databinding.FragmentChannelsBinding
 import com.google.android.material.tabs.TabLayoutMediator
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
-import java.util.concurrent.TimeUnit
-
 class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
 
     override var _binding: Lazy<FragmentChannelsBinding>? = lazy {
         FragmentChannelsBinding.inflate(layoutInflater)
     }
 
-    private val compositeDisposable = CompositeDisposable()
-    private val searchSearchSubject: PublishSubject<String> = PublishSubject.create()
+    val channelsTabAdapter = lazy { ChannelsTabAdapter(
+            fragment = this,
+            getChannelsTabsFragments()
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val channelsTabAdapter = ChannelsTabAdapter(
-            fragment = this,
-            tabsNames = mapOf(
-                0 to resources.getString(R.string.channels_tab_subscribed),
-                1 to resources.getString(R.string.channels_tab_all_streams)
-            )
+
+        binding.cannelsViewPager.adapter = channelsTabAdapter.value
+
+        val tabsNames = mapOf(
+            POSITION_SUBSCRIBED_TAB_NAVIGATION to resources.getString(R.string.channels_tab_subscribed),
+            POSITION_ALL_STREAMS_TAB_NAVIGATION to resources.getString(R.string.channels_tab_all_streams)
         )
-        binding.cannelsViewPager.adapter = channelsTabAdapter
-
-
         TabLayoutMediator(binding.topNavMenu, binding.cannelsViewPager) { tab, position ->
-            tab.text = channelsTabAdapter.tabsNames[position]
+            tab.text = tabsNames[position]
         }.attach()
 
 
@@ -55,39 +46,43 @@ class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.searchChannels.searchEdit.doAfterTextChanged {
-            searchSearchSubject.onNext(it.toString())
+            searchInCurrentFragment(it.toString())
         }
 
-        searchSearchSubject
-            .subscribeOn(Schedulers.io())
-            .distinctUntilChanged()
-            .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { searchString ->
-                    val curFragment = childFragmentManager.findFragmentByTag (
-                        "f" + binding.cannelsViewPager.currentItem
-                    )
-
-                    (curFragment as? ChannelsListFragment)?.apply {
-                        //searchInChannels(searchString)
-                    }
-
-                },
-                onError =  { throw it }
-            )
-            .addTo(compositeDisposable)
+        binding.searchChannels.searchBtn.setOnClickListener {
+            searchInCurrentFragment(binding.searchChannels.searchEdit.text.toString())
+        }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        compositeDisposable.dispose()
-        _binding = null
+    private fun searchInCurrentFragment(searchString: String) {
+        channelsTabAdapter.value.fragmentAt(binding.cannelsViewPager.currentItem)?.let {
+            (it as? ChannelsListFragment)?.apply { searchChannels(searchString) }
+        }
+    }
+
+    private fun getChannelsTabsFragments(): Map<Int, Fragment> {
+        // При первом заходе создаем новые фрагменты в последующем получаем их из FragmentManager
+        val subscribed =
+            childFragmentManager.findFragmentByTag("$VIEW_PAGER_TAG$POSITION_SUBSCRIBED_TAB_NAVIGATION")
+                ?: ChannelsListFragment.newInstance()
+
+        val allStreams =
+            childFragmentManager.findFragmentByTag("$VIEW_PAGER_TAG$POSITION_ALL_STREAMS_TAB_NAVIGATION")
+                ?: ChannelsListFragment.newInstance()
+        return mapOf(
+            POSITION_SUBSCRIBED_TAB_NAVIGATION to subscribed,
+            POSITION_ALL_STREAMS_TAB_NAVIGATION to allStreams
+        )
     }
 
     companion object {
         //private const val SAVED_BUNDLE_CHANNELS = "com.alexpaxom.SAVED_BUNDLE_CHANNELS"
         const val FRAGMENT_ID = "com.alexpaxom.CHANNELS_FRAGMENT_ID"
+
+        private const val POSITION_SUBSCRIBED_TAB_NAVIGATION = 0
+        private const val POSITION_ALL_STREAMS_TAB_NAVIGATION = 1
+        private const val VIEW_PAGER_TAG = "f"
+
 
         @JvmStatic
         fun newInstance() = ChannelsFragment()

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Channel(
+data class ChannelItem(
     override val typeId: Int = 0,
     override val id: Int,
     val name: String,

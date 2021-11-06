@@ -15,7 +15,7 @@ import com.alexpaxom.homework_2.customview.EmojiReactionCounter
 import com.alexpaxom.homework_2.data.models.Message
 import com.alexpaxom.homework_2.data.models.Reaction
 import com.alexpaxom.homework_2.data.models.ReactionsGroup
-import com.alexpaxom.homework_2.data.repositories.TestRepositoryImpl
+import com.alexpaxom.homework_2.domain.repositories.TestRepositoryImpl
 import com.alexpaxom.homework_2.databinding.FragmentChatBinding
 import java.util.*
 

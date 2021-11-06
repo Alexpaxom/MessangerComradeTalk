@@ -1,12 +1,12 @@
-package com.alexpaxom.homework_2.data.repositories
+package com.alexpaxom.homework_2.domain.repositories
 
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.*
-import io.reactivex.Single
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
 
+@Deprecated("Will deleted when be realized repository for any type")
 class TestRepositoryImpl {
 
     private val names = listOf(
@@ -120,7 +120,7 @@ class TestRepositoryImpl {
             val countTopics = random.nextInt(maxCountTopics)
             channelsList.add(
                 ExpandedChanelGroup(
-                    channel = Channel(
+                    channel = ChannelItem(
                         typeId = R.layout.channel_info_item,
                         id = nextChannelId,
                         name = "Channel $it"
@@ -134,11 +134,11 @@ class TestRepositoryImpl {
         return channelsList
     }
 
-    fun getTopics(count: Int, channelId: Int = 0): List<Topic> {
-        val topicsResult = arrayListOf<Topic>()
+    fun getTopics(count: Int, channelId: Int = 0): List<TopicItem> {
+        val topicsResult = arrayListOf<TopicItem>()
         repeat(count) {
             topicsResult.add(
-                Topic(
+                TopicItem(
                     typeId = R.layout.topic_info_item,
                     id = channelId + it,
                     channelId = channelId,

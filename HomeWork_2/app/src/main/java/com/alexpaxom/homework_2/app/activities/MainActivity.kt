@@ -9,7 +9,7 @@ import com.alexpaxom.homework_2.app.fragments.ChannelsFragment
 import com.alexpaxom.homework_2.app.fragments.FragmentWrapperContainer
 import com.alexpaxom.homework_2.app.fragments.ProfileFragment
 import com.alexpaxom.homework_2.app.fragments.UsersFragment
-import com.alexpaxom.homework_2.data.repositories.TestRepositoryImpl
+import com.alexpaxom.homework_2.domain.repositories.TestRepositoryImpl
 import com.alexpaxom.homework_2.databinding.ActivityMainBinding
 
 

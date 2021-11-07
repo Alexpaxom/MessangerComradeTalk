@@ -105,13 +105,8 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
     }
 
     private fun onUserClickListener(adapterPos: Int) {
-        (parentFragment as? FragmentWrapperContainer)?.apply {
-            replaceNavigate(ProfileFragment.newInstance(
-                usersListAdapter.dataList[adapterPos].id),
-                ProfileFragment.FRAGMENT_ID,
-                true
-            )
-        }
+        val profileFragment = ProfileFragment.newInstance(usersListAdapter.dataList[adapterPos].id)
+        profileFragment.show(childFragmentManager, ProfileFragment.FRAGMENT_ID)
     }
 
     override fun toResult(resultState: UsersState.ResultState) {

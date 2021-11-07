@@ -7,11 +7,10 @@ import com.alexpaxom.homework_2.databinding.FragmentWrapContainerBinding
 
 class FragmentWrapperContainer : ViewBindingFragment<FragmentWrapContainerBinding>() {
 
-    override var _binding: Lazy<FragmentWrapContainerBinding>? = lazy {
-        FragmentWrapContainerBinding.inflate(layoutInflater)
-    }
-
     private var innerFragment: Fragment? = null
+
+    override fun createBinding(): FragmentWrapContainerBinding =
+        FragmentWrapContainerBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if(savedInstanceState == null) {

@@ -13,9 +13,9 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
 class ProfileFragment() : ViewBindingFragment<FragmentProfileBinding>() {
-    override var _binding: Lazy<FragmentProfileBinding>? = lazy {
+
+    override fun createBinding(): FragmentProfileBinding =
         FragmentProfileBinding.inflate(layoutInflater)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

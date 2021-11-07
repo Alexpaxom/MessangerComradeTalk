@@ -21,15 +21,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 
 class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>(),
 ChannelsStateMachine {
-
-    override var _binding: Lazy<CnannelsListFragmentBinding>? = lazy {
-        CnannelsListFragmentBinding.inflate(layoutInflater)
-    }
 
     override var currentState: ChannelsScreenState = InitialState
     private val compositeDisposable = CompositeDisposable()
@@ -39,7 +36,10 @@ ChannelsStateMachine {
     }
     private val channelsListAdapter = ChannelsListAdapter(channelsListHoldersFactory)
 
-    private val searchChannelsSubject: ReplaySubject<String> = ReplaySubject.create()
+    private val searchChannelsSubject: BehaviorSubject<String> = BehaviorSubject.create()
+
+    override fun createBinding(): CnannelsListFragmentBinding =
+        CnannelsListFragmentBinding.inflate(layoutInflater)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,7 +69,9 @@ ChannelsStateMachine {
         searchChannelsSubject
             .subscribeOn(Schedulers.io())
             .distinctUntilChanged()
+            .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { goToState(LoadingState) }
+            .observeOn(Schedulers.io())
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
             .switchMap { SearchExpandedChannelGroupTestImpl().searchInChannelGroups(it).toObservable() }
             .observeOn(AndroidSchedulers.mainThread())

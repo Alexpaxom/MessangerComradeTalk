@@ -12,15 +12,14 @@ import com.alexpaxom.homework_2.databinding.FragmentChannelsBinding
 import com.google.android.material.tabs.TabLayoutMediator
 class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
 
-    override var _binding: Lazy<FragmentChannelsBinding>? = lazy {
-        FragmentChannelsBinding.inflate(layoutInflater)
-    }
-
     val channelsTabAdapter = lazy { ChannelsTabAdapter(
             fragment = this,
             getChannelsTabsFragments()
         )
     }
+
+    override fun createBinding(): FragmentChannelsBinding =
+        FragmentChannelsBinding.inflate(layoutInflater)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -87,6 +86,4 @@ class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
         @JvmStatic
         fun newInstance() = ChannelsFragment()
     }
-
-
 }

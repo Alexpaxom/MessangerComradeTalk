@@ -40,12 +40,12 @@ class TestRepositoryImpl {
         "\uD83D\uDE11",
     )
 
-    fun getUserById(userId: Int): User {
+    fun getUserById(userId: Int): UserItem {
         for(user in names) {
 
             if(user.hashCode() == userId) {
                 val userParam = user.split(">")
-                return User(
+                return UserItem(
                     typeId = R.layout.user_info_item,
                     id = user.hashCode(),
                     name = userParam[0],
@@ -61,12 +61,12 @@ class TestRepositoryImpl {
         error("cant find user with id $userId")
     }
 
-    fun getUsers(): List<User> {
-        val retUsersList = arrayListOf<User>()
+    fun getUsers(): List<UserItem> {
+        val retUsersList = arrayListOf<UserItem>()
         for(user in names) {
             val userParam = user.split(">")
             retUsersList.add(
-                User(
+                UserItem(
                     typeId = R.layout.user_info_item,
                     id = user.hashCode(),
                     name = userParam[0],

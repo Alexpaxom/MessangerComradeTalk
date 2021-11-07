@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class User(
+data class UserItem(
     override val typeId: Int = 0,
     val id: Int,
     val name: String,

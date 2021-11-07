@@ -7,19 +7,9 @@ import io.reactivex.Single
 
 class UsersTestDataRepositoryImpl: UsersRepository {
 
-    private val names = listOf(
-        "Иванов Сергей>https://ichef.bbci.co.uk/news/640/cpsprodpb/14A82/production/_116301648_gettyimages-1071204136.jpg",
-        "Дегтярев Иван>https://image.jimcdn.com/app/cms/image/transf/none/path/s3974dcc17bc4f3da/image/iddd68c3ee51ac5c9/version/1588925960/image.jpg",
-        "Сидоврова Светлана>https://www.crushpixel.com/big-static10/preview4/muscular-builder-with-bricks-on-573251.jpg",
-        "Горбушкина Мирослва>https://img5.goodfon.ru/wallpaper/nbig/5/fd/sobachka-vzgliad-fon-drug.jpg",
-        "Екатерина II>https://stuki-druki.com/aforizms/Ekaterina-Velikaya-01.jpg",
-        "Юрий Тинькофф>https://s0.rbk.ru/v6_top_pics/media/img/6/23/755132645878236.jpg",
-        "Илон Маск>https://www.ixbt.com/img/n1/news/2021/5/1/4adf85be7536d688480f1f6485034c527e552662_large_large.jpg"
-    )
-
     override fun getUsers(): Single<List<UserItem>> {
         val retUsersList = arrayListOf<UserItem>()
-        for(user in names) {
+        for(user in NAMES) {
             val userParam = user.split(">")
             retUsersList.add(
                 UserItem(
@@ -40,7 +30,7 @@ class UsersTestDataRepositoryImpl: UsersRepository {
     override fun getUserById(userId: Int): Single<UserItem> {
         var retUser: UserItem? = null
 
-        for(user in names) {
+        for(user in NAMES) {
             if(user.hashCode() == userId) {
                 val userParam = user.split(">")
                 retUser = UserItem(
@@ -59,5 +49,17 @@ class UsersTestDataRepositoryImpl: UsersRepository {
             return Single.just(retUser)
 
         error("cant find user with id $userId")
+    }
+
+    companion object {
+        val NAMES = listOf(
+            "Иванов Сергей>https://ichef.bbci.co.uk/news/640/cpsprodpb/14A82/production/_116301648_gettyimages-1071204136.jpg",
+            "Дегтярев Иван>https://image.jimcdn.com/app/cms/image/transf/none/path/s3974dcc17bc4f3da/image/iddd68c3ee51ac5c9/version/1588925960/image.jpg",
+            "Сидоврова Светлана>https://www.crushpixel.com/big-static10/preview4/muscular-builder-with-bricks-on-573251.jpg",
+            "Горбушкина Мирослва>https://img5.goodfon.ru/wallpaper/nbig/5/fd/sobachka-vzgliad-fon-drug.jpg",
+            "Екатерина II>https://stuki-druki.com/aforizms/Ekaterina-Velikaya-01.jpg",
+            "Юрий Тинькофф>https://s0.rbk.ru/v6_top_pics/media/img/6/23/755132645878236.jpg",
+            "Илон Маск>https://www.ixbt.com/img/n1/news/2021/5/1/4adf85be7536d688480f1f6485034c527e552662_large_large.jpg"
+        )
     }
 }

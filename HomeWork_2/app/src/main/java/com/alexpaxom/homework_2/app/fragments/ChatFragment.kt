@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,15 +14,21 @@ import com.alexpaxom.homework_2.app.adapters.chathistory.ChatHistoryAdapter
 import com.alexpaxom.homework_2.app.adapters.chathistory.ChatMessageFactory
 import com.alexpaxom.homework_2.app.adapters.decorators.ChatDateDecorator
 import com.alexpaxom.homework_2.customview.EmojiReactionCounter
-import com.alexpaxom.homework_2.data.models.Message
+import com.alexpaxom.homework_2.data.models.MessageItem
 import com.alexpaxom.homework_2.data.models.Reaction
 import com.alexpaxom.homework_2.data.models.ReactionsGroup
+import com.alexpaxom.homework_2.data.usecases.testusecases.MessagesLoadUseCaseTestImpl
 import com.alexpaxom.homework_2.domain.repositories.TestRepositoryImpl
 import com.alexpaxom.homework_2.databinding.FragmentChatBinding
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 
 
-class ChatFragment : DialogFragment() {
+class ChatFragment : DialogFragment(), ChatStateMachine {
 
     private var _binding: FragmentChatBinding? = null
     private val binding get() = _binding!!
@@ -30,7 +38,11 @@ class ChatFragment : DialogFragment() {
         { adapterPos, emojiView -> clickOnReaction(adapterPos, emojiView) }
     )
 
+    override var currentState: ChatState = ChatState.InitialState
+
     private val chatHistoryAdapter = ChatHistoryAdapter(chatMessageFactory)
+
+    private val compositeDisposable = CompositeDisposable()
 
 
     override fun onCreateView(
@@ -43,17 +55,16 @@ class ChatFragment : DialogFragment() {
         // Обрабочики нажатий на элементы списка сообщений
 
         if(savedInstanceState == null) {
-            chatHistoryAdapter.dataList = TestRepositoryImpl().getMessages(30)
+            loadMessages()
         }
         else {
-
-            val arr = savedInstanceState.getParcelableArrayList<Message>(SAVED_BUNDLE_MESSAGES)
-            chatHistoryAdapter.dataList = arr?: listOf()
+            goToState(ChatState.ResultState(
+                savedInstanceState.getParcelableArrayList<MessageItem>(SAVED_BUNDLE_MESSAGES)
+                ?: listOf()))
         }
 
         binding.chatingHistory.layoutManager = LinearLayoutManager(context)
         binding.chatingHistory.adapter = chatHistoryAdapter
-        binding.chatingHistory.scrollToPosition(chatHistoryAdapter.dataList.size-1)
 
 
         val decorator = ChatDateDecorator(binding.chatingHistory)
@@ -88,7 +99,7 @@ class ChatFragment : DialogFragment() {
             binding.messageEnterEdit.text?.let {
                 if (it.isNotEmpty()) {
                     chatHistoryAdapter.addItem(
-                        Message(
+                        MessageItem(
                         typeId = R.layout.my_message_item,
                         id = MESSAGE_ID++,
                         userId = MY_USER_ID,
@@ -120,8 +131,20 @@ class ChatFragment : DialogFragment() {
         return binding.root
     }
 
+    fun loadMessages() {
+        MessagesLoadUseCaseTestImpl().getMessages()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { goToState(ChatState.LoadingState) }
+            .subscribeBy(
+                onSuccess = { goToState(ChatState.ResultState(it)) },
+                onError = { goToState(ChatState.ErrorState(it)) }
+            )
+            .addTo(compositeDisposable)
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
-        val list: ArrayList<Message> = ArrayList(chatHistoryAdapter.dataList)
+        val list: ArrayList<MessageItem> = ArrayList(chatHistoryAdapter.dataList)
         outState.putParcelableArrayList(SAVED_BUNDLE_MESSAGES, list)
         super.onSaveInstanceState(outState)
     }
@@ -156,14 +179,34 @@ class ChatFragment : DialogFragment() {
         }
     }
 
+    override fun toResult(resultState: ChatState.ResultState) {
+        binding.messagesLoadingProgress.isVisible = false
+
+        chatHistoryAdapter.dataList = resultState.messages
+        binding.chatingHistory.scrollToPosition(chatHistoryAdapter.dataList.size-1)
+    }
+
+    override fun toLoading(loadingState: ChatState.LoadingState) {
+        binding.messagesLoadingProgress.isVisible = true
+    }
+
+    override fun toError(errorState: ChatState.ErrorState) {
+        binding.messagesLoadingProgress.isVisible = false
+        Toast.makeText(context, errorState.error.localizedMessage, Toast.LENGTH_LONG).show()
+    }
+
     override fun getTheme(): Int {
         return R.style.Theme_DialogFragment
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onDestroy() {
+        compositeDisposable.dispose()
+        super.onDestroy()
     }
 
     companion object {

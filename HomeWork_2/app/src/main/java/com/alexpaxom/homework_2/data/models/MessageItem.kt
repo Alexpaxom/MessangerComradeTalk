@@ -5,7 +5,7 @@ import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 @Parcelize
-data class Message(
+data class MessageItem(
     override val typeId: Int = 0,
     val id: Int,
     val userId: Int,
@@ -15,7 +15,7 @@ data class Message(
     val avatarUrl: String?,
     val reactionsGroup: ReactionsGroup = ReactionsGroup()
 ): Parcelable, ListItem {
-    constructor(old: Message, newReactionsGroup: ReactionsGroup) : this(
+    constructor(old: MessageItem, newReactionsGroup: ReactionsGroup) : this(
         old.typeId,
         old.id,
         old.userId,

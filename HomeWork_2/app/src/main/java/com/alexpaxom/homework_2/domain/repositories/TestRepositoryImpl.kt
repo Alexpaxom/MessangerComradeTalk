@@ -81,15 +81,15 @@ class TestRepositoryImpl {
         return retUsersList
     }
 
-    fun getMessages(count: Int): ArrayList<Message> {
-        val ret = arrayListOf<Message>()
+    fun getMessages(count: Int): ArrayList<MessageItem> {
+        val ret = arrayListOf<MessageItem>()
         val date = Date()
         date.time -= 1000*60*60*12*count
 
         repeat(count) {
             val user = names.random().split(">")
             ret.add (
-                Message(
+                MessageItem(
                     typeId = R.layout.message_item,
                     id = it,
                     userName = user[0],

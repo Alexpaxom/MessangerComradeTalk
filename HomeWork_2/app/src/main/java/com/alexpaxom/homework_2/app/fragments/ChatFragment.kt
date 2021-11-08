@@ -15,10 +15,10 @@ import com.alexpaxom.homework_2.app.adapters.chathistory.ChatMessageFactory
 import com.alexpaxom.homework_2.app.adapters.decorators.ChatDateDecorator
 import com.alexpaxom.homework_2.customview.EmojiReactionCounter
 import com.alexpaxom.homework_2.data.models.MessageItem
-import com.alexpaxom.homework_2.data.models.Reaction
+import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.data.models.ReactionsGroup
 import com.alexpaxom.homework_2.data.usecases.testusecases.MessagesLoadUseCaseTestImpl
-import com.alexpaxom.homework_2.domain.repositories.TestRepositoryImpl
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessagesLoadUseCaseZulipApiImpl
 import com.alexpaxom.homework_2.databinding.FragmentChatBinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -79,7 +79,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
                 emojiUnicode?.let { emojiUnicode ->
                     chatHistoryAdapter.addReactionByMessageID(
                         messageId,
-                        Reaction(
+                        ReactionItem(
                             R.layout.emoji_for_select_view,
                             MY_USER_ID,
                             emojiUnicode
@@ -132,7 +132,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     }
 
     fun loadMessages() {
-        MessagesLoadUseCaseTestImpl().getMessages()
+        MessagesLoadUseCaseZulipApiImpl().getMessages()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { goToState(ChatState.LoadingState) }
@@ -160,7 +160,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
         if(emojiView.isSelected) {
             chatHistoryAdapter.addReactionByMessageID(
                 chatHistoryAdapter.dataList[adapterPos].id,
-                Reaction(
+                ReactionItem(
                     R.layout.emoji_for_select_view,
                     MY_USER_ID,
                     emojiView.displayEmoji
@@ -170,7 +170,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
         else {
             chatHistoryAdapter.removeReactionByMessageID(
                 chatHistoryAdapter.dataList[adapterPos].id,
-                Reaction(
+                ReactionItem(
                     R.layout.emoji_for_select_view,
                     MY_USER_ID,
                     emojiView.displayEmoji

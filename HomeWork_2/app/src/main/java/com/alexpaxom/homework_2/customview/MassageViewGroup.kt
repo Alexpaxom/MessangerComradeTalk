@@ -10,7 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.*
 import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.data.models.Reaction
+import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.data.models.ReactionsGroup
 import com.bumptech.glide.Glide
 
@@ -156,7 +156,7 @@ class MassageViewGroup @JvmOverloads constructor(
         }
     }
 
-    fun addReaction(reaction: Reaction) {
+    fun addReaction(reaction: ReactionItem) {
         reactionsGroup.addReaction(reaction)
     }
 

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Reaction(
+data class ReactionItem(
     override val typeId: Int = 0,
     val userId: Int,
     val emojiUnicode: String

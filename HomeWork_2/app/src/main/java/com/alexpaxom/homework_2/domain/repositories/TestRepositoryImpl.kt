@@ -149,17 +149,17 @@ class TestRepositoryImpl {
         return topicsResult
     }
 
-    private fun reactionsList(maxCount: Int): ArrayList<Reaction>{
+    private fun reactionsList(maxCount: Int): ArrayList<ReactionItem>{
         val random = Random(100)
 
         val countReactions = random.nextInt(maxCount)
 
-        val reactionList: ArrayList<Reaction> = arrayListOf()
+        val reactionList: ArrayList<ReactionItem> = arrayListOf()
 
         for (i in 0..countReactions) {
 
             reactionList.add(
-                Reaction(
+                ReactionItem(
                     userId = i,
                     emojiUnicode = reactions.random()
                 )

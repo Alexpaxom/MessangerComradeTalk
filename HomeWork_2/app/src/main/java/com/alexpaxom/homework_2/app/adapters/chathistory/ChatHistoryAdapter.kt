@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseDiffUtilAdapter
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseHolderFactory
 import com.alexpaxom.homework_2.data.models.MessageItem
-import com.alexpaxom.homework_2.data.models.Reaction
+import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.helpers.DateFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -20,7 +20,7 @@ class ChatHistoryAdapter(
     }
 
 
-    fun addReactionByMessageID(messageId: Int, reaction: Reaction) {
+    fun addReactionByMessageID(messageId: Int, reaction: ReactionItem) {
         diffUtil.currentList.indexOfLast { it.id == messageId }.let { messageId ->
             if(messageId != -1) {
                     updateItem(messageId, MessageItem(
@@ -32,7 +32,7 @@ class ChatHistoryAdapter(
         }
     }
 
-    fun removeReactionByMessageID(messageId: Int, reaction: Reaction) {
+    fun removeReactionByMessageID(messageId: Int, reaction: ReactionItem) {
         diffUtil.currentList.indexOfLast { it.id == messageId }.let { messageId ->
             if(messageId != -1) {
                 updateItem(messageId,

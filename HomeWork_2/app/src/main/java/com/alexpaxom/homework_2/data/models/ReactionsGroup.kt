@@ -5,7 +5,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class ReactionsGroup(
-    val reactionList: List<Reaction> = listOf(),
+    val reactionList: List<ReactionItem> = listOf(),
     var userIdOwner: Int = 0,
 ): Parcelable {
 
@@ -17,7 +17,7 @@ data class ReactionsGroup(
         return (reactionList.findLast { it.userId == userIdOwner && it.emojiUnicode == emojiUnicode } != null)
     }
 
-    fun addReaction(reaction: Reaction): ReactionsGroup {
+    fun addReaction(reaction: ReactionItem): ReactionsGroup {
         if(reactionList.findLast { it == reaction } != null)
             return this
 
@@ -27,7 +27,7 @@ data class ReactionsGroup(
         )
     }
 
-    fun removeReaction(reaction: Reaction): ReactionsGroup {
+    fun removeReaction(reaction: ReactionItem): ReactionsGroup {
         return ReactionsGroup(
             reactionList = reactionList.filter { it != reaction },
             userIdOwner = userIdOwner

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.emojiselector.EmojiHoldersFactory
 import com.alexpaxom.homework_2.app.adapters.emojiselector.EmojiSelectorAdapter
-import com.alexpaxom.homework_2.data.models.Reaction
+import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.databinding.EmojiSelectorBottomDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -42,7 +42,7 @@ class FragmentEmojiSelector : BottomSheetDialogFragment() {
             "\uD83E\uDD29",
             "\uD83D\uDE37",
             "\uD83E\uDD22",
-        ).map { Reaction(R.layout.emoji_for_select_view, 0, it) }
+        ).map { ReactionItem(R.layout.emoji_for_select_view, 0, it) }
 
 
         binding.selectorEmojiList.adapter = emojiSelectorAdapter

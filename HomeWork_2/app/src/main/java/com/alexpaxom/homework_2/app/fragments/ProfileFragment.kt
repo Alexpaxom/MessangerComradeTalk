@@ -1,6 +1,7 @@
 package com.alexpaxom.homework_2.app.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +30,14 @@ class ProfileFragment: DialogFragment(), ProfileStateMachine {
     private var loadedUser: UserItem? = null
     private val compositeDisposable = CompositeDisposable()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NO_FRAME, R.style.Theme_DialogFragment)
+        arguments?.getBoolean(ARGUMENT_OWNER_PARAMETER)?.let { ownerFlag ->
+                showsDialog = !ownerFlag
+        }
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -81,14 +90,6 @@ class ProfileFragment: DialogFragment(), ProfileStateMachine {
     override fun toError(errorState: ProfileState.ErrorState) {
         binding.profileLoadProgress.isVisible = false
         Toast.makeText(context, errorState.error.localizedMessage, Toast.LENGTH_LONG).show()
-    }
-
-    override fun getTheme(): Int {
-        val isOwner = arguments?.getBoolean(ARGUMENT_OWNER_PARAMETER) ?: false
-        return if(isOwner)
-                super.getTheme()
-            else
-                R.style.Theme_DialogFragment
     }
 
     override fun onDestroyView() {

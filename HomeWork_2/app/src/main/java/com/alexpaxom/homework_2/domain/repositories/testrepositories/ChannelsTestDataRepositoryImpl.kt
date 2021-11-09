@@ -10,7 +10,7 @@ class ChannelsTestDataRepositoryImpl: ChannelsRepository {
     private val randomSeed = 100
     private val maxCountElements = 10
 
-    override fun getChannels(): Single<List<ChannelItem>> {
+    override fun getSubscribedChannels(): Single<List<ChannelItem>> {
         val random = Random(randomSeed)
 
         val channelsList: ArrayList<ChannelItem> = arrayListOf()
@@ -28,5 +28,9 @@ class ChannelsTestDataRepositoryImpl: ChannelsRepository {
         }
 
         return Single.just(channelsList)
+    }
+
+    override fun getAllChannels(): Single<List<ChannelItem>> {
+        TODO("Not yet implemented")
     }
 }

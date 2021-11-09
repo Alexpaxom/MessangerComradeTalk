@@ -15,6 +15,7 @@ import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListAdapter
 import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListHoldersFactory
 import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
 import com.alexpaxom.homework_2.data.usecases.testusecases.SearchExpandedChannelGroupTestImpl
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchExpandedChannelGroupZulipImpl
 import com.alexpaxom.homework_2.databinding.CnannelsListFragmentBinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -37,6 +38,8 @@ ChannelsStateMachine {
     private val channelsListAdapter = ChannelsListAdapter(channelsListHoldersFactory)
 
     private val searchChannelsSubject: BehaviorSubject<String> = BehaviorSubject.create()
+
+    private val searchExpandedChannelGroup = SearchExpandedChannelGroupZulipImpl()
 
     override fun createBinding(): CnannelsListFragmentBinding =
         CnannelsListFragmentBinding.inflate(layoutInflater)
@@ -73,7 +76,13 @@ ChannelsStateMachine {
             .doOnNext { goToState(LoadingState) }
             .observeOn(Schedulers.io())
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-            .switchMap { SearchExpandedChannelGroupTestImpl().searchInChannelGroups(it).toObservable() }
+            .switchMap {
+                val subscribedFilterFlag = arguments?.getBoolean(SUBSCRIBED_FILTER_FLAG) ?: false
+                if(subscribedFilterFlag)
+                    searchExpandedChannelGroup.searchInSubscribedChannelGroups(it).toObservable()
+                else
+                    searchExpandedChannelGroup.searchInAllChannelGroups(it).toObservable()
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { goToState(ResultState(it)) },
@@ -127,10 +136,15 @@ ChannelsStateMachine {
 
     companion object {
         private const val SAVED_BUNDLE_CHANNELS = "com.alexpaxom.SAVED_BUNDLE_CHANNELS"
+        private const val SUBSCRIBED_FILTER_FLAG = "com.alexpaxom.SUBSCRIBED_FILTER_FLAG"
         const val FRAGMENT_ID = "com.alexpaxom.CHANNELS_LIST_FRAGMENT_ID"
         const val INITIAL_SEARCH_QUERY: String = ""
 
         @JvmStatic
-        fun newInstance() = ChannelsListFragment()
+        fun newInstance(subscribedFilterFlag: Boolean) = ChannelsListFragment().apply {
+            arguments = Bundle().apply {
+                putBoolean(SUBSCRIBED_FILTER_FLAG, subscribedFilterFlag)
+            }
+        }
     }
 }

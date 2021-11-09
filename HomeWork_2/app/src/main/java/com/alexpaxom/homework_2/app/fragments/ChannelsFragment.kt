@@ -63,11 +63,11 @@ class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
         // При первом заходе создаем новые фрагменты в последующем получаем их из FragmentManager
         val subscribed =
             childFragmentManager.findFragmentByTag("$VIEW_PAGER_TAG$POSITION_SUBSCRIBED_TAB_NAVIGATION")
-                ?: ChannelsListFragment.newInstance()
+                ?: ChannelsListFragment.newInstance(true)
 
         val allStreams =
             childFragmentManager.findFragmentByTag("$VIEW_PAGER_TAG$POSITION_ALL_STREAMS_TAB_NAVIGATION")
-                ?: ChannelsListFragment.newInstance()
+                ?: ChannelsListFragment.newInstance(false)
         return mapOf(
             POSITION_SUBSCRIBED_TAB_NAVIGATION to subscribed,
             POSITION_ALL_STREAMS_TAB_NAVIGATION to allStreams

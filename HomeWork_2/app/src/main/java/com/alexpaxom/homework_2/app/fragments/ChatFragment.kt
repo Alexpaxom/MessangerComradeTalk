@@ -42,11 +42,12 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     private val chatHistoryAdapter = ChatHistoryAdapter(chatMessageFactory)
     private val compositeDisposable = CompositeDisposable()
 
-    private val topicName = "swimming turtles"
-    private val streamName = "general"
-    private val streamId = 306312
+    private var topicName = arguments?.getString(ARGUMENT_TOPIC_NAME) ?: ""
+    private var streamName = arguments?.getString(ARGUMENT_STREAM_NAME) ?: ""
+    private var streamId = arguments?.getInt(ARGUMENT_STREAM_ID) ?: 0
+    private var MyUserId = arguments?.getInt(ARGUMENT_MY_USER_ID) ?: 0
 
-    private val messagesLoader = MessagesLoadUseCaseZulipApiImpl(MY_USER_ID)
+    private val messagesLoader = MessagesLoadUseCaseZulipApiImpl(MyUserId)
     private val messagesSender = MessageSendUseCaseZulipApiImpl()
     private val emojiHelper = EmojiHelper()
 
@@ -57,6 +58,10 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     ): View {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
 
+        topicName = arguments?.getString(ARGUMENT_TOPIC_NAME) ?: ""
+        streamName = arguments?.getString(ARGUMENT_STREAM_NAME) ?: ""
+        streamId = arguments?.getInt(ARGUMENT_STREAM_ID) ?: 0
+        MyUserId = arguments?.getInt(ARGUMENT_MY_USER_ID) ?: 0
 
         // Обрабочики нажатий на элементы списка сообщений
 
@@ -65,7 +70,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
                 messageId = MessagesLoadUseCaseZulipApiImpl.NEWEST_MESSAGE,
                 numBefore = DEFAULT_COUNT_LOAD_MESSAGES,
                 numAfter = 0,
-                filter = null
+                filter = createFilterForMessages()
             )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -99,7 +104,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
                     addReaction(
                         ReactionItem(
                             typeId = R.layout.emoji_for_select_view,
-                            userId = MY_USER_ID,
+                            userId = MyUserId,
                             emojiUnicode = emojiUnicode,
                             emojiName = emojiHelper.getNameByUnicode(emojiUnicode)
                         ),
@@ -154,7 +159,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
             messageId = chatHistoryAdapter.dataList.last().id.toLong(),
             numBefore = 0,
             numAfter = MAX_COUNT_LOAD_MESSAGES,
-            filter = null
+            filter = createFilterForMessages()
         )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -189,10 +194,16 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
         fragmentEmojiSelector.show(childFragmentManager, FragmentEmojiSelector.EMOJI_SELECT_RESULT_DIALOG_ID)
     }
 
+    private fun createFilterForMessages(): String {
+        return "["+
+                """{"operator": "stream", "operand": "$streamName"}"""+
+                "]"
+    }
+
     private fun clickOnReaction(adapterPos: Int, emojiView: EmojiReactionCounter) {
         val reaction = ReactionItem(
             typeId = R.layout.emoji_for_select_view,
-            userId = MY_USER_ID,
+            userId = MyUserId,
             emojiUnicode = emojiView.displayEmoji,
             emojiName = emojiHelper.getNameByUnicode(emojiView.displayEmoji)
         )
@@ -273,12 +284,28 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     companion object {
 
         private const val SAVED_BUNDLE_MESSAGES = "com.alexpaxom.SAVED_BUNDLE_MESSAGES"
-        private const val MY_USER_ID = 456094
+        private const val ARGUMENT_TOPIC_NAME = "com.alexpaxom.ARGUMENT_TOPIC_NAME"
+        private const val ARGUMENT_STREAM_NAME = "com.alexpaxom.ARGUMENT_STREAM_NAME"
+        private const val ARGUMENT_STREAM_ID = "com.alexpaxom.ARGUMENT_STREAM_ID"
+        private const val ARGUMENT_MY_USER_ID = "com.alexpaxom.ARGUMENT_MY_USER_ID"
+
         const val FRAGMENT_ID = "com.alexpaxom.CHAT_FRAGMENT_ID"
         private const val DEFAULT_COUNT_LOAD_MESSAGES = 100
         private const val MAX_COUNT_LOAD_MESSAGES = 1000
         @JvmStatic
-        fun newInstance() = ChatFragment()
+        fun newInstance(
+                topicName: String = "swimming turtles",
+                streamName: String = "general",
+                streamId: Int = 306312,
+                MyUserId: Int = 456094
+        ) = ChatFragment().apply {
+            arguments = Bundle().apply {
+                putString(ARGUMENT_TOPIC_NAME, topicName)
+                putString(ARGUMENT_STREAM_NAME, streamName)
+                putInt(ARGUMENT_STREAM_ID, streamId)
+                putInt(ARGUMENT_MY_USER_ID, MyUserId)
+            }
+        }
     }
 
 }

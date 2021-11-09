@@ -19,10 +19,15 @@ class MessagesLoadUseCaseZulipApiImpl(
         return messagesZulipDataRepository.getMessages( messageId, numBefore, numAfter, filter )
             .map {
                 it.map {message ->
-                    if(message.userId == ownUserId)
-                        message.copy(typeId = R.layout.my_message_item)
+
+                    val typedMessage = if(message.userId == ownUserId)
+                        message.copy( typeId = R.layout.my_message_item )
                     else
                         message
+
+                    typedMessage.reactionsGroup.userIdOwner = ownUserId
+
+                    return@map typedMessage
                 }
             }
     }

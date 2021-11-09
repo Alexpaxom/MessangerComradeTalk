@@ -32,6 +32,7 @@ sealed interface ChatState {
 
     class ErrorState(val error: Throwable): ChatState {
         override fun toLoadingState(): Boolean = true
+        override fun toErrorState(): Boolean = true
     }
 
     class AddingMessagesState(val position: Int, val messages: List<MessageItem>): ChatState {

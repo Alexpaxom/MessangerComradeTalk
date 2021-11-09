@@ -8,12 +8,19 @@ import com.alexpaxom.homework_2.data.models.ReactionsGroup
 import com.alexpaxom.homework_2.domain.entity.Message
 import java.util.*
 
-class MessagesConverter {
+class MessageConverter {
+
+    val reactionConverter = ReactionConverter()
+
     fun convert(message: Message): MessageItem {
         val text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 Html.fromHtml(message.content, Html.FROM_HTML_MODE_COMPACT)
             else
                 Html.fromHtml(message.content)
+
+        val reactionsList = message.reactions
+            .filter{it.reactionType == "unicode_emoji"}
+            .map{ reactionConverter.convert(it) }
 
 
         return MessageItem(
@@ -24,7 +31,7 @@ class MessagesConverter {
                 text = text.toString(),
                 datetime = Date(message.timestamp*CONVERT_FROM_UTC_SECONDS),
                 avatarUrl = message.avatarUrl,
-                reactionsGroup = ReactionsGroup()
+                reactionsGroup = ReactionsGroup(reactionsList)
             )
     }
 

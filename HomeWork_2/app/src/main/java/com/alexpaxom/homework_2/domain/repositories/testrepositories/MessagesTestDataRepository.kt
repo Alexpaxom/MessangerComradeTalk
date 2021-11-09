@@ -4,8 +4,10 @@ import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.MessageItem
 import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.data.models.ReactionsGroup
+import com.alexpaxom.homework_2.domain.entity.ReactionResult
 import com.alexpaxom.homework_2.domain.entity.SendResult
 import com.alexpaxom.homework_2.domain.repositories.MessagesRepository
+import com.alexpaxom.homework_2.helpers.EmojiHelper
 import io.reactivex.Single
 import java.util.*
 import kotlin.random.Random
@@ -77,19 +79,30 @@ class MessagesTestDataRepository: MessagesRepository {
         TODO("Not yet implemented")
     }
 
+    override fun addReaction(messageId: Int, emojiName: String): Single<ReactionResult> {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeReaction(messageId: Int, emojiName: String): Single<ReactionResult> {
+        TODO("Not yet implemented")
+    }
+
     private fun reactionsList(maxCount: Int): ArrayList<ReactionItem>{
         val random = Random(100)
+
+        val emojiHelper = EmojiHelper()
 
         val countReactions = random.nextInt(maxCount)
 
         val reactionList: ArrayList<ReactionItem> = arrayListOf()
 
         for (i in 0..countReactions) {
-
+            val reactionUnicode = emojiHelper.emojiMap.keys.random()
             reactionList.add(
                 ReactionItem(
                     userId = i,
-                    emojiUnicode = reactions.random()
+                    emojiUnicode = reactionUnicode,
+                    emojiName = emojiHelper.getNameByUnicode(reactionUnicode)
                 )
             )
 

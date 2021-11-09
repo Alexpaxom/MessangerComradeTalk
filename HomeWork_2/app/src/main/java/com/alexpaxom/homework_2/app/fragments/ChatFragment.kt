@@ -19,6 +19,7 @@ import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessageSendUseCaseZulipApiImpl
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessagesLoadUseCaseZulipApiImpl
 import com.alexpaxom.homework_2.databinding.FragmentChatBinding
+import com.alexpaxom.homework_2.helpers.EmojiHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -47,6 +48,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
 
     private val messagesLoader = MessagesLoadUseCaseZulipApiImpl(MY_USER_ID)
     private val messagesSender = MessageSendUseCaseZulipApiImpl()
+    private val emojiHelper = EmojiHelper()
 
 
     override fun onCreateView(
@@ -94,13 +96,14 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
                 val emojiUnicode = resultBundle.getString(FragmentEmojiSelector.EMOJI_UNICODE)
                 val messageId = resultBundle.getInt(FragmentEmojiSelector.RESULT_ID)
                 emojiUnicode?.let { emojiUnicode ->
-                    chatHistoryAdapter.addReactionByMessageID(
-                        messageId,
+                    addReaction(
                         ReactionItem(
-                            R.layout.emoji_for_select_view,
-                            MY_USER_ID,
-                            emojiUnicode
-                        )
+                            typeId = R.layout.emoji_for_select_view,
+                            userId = MY_USER_ID,
+                            emojiUnicode = emojiUnicode,
+                            emojiName = emojiHelper.getNameByUnicode(emojiUnicode)
+                        ),
+                        messageId
                     )
                 }
             })
@@ -187,26 +190,49 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     }
 
     private fun clickOnReaction(adapterPos: Int, emojiView: EmojiReactionCounter) {
-        if(emojiView.isSelected) {
-            chatHistoryAdapter.addReactionByMessageID(
-                chatHistoryAdapter.dataList[adapterPos].id,
-                ReactionItem(
-                    R.layout.emoji_for_select_view,
-                    MY_USER_ID,
-                    emojiView.displayEmoji
-                )
+        val reaction = ReactionItem(
+            typeId = R.layout.emoji_for_select_view,
+            userId = MY_USER_ID,
+            emojiUnicode = emojiView.displayEmoji,
+            emojiName = emojiHelper.getNameByUnicode(emojiView.displayEmoji)
+        )
+
+        if(emojiView.isSelected)
+            addReaction(reaction, chatHistoryAdapter.dataList[adapterPos].id)
+        else
+            removeReaction(reaction, chatHistoryAdapter.dataList[adapterPos].id)
+    }
+
+    private fun addReaction(reaction: ReactionItem, messageId: Int) {
+        messagesSender.addReaction(messageId, reaction.emojiName)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    chatHistoryAdapter.addReactionByMessageID(
+                        messageId,
+                        reaction
+                    )
+                },
+                onError = { goToState(ChatState.ErrorState(it)) }
             )
-        }
-        else {
-            chatHistoryAdapter.removeReactionByMessageID(
-                chatHistoryAdapter.dataList[adapterPos].id,
-                ReactionItem(
-                    R.layout.emoji_for_select_view,
-                    MY_USER_ID,
-                    emojiView.displayEmoji
-                )
+            .addTo(compositeDisposable)
+    }
+
+    private fun removeReaction(reaction: ReactionItem, messageId: Int) {
+        messagesSender.removeReaction(messageId, reaction.emojiName)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    chatHistoryAdapter.removeReactionByMessageID(
+                        messageId,
+                        reaction
+                    )
+                },
+                onError = { goToState(ChatState.ErrorState(it)) }
             )
-        }
+            .addTo(compositeDisposable)
     }
 
     override fun toResult(resultState: ChatState.ResultState) {
@@ -249,7 +275,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
         private const val SAVED_BUNDLE_MESSAGES = "com.alexpaxom.SAVED_BUNDLE_MESSAGES"
         private const val MY_USER_ID = 456094
         const val FRAGMENT_ID = "com.alexpaxom.CHAT_FRAGMENT_ID"
-        private const val DEFAULT_COUNT_LOAD_MESSAGES = 20
+        private const val DEFAULT_COUNT_LOAD_MESSAGES = 100
         private const val MAX_COUNT_LOAD_MESSAGES = 1000
         @JvmStatic
         fun newInstance() = ChatFragment()

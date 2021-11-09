@@ -2,6 +2,7 @@ package com.alexpaxom.homework_2.domain.repositories
 
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.*
+import com.alexpaxom.homework_2.helpers.EmojiHelper
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
@@ -152,16 +153,19 @@ class TestRepositoryImpl {
     private fun reactionsList(maxCount: Int): ArrayList<ReactionItem>{
         val random = Random(100)
 
+        val emojiHelper = EmojiHelper()
+
         val countReactions = random.nextInt(maxCount)
 
         val reactionList: ArrayList<ReactionItem> = arrayListOf()
 
         for (i in 0..countReactions) {
-
+            val reactionUnicode = emojiHelper.emojiMap.keys.random()
             reactionList.add(
                 ReactionItem(
                     userId = i,
-                    emojiUnicode = reactions.random()
+                    emojiUnicode = reactionUnicode,
+                    emojiName = emojiHelper.getNameByUnicode(reactionUnicode)
                 )
             )
 

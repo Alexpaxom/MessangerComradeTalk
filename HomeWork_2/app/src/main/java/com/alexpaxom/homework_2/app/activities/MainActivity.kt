@@ -2,156 +2,98 @@ package com.alexpaxom.homework_2.app.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.core.widget.doOnTextChanged
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.fragment.app.Fragment
 import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.app.adapters.chathistory.ChatHistoryAdapter
-import com.alexpaxom.homework_2.app.adapters.chathistory.ChatMessageFactory
-import com.alexpaxom.homework_2.app.adapters.decorators.ChatDateDecorator
-import com.alexpaxom.homework_2.app.fragments.FragmentEmojiSelector
-import com.alexpaxom.homework_2.customview.EmojiReactionCounter
-import com.alexpaxom.homework_2.data.models.Message
-import com.alexpaxom.homework_2.data.models.Reaction
-import com.alexpaxom.homework_2.data.models.ReactionsGroup
+import com.alexpaxom.homework_2.app.adapters.MainNavigationViewpageAdapter
+import com.alexpaxom.homework_2.app.fragments.ChannelsFragment
+import com.alexpaxom.homework_2.app.fragments.FragmentWrapperContainer
+import com.alexpaxom.homework_2.app.fragments.ProfileFragment
+import com.alexpaxom.homework_2.app.fragments.UsersFragment
 import com.alexpaxom.homework_2.data.repositories.TestMessagesRepository
-import com.alexpaxom.homework_2.databinding.FragmentChatBinding
-import java.util.*
-import kotlin.collections.ArrayList
+import com.alexpaxom.homework_2.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var binding: FragmentChatBinding
+    lateinit var binding: ActivityMainBinding
 
-    private val chatMessageFactory = ChatMessageFactory(
-        { selectNewReaction(it) },
-        { adapterPos, emojiView -> clickOnReaction(adapterPos, emojiView) }
-    )
-
-    private val chatHistoryAdapter = ChatHistoryAdapter(chatMessageFactory)
+    private val mainNavigationViewpageAdapter = lazy {
+        MainNavigationViewpageAdapter(
+            supportFragmentManager,
+            lifecycle,
+            getMainNavigationFragments()
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        binding = FragmentChatBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // Обрабочики нажатий на элементы списка сообщений
-
-        if(savedInstanceState == null) {
-            chatHistoryAdapter.dataList = TestMessagesRepository().getMessages(30)
-        }
-        else {
-
-            val arr = savedInstanceState.getParcelableArrayList<Message>(SAVED_BUNDLE_MESSAGES)
-            chatHistoryAdapter.dataList = arr?: listOf()
-        }
-
-        binding.chatingHistory.layoutManager = LinearLayoutManager(this)
-        binding.chatingHistory.adapter = chatHistoryAdapter
-        binding.chatingHistory.scrollToPosition(chatHistoryAdapter.dataList.size-1)
-
-
-        val decorator = ChatDateDecorator(binding.chatingHistory)
-        binding.chatingHistory.addItemDecoration(decorator)
-
-
-        // Обработка результата выбора эмоджи через диалог
-        supportFragmentManager.setFragmentResultListener(FragmentEmojiSelector.EMOJI_SELECT_RESULT_DIALOG_ID, this,
-            { _, resultBundle ->
-                val emojiUnicode = resultBundle.getString(FragmentEmojiSelector.EMOJI_UNICODE)
-                val messageId = resultBundle.getInt(FragmentEmojiSelector.RESULT_ID)
-                emojiUnicode?.let { emojiUnicode ->
-                    chatHistoryAdapter.addReactionByMessageID(
-                        messageId,
-                        Reaction(
-                            R.layout.emoji_for_select_view,
-                            MY_USER_ID,
-                            emojiUnicode
-                        )
-                    )
-                }
-            })
-
-        // Колбек после добавления нового сообщения в список
-        chatHistoryAdapter.setClickListenerOnAddMessage {
-            binding.chatingHistory.scrollToPosition(it)
-        }
-
-
-        // Обработка нажатия на кнопку отправки сообщения
-        binding.messageSendBtn.setOnClickListener() {
-            binding.messageEnterEdit.text?.let {
-                if (it.isNotEmpty()) {
-                    chatHistoryAdapter.addItem(Message(
-                        typeId = R.layout.my_message_item,
-                        id = MESSAGE_ID++,
-                        userId = MY_USER_ID,
-                        userName = "My message",
-                        text = binding.messageEnterEdit.text.toString(),
-                        datetime = Date(),
-                        avatarUrl = null,
-                        reactionsGroup = ReactionsGroup(listOf(), MY_USER_ID)
-                    ))
-                    binding.messageEnterEdit.text?.clear()
-                }
-            }
-        }
-
-        // Обработка состояний при вводе данных в поле сообщения
-
-        binding.messageEnterEdit.doOnTextChanged { text, start, before, count ->
-            binding.messageEnterEdit.text?.let {
-                binding.messageSendBtn.setImageResource(
-                    if(it.isNotEmpty())
-                        android.R.drawable.ic_menu_send
-                    else
-                        android.R.drawable.ic_menu_add
-                )
-            }
-        }
         super.onCreate(savedInstanceState)
+
+        binding.mainNavigatinViewPager.adapter = mainNavigationViewpageAdapter.value
+        binding.mainNavigatinViewPager.isUserInputEnabled = false;
+
+
+        // Обработчик нажатий основного нижнего меню
+        binding.mainBottomNavMenu.setOnItemSelectedListener {
+            when(it.itemId) {
+                R.id.bottom_menu_item_channels ->
+                    binding.mainNavigatinViewPager.currentItem = POSITION_CHANNELS_BOTTOM_NAVIGATION
+
+                R.id.bottom_menu_item_people ->
+                    binding.mainNavigatinViewPager.currentItem = POSITION_PEOPLE_BOTTOM_NAVIGATION
+
+                R.id.bottom_menu_item_profile ->
+                    binding.mainNavigatinViewPager.currentItem = POSITION_PROFILE_BOTTOM_NAVIGATION
+            }
+
+            true
+        }
     }
 
+    private fun getMainNavigationFragments(): Map<Int, Fragment> {
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        val list: ArrayList<Message> = ArrayList(chatHistoryAdapter.dataList)
-        outState.putParcelableArrayList(SAVED_BUNDLE_MESSAGES, list)
-        super.onSaveInstanceState(outState)
-    }
+        val userId = TestMessagesRepository().getUsers().first().id
 
-    private fun selectNewReaction(adapterPos: Int) {
-        val fragmentEmojiSelector = FragmentEmojiSelector.newInstance(
-            chatHistoryAdapter.dataList[adapterPos].id
+        // При первом заходе создаем новые фрагменты в последующем получаем их из FragmentManager
+        val channelFragment =
+            supportFragmentManager.findFragmentByTag("$VIEW_PAGER_TAG$POSITION_CHANNELS_BOTTOM_NAVIGATION")
+                ?: FragmentWrapperContainer.newInstance(ChannelsFragment.FRAGMENT_ID)
+
+        val usersFragment =
+            supportFragmentManager.findFragmentByTag("$VIEW_PAGER_TAG$POSITION_PEOPLE_BOTTOM_NAVIGATION")
+                ?: FragmentWrapperContainer.newInstance(UsersFragment.FRAGMENT_ID)
+
+        val profileFragment =
+            supportFragmentManager.findFragmentByTag("$VIEW_PAGER_TAG$POSITION_PROFILE_BOTTOM_NAVIGATION")
+                ?: ProfileFragment.newInstance(userId, true)
+
+        return mapOf(
+            POSITION_CHANNELS_BOTTOM_NAVIGATION to channelFragment,
+            POSITION_PEOPLE_BOTTOM_NAVIGATION to usersFragment,
+            POSITION_PROFILE_BOTTOM_NAVIGATION to profileFragment,
         )
-        fragmentEmojiSelector.show(supportFragmentManager, FragmentEmojiSelector.EMOJI_SELECT_RESULT_DIALOG_ID)
     }
 
-    private fun clickOnReaction(adapterPos: Int, emojiView: EmojiReactionCounter) {
-        if(emojiView.isSelected) {
-            chatHistoryAdapter.addReactionByMessageID(
-                chatHistoryAdapter.dataList[adapterPos].id,
-                Reaction(
-                    R.layout.emoji_for_select_view,
-                    MY_USER_ID,
-                    emojiView.displayEmoji
-                )
-            )
+
+    override fun onBackPressed() {
+        mainNavigationViewpageAdapter.value.fragmentAt(binding.mainNavigatinViewPager.currentItem)
+            ?.let {
+            //if assert with 0 will delete fragment and shown empty screen
+            if(it.childFragmentManager.backStackEntryCount > 1) {
+                it.childFragmentManager.popBackStack()
+                return
+            }
         }
-        else {
-            chatHistoryAdapter.removeReactionByMessageID(
-                chatHistoryAdapter.dataList[adapterPos].id,
-                Reaction(
-                    R.layout.emoji_for_select_view,
-                    MY_USER_ID,
-                    emojiView.displayEmoji
-                )
-            )
-        }
+
+        super.onBackPressed()
     }
 
     companion object {
-        private const val SAVED_BUNDLE_MESSAGES = "com.alexpaxom.SAVED_BUNDLE_MESSAGES"
-        private const val MY_USER_ID = 99999
-        private var MESSAGE_ID = 1000 // временное поле нужно для того что бы у сообщений было уникльное id
+        private const val POSITION_CHANNELS_BOTTOM_NAVIGATION = 0
+        private const val POSITION_PEOPLE_BOTTOM_NAVIGATION = 1
+        private const val POSITION_PROFILE_BOTTOM_NAVIGATION = 2
+        private const val VIEW_PAGER_TAG = "f"
     }
 }

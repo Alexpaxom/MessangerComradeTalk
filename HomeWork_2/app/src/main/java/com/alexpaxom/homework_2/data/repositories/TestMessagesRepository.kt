@@ -1,9 +1,7 @@
 package com.alexpaxom.homework_2.data.repositories
 
 import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.data.models.Message
-import com.alexpaxom.homework_2.data.models.Reaction
-import com.alexpaxom.homework_2.data.models.ReactionsGroup
+import com.alexpaxom.homework_2.data.models.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
@@ -41,6 +39,47 @@ class TestMessagesRepository {
         "\uD83D\uDE11",
     )
 
+    fun getUserById(userId: Int): User {
+        for(user in names) {
+
+            if(user.hashCode() == userId) {
+                val userParam = user.split(">")
+                return User(
+                    typeId = R.layout.user_info_item,
+                    id = user.hashCode(),
+                    name = userParam[0],
+                    email = "test@test.com",
+                    avatarUrl = userParam[1],
+                    status = "On meeting",
+                    online = true
+                )
+            }
+
+        }
+
+        error("cant find user with id $userId")
+    }
+
+    fun getUsers(): List<User> {
+        val retUsersList = arrayListOf<User>()
+        for(user in names) {
+            val userParam = user.split(">")
+            retUsersList.add(
+                User(
+                    typeId = R.layout.user_info_item,
+                    id = user.hashCode(),
+                    name = userParam[0],
+                    email = "test@test.com",
+                    avatarUrl = userParam[1],
+                    status = "On meeting",
+                    online = true
+                )
+            )
+        }
+
+        return retUsersList
+    }
+
     fun getMessages(count: Int): ArrayList<Message> {
         val ret = arrayListOf<Message>()
         val date = Date()
@@ -68,6 +107,48 @@ class TestMessagesRepository {
 
     }
 
+    fun getChannels(countChannels: Int, maxCountTopics: Int = 0): List<ExpandedChanelGroup> {
+        val random = Random(100)
+
+
+        val channelsList: ArrayList<ExpandedChanelGroup> = arrayListOf()
+
+        var nextChannelId = 0
+
+        repeat(countChannels) {
+            val countTopics = random.nextInt(maxCountTopics)
+            val channelId = nextChannelId
+            channelsList.add(
+                ExpandedChanelGroup(
+                    channel = Channel(
+                        typeId = R.layout.channel_info_item,
+                        id = nextChannelId,
+                        name = "Channel $it"
+                    ),
+                    topics = getTopics(countTopics)
+                )
+            )
+            nextChannelId += countTopics + 1
+        }
+
+        return channelsList
+    }
+
+    fun getTopics(count: Int, channelId: Int = 0): List<Topic> {
+        val topicsResult = arrayListOf<Topic>()
+        repeat(count) {
+            topicsResult.add(
+                Topic(
+                    typeId = R.layout.topic_info_item,
+                    id = channelId + it,
+                    channelId = channelId,
+                    name = "Topic №${channelId + it}",
+                )
+            )
+        }
+        return topicsResult
+    }
+
     private fun reactionsList(maxCount: Int): ArrayList<Reaction>{
         val random = Random(100)
 
@@ -88,6 +169,8 @@ class TestMessagesRepository {
 
         return reactionList
     }
+
+
 
     companion object {
         private const val MY_USER_ID = 99999

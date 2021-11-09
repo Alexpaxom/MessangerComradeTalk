@@ -10,7 +10,7 @@ abstract class BaseDiffUtilAdapter<P: ListItem>(
     val holdersFactory: BaseHolderFactory
 ): RecyclerView.Adapter<BaseViewHolder<ListItem>>() {
 
-    var dataList: List<P>
+    open var dataList: List<P>
         get() = diffUtil.currentList
         set(value) {
             diffUtil.submitList(value)
@@ -58,6 +58,10 @@ abstract class BaseDiffUtilAdapter<P: ListItem>(
         list.removeAt(pos)
 
         diffUtil.submitList(list)
+    }
+
+    open fun removeAll() {
+        diffUtil.submitList(listOf())
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<ListItem>, position: Int) {

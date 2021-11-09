@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="primary">#1E1E1E</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -14,5 +15,18 @@
     <color name="color_reaction_unselected">#1C1C1C</color>
     <color name="my_massage_text_background">#2A9D8F</color>
     <color name="delimiter_date_text_color">#999999</color>
+    <color name="ic_color_gray">#919191</color>
     <color name="bg_date_delimiter_color">#070707</color>
+    <color name="channels_list_divider_color">#282828</color>
+    <color name="green_topic_color">#2A9D8F</color>
+    <color name="user_info_name_color">#FAFAFA</color>
+    <color name="user_info_email_color">#A2A2A2</color>
+    <color name="profile_status_color">#BCBCBC</color>
+    <color name="profile_online_status_color">#4AB54D</color>
+    <color name="profile_logout_btn_back_color">#1B1B1B</color>
+    <color name="profile_logout_btn_text_color">#FFFFFF</color>
+    <color name="bottom_nav_main_menu_background">#1E1E1E</color>
+    <color name="bottom_nav_main_menu_color_unselect">#919191</color>
+    <color name="bottom_nav_main_menu_color_select">#FAFAFA</color>
+    <color name="tab_underscore_color">#219653</color>
 </resources>

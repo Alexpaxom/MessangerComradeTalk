@@ -1,17 +1,9 @@
-package com.alexpaxom.homework_2.domain.repositories
+package com.alexpaxom.homework_2.data.usecases
 
-import com.alexpaxom.homework_2.data.models.MessageItem
 import com.alexpaxom.homework_2.domain.entity.SendResult
 import io.reactivex.Single
 
-interface MessagesRepository {
-    fun getMessages(
-        messageId: Long,
-        numBefore:Int,
-        numAfter:Int,
-        filter:String?,
-    ): Single<List<MessageItem>>
-
+interface MessageSendUseCase {
     fun sendMessageToStream(
         streamId: Int,
         topic: String,

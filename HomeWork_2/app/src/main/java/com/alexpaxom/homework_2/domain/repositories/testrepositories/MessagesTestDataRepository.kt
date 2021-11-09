@@ -4,6 +4,7 @@ import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.MessageItem
 import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.data.models.ReactionsGroup
+import com.alexpaxom.homework_2.domain.entity.SendResult
 import com.alexpaxom.homework_2.domain.repositories.MessagesRepository
 import io.reactivex.Single
 import java.util.*
@@ -34,7 +35,12 @@ class MessagesTestDataRepository: MessagesRepository {
         "\uD83D\uDE11",
     )
 
-    override fun getMessages(): Single<List<MessageItem>> {
+    override fun getMessages(
+        messageId: Long,
+        numBefore: Int,
+        numAfter: Int,
+        filter: String?
+    ): Single<List<MessageItem>> {
         val ret = arrayListOf<MessageItem>()
         val date = Date()
         date.time -= 1000*60*60*12*countMessages
@@ -57,6 +63,18 @@ class MessagesTestDataRepository: MessagesRepository {
         }
 
         return Single.just(ret)
+    }
+
+    override fun sendMessageToStream(
+        streamId: Int,
+        topic: String,
+        message: String
+    ): Single<SendResult> {
+        TODO("Not yet implemented")
+    }
+
+    override fun sendMessageToUsers(usersIds: List<Int>, message: String): Single<SendResult> {
+        TODO("Not yet implemented")
     }
 
     private fun reactionsList(maxCount: Int): ArrayList<ReactionItem>{

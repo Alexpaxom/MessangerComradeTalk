@@ -29,8 +29,8 @@ class Message (
 //    @field:Json(name = "topic_links")
 //        val topicLinks: List<Any>? = null
 //
-    @field:Json(name = "is_me_message")
-    val isMeMessage: Boolean = false,
+//    @field:Json(name = "is_me_message")
+//    val isMeMessage: Boolean = false,
 
     @field:Json(name = "reactions")
     val reactions: List<DomainReaction> = listOf(),

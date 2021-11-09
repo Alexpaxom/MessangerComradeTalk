@@ -16,8 +16,7 @@ import com.alexpaxom.homework_2.app.adapters.decorators.ChatDateDecorator
 import com.alexpaxom.homework_2.customview.EmojiReactionCounter
 import com.alexpaxom.homework_2.data.models.MessageItem
 import com.alexpaxom.homework_2.data.models.ReactionItem
-import com.alexpaxom.homework_2.data.models.ReactionsGroup
-import com.alexpaxom.homework_2.data.usecases.testusecases.MessagesLoadUseCaseTestImpl
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessageSendUseCaseZulipApiImpl
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessagesLoadUseCaseZulipApiImpl
 import com.alexpaxom.homework_2.databinding.FragmentChatBinding
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -39,10 +38,15 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     )
 
     override var currentState: ChatState = ChatState.InitialState
-
     private val chatHistoryAdapter = ChatHistoryAdapter(chatMessageFactory)
-
     private val compositeDisposable = CompositeDisposable()
+
+    private val topicName = "swimming turtles"
+    private val streamName = "general"
+    private val streamId = 306312
+
+    private val messagesLoader = MessagesLoadUseCaseZulipApiImpl(MY_USER_ID)
+    private val messagesSender = MessageSendUseCaseZulipApiImpl()
 
 
     override fun onCreateView(
@@ -55,7 +59,20 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
         // Обрабочики нажатий на элементы списка сообщений
 
         if(savedInstanceState == null) {
-            loadMessages()
+            messagesLoader.getMessages(
+                messageId = MessagesLoadUseCaseZulipApiImpl.NEWEST_MESSAGE,
+                numBefore = DEFAULT_COUNT_LOAD_MESSAGES,
+                numAfter = 0,
+                filter = null
+            )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { goToState(ChatState.LoadingState) }
+            .subscribeBy(
+                onSuccess = { goToState(ChatState.ResultState(it)) },
+                onError = { goToState(ChatState.ErrorState(it)) }
+            )
+            .addTo(compositeDisposable)
         }
         else {
             goToState(ChatState.ResultState(
@@ -88,29 +105,12 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
                 }
             })
 
-        // Колбек после добавления нового сообщения в список
-        chatHistoryAdapter.setClickListenerOnAddMessage {
-            binding.chatingHistory.scrollToPosition(it)
-        }
-
 
         // Обработка нажатия на кнопку отправки сообщения
         binding.messageSendBtn.setOnClickListener() {
             binding.messageEnterEdit.text?.let {
                 if (it.isNotEmpty()) {
-                    chatHistoryAdapter.addItem(
-                        MessageItem(
-                        typeId = R.layout.my_message_item,
-                        id = MESSAGE_ID++,
-                        userId = MY_USER_ID,
-                        userName = "My message",
-                        text = binding.messageEnterEdit.text.toString(),
-                        datetime = Date(),
-                        avatarUrl = null,
-                        reactionsGroup = ReactionsGroup(listOf(), MY_USER_ID)
-                    )
-                    )
-                    binding.messageEnterEdit.text?.clear()
+                    sendMessage(it.toString())
                 }
             }
         }
@@ -131,13 +131,43 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
         return binding.root
     }
 
-    fun loadMessages() {
-        MessagesLoadUseCaseZulipApiImpl().getMessages()
+    private fun sendMessage(message: String) {
+        messagesSender.sendMessageToStream(streamId, topicName, message)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { goToState(ChatState.LoadingState) }
             .subscribeBy(
-                onSuccess = { goToState(ChatState.ResultState(it)) },
+                onSuccess = {
+                    loadingNewMessages(scrollToEnd = true)
+                    binding.messageEnterEdit.text?.clear()
+                },
+                onError = { goToState(ChatState.ErrorState(it)) }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    private fun loadingNewMessages(scrollToEnd: Boolean = false) {
+        messagesLoader.getMessages(
+            messageId = chatHistoryAdapter.dataList.last().id.toLong(),
+            numBefore = 0,
+            numAfter = MAX_COUNT_LOAD_MESSAGES,
+            filter = null
+        )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { goToState(ChatState.LoadingState) }
+            .subscribeBy(
+                onSuccess = {
+                    goToState(
+                        ChatState.AddingMessagesState(
+                            position = chatHistoryAdapter.dataList.size,
+                            messages = it,
+                        )
+                    )
+
+                    if(scrollToEnd)
+                        binding.chatingHistory.scrollToPosition(chatHistoryAdapter.dataList.size-1)
+                },
                 onError = { goToState(ChatState.ErrorState(it)) }
             )
             .addTo(compositeDisposable)
@@ -195,6 +225,11 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
         Toast.makeText(context, errorState.error.localizedMessage, Toast.LENGTH_LONG).show()
     }
 
+    override fun toAddingMessages(newMessages: ChatState.AddingMessagesState) {
+        binding.messagesLoadingProgress.isVisible = false
+        chatHistoryAdapter.addMessagesToPosition(newMessages.position, newMessages.messages)
+    }
+
     override fun getTheme(): Int {
         return R.style.Theme_DialogFragment
     }
@@ -212,9 +247,10 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     companion object {
 
         private const val SAVED_BUNDLE_MESSAGES = "com.alexpaxom.SAVED_BUNDLE_MESSAGES"
-        private const val MY_USER_ID = 99999
-        private var MESSAGE_ID = 1000 // временное поле нужно для того что бы у сообщений было уникльное id
+        private const val MY_USER_ID = 456094
         const val FRAGMENT_ID = "com.alexpaxom.CHAT_FRAGMENT_ID"
+        private const val DEFAULT_COUNT_LOAD_MESSAGES = 20
+        private const val MAX_COUNT_LOAD_MESSAGES = 1000
         @JvmStatic
         fun newInstance() = ChatFragment()
     }

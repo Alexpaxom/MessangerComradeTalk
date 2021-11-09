@@ -1,5 +1,6 @@
 package com.alexpaxom.homework_2.app.adapters.chathistory
 
+import android.util.Log
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseDiffUtilAdapter
@@ -9,23 +10,23 @@ import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.helpers.DateFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class ChatHistoryAdapter(
     holdersFactory: BaseHolderFactory
 ): BaseDiffUtilAdapter<MessageItem>(holdersFactory) {
-    private var addMessageClickListener: ((messagePos: Int) -> Unit)? = null
-
     init {
         diffUtil = createDiffUtil()
     }
 
 
     fun addReactionByMessageID(messageId: Int, reaction: ReactionItem) {
-        diffUtil.currentList.indexOfLast { it.id == messageId }.let { messageId ->
-            if(messageId != -1) {
-                    updateItem(messageId, MessageItem(
-                        diffUtil.currentList[messageId],
-                        diffUtil.currentList[messageId].reactionsGroup.addReaction(reaction)
+        diffUtil.currentList.indexOfLast { it.id == messageId }.let { messagePos ->
+            if(messagePos != -1) {
+                updateItem(
+                    messagePos,
+                    diffUtil.currentList[messagePos].copy (
+                        reactionsGroup = diffUtil.currentList[messagePos].reactionsGroup.addReaction(reaction)
                     )
                 )
             }
@@ -33,16 +34,23 @@ class ChatHistoryAdapter(
     }
 
     fun removeReactionByMessageID(messageId: Int, reaction: ReactionItem) {
-        diffUtil.currentList.indexOfLast { it.id == messageId }.let { messageId ->
-            if(messageId != -1) {
-                updateItem(messageId,
-                    MessageItem(
-                        diffUtil.currentList[messageId],
-                        diffUtil.currentList[messageId].reactionsGroup.removeReaction(reaction)
+        diffUtil.currentList.indexOfLast { it.id == messageId }.let { messagePos ->
+            if(messagePos != -1) {
+                updateItem(
+                    messagePos,
+                    diffUtil.currentList[messagePos].copy (
+                        reactionsGroup = diffUtil.currentList[messagePos].reactionsGroup.removeReaction(reaction)
                     )
                 )
             }
         }
+    }
+
+    fun addMessagesToPosition(position: Int, messages: List<MessageItem>) {
+        val newList = arrayListOf<MessageItem>()
+        newList.addAll(dataList)
+        newList.addAll(position, messages)
+        dataList = newList
     }
 
 
@@ -76,29 +84,15 @@ class ChatHistoryAdapter(
         )
     }
 
-    companion object {
-        private const val MY_USER_ID = 99999
-    }
 
-    fun setClickListenerOnAddMessage(listener: (messagePos: Int) -> Unit ){
-        addMessageClickListener = listener
-    }
 
     fun createDiffUtil(): AsyncListDiffer<MessageItem> {
         val differ = AsyncListDiffer(this, MessagesDiffUtil())
-        differ.addListListener { previousList, currentList ->
-            if(previousList.size != 0 && currentList.size != 0 ) {
-                // Передвигаем список в конец при добавлении сообщения пользователем
-                if(currentList[currentList.size-1].userId == MY_USER_ID &&
-                    previousList[previousList.size-1].id != currentList[currentList.size-1].id
-                ){
-                    addMessageClickListener?.invoke(currentList.size-1)
-                }
-
-            }
-        }
-
         return differ
+    }
+
+    companion object {
+        private const val MY_USER_ID = 456094
     }
 
 }

@@ -1,6 +1,7 @@
 package com.alexpaxom.homework_2.app.fragments
 
 import com.alexpaxom.homework_2.data.models.MessageItem
+import java.text.FieldPosition
 
 
 sealed interface ChatState {
@@ -8,6 +9,7 @@ sealed interface ChatState {
     fun toResultState(): Boolean = defaultAction
     fun toLoadingState(): Boolean = defaultAction
     fun toErrorState(): Boolean = defaultAction
+    fun toAddingMessagesState(): Boolean = defaultAction
 
     object InitialState : ChatState {
         override fun toLoadingState(): Boolean = true
@@ -18,16 +20,26 @@ sealed interface ChatState {
         override fun toResultState(): Boolean = true
         override fun toLoadingState(): Boolean = true
         override fun toErrorState(): Boolean = true
+        override fun toAddingMessagesState(): Boolean = true
     }
 
     object LoadingState : ChatState {
         override fun toResultState(): Boolean = true
         override fun toLoadingState(): Boolean = true
         override fun toErrorState(): Boolean = true
+        override fun toAddingMessagesState(): Boolean = true
     }
 
     class ErrorState(val error: Throwable): ChatState {
         override fun toLoadingState(): Boolean = true
+    }
+
+    class AddingMessagesState(val position: Int, val messages: List<MessageItem>): ChatState {
+        override fun toResultState(): Boolean = true
+        override fun toLoadingState(): Boolean = true
+        override fun toErrorState(): Boolean = true
+        override fun toAddingMessagesState(): Boolean = true
+
     }
 
     companion object {
@@ -55,6 +67,11 @@ interface ChatStateMachine {
                 currentState.toErrorState()
             }
 
+            is ChatState.AddingMessagesState -> {
+                if(currentState.toAddingMessagesState()) toAddingMessages(newState)
+                currentState.toAddingMessagesState()
+            }
+
             is ChatState.InitialState -> { currentState.toInitialState() }
         }
 
@@ -68,6 +85,7 @@ interface ChatStateMachine {
     fun toResult(resultState: ChatState.ResultState){}
     fun toLoading(loadingState: ChatState.LoadingState){}
     fun toError(errorState: ChatState.ErrorState){}
+    fun toAddingMessages(newMessages: ChatState.AddingMessagesState){}
 
     fun defaultToStateCallback(nextState: ChatState): Boolean {
         error("Try to go from state ${currentState::class.java.name} to ${nextState::class.java.name} this transition not defined")

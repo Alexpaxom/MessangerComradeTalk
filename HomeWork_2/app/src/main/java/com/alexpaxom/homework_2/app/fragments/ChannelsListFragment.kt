@@ -11,9 +11,12 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.activities.MainActivity
 import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListAdapter
 import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListHoldersFactory
+import com.alexpaxom.homework_2.data.models.ChannelItem
 import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
+import com.alexpaxom.homework_2.data.models.TopicItem
 import com.alexpaxom.homework_2.data.usecases.testusecases.SearchExpandedChannelGroupTestImpl
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchExpandedChannelGroupZulipImpl
 import com.alexpaxom.homework_2.databinding.CnannelsListFragmentBinding
@@ -24,6 +27,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.ReplaySubject
+import java.text.FieldPosition
 import java.util.concurrent.TimeUnit
 
 class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>(),
@@ -32,8 +36,7 @@ ChannelsStateMachine {
     override var currentState: ChannelsScreenState = InitialState
     private val compositeDisposable = CompositeDisposable()
     private val channelsListHoldersFactory = ChannelsListHoldersFactory {
-        val chatFragment = ChatFragment.newInstance()
-        chatFragment.show(parentFragmentManager, ChatFragment.FRAGMENT_ID)
+        onItemClick(it)
     }
     private val channelsListAdapter = ChannelsListAdapter(channelsListHoldersFactory)
 
@@ -131,6 +134,28 @@ ChannelsStateMachine {
     override fun onDestroy() {
         compositeDisposable.dispose()
         super.onDestroy()
+    }
+
+    private fun onItemClick(position: Int) {
+        val item = channelsListAdapter.innerList[position]
+        val chatFragment = when(item) {
+            is ChannelItem -> ChatFragment.newInstance(
+                topicName = "",
+                streamName = item.name,
+                streamId = item.id,
+                myUserId = (requireActivity() as MainActivity).ownUserId
+
+            )
+            is TopicItem -> ChatFragment.newInstance(
+                topicName = item.name,
+                streamName = "",
+                streamId = item.channelId,
+                myUserId = (requireActivity() as MainActivity).ownUserId
+
+            )
+        }
+
+        chatFragment.show(parentFragmentManager, ChatFragment.FRAGMENT_ID)
     }
 
 

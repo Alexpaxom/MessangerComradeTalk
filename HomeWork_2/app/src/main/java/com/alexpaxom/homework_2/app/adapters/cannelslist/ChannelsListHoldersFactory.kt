@@ -5,11 +5,13 @@ import android.view.ViewGroup
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseHolderFactory
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseViewHolder
+import com.alexpaxom.homework_2.data.models.ChannelItem
+import com.alexpaxom.homework_2.data.models.TopicItem
 import com.alexpaxom.homework_2.databinding.ChannelInfoItemBinding
 import com.alexpaxom.homework_2.databinding.TopicInfoItemBinding
 
 class ChannelsListHoldersFactory(
-    private val onMessageClickListener: (topicPos: Int) -> Unit
+    private val onExpandableChannelItemClickListener: (position: Int) -> Unit
 ): BaseHolderFactory() {
     override fun createViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> {
         return when(viewType) {
@@ -19,7 +21,7 @@ class ChannelsListHoldersFactory(
                     viewGroup,
                     false
                 ),
-                onMessageClickListener
+                onExpandableChannelItemClickListener
             )
             R.layout.channel_info_item -> ChannelInfoHolder(
                 ChannelInfoItemBinding.inflate(
@@ -27,7 +29,7 @@ class ChannelsListHoldersFactory(
                     viewGroup,
                     false
                 ),
-                onMessageClickListener
+                onExpandableChannelItemClickListener
             )
             else -> error("Bad type channel list holder")
         }

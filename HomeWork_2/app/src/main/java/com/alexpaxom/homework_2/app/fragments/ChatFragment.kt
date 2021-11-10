@@ -25,6 +25,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.*
 
 
@@ -42,12 +44,12 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     private val chatHistoryAdapter = ChatHistoryAdapter(chatMessageFactory)
     private val compositeDisposable = CompositeDisposable()
 
-    private var topicName = arguments?.getString(ARGUMENT_TOPIC_NAME) ?: ""
-    private var streamName = arguments?.getString(ARGUMENT_STREAM_NAME) ?: ""
-    private var streamId = arguments?.getInt(ARGUMENT_STREAM_ID) ?: 0
-    private var MyUserId = arguments?.getInt(ARGUMENT_MY_USER_ID) ?: 0
+    private var topicName = lazy { arguments?.getString(ARGUMENT_TOPIC_NAME) ?: "" }
+    private var streamName = lazy { arguments?.getString(ARGUMENT_STREAM_NAME) ?: "" }
+    private var streamId = lazy { arguments?.getInt(ARGUMENT_STREAM_ID) ?: 0 }
+    private var myUserId = lazy { arguments?.getInt(ARGUMENT_MY_USER_ID) ?: 0 }
 
-    private val messagesLoader = MessagesLoadUseCaseZulipApiImpl(MyUserId)
+    private var messagesLoader = lazy {  MessagesLoadUseCaseZulipApiImpl(myUserId.value) }
     private val messagesSender = MessageSendUseCaseZulipApiImpl()
     private val emojiHelper = EmojiHelper()
 
@@ -58,15 +60,12 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     ): View {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
 
-        topicName = arguments?.getString(ARGUMENT_TOPIC_NAME) ?: ""
-        streamName = arguments?.getString(ARGUMENT_STREAM_NAME) ?: ""
-        streamId = arguments?.getInt(ARGUMENT_STREAM_ID) ?: 0
-        MyUserId = arguments?.getInt(ARGUMENT_MY_USER_ID) ?: 0
+
 
         // Обрабочики нажатий на элементы списка сообщений
 
         if(savedInstanceState == null) {
-            messagesLoader.getMessages(
+            messagesLoader.value.getMessages(
                 messageId = MessagesLoadUseCaseZulipApiImpl.NEWEST_MESSAGE,
                 numBefore = DEFAULT_COUNT_LOAD_MESSAGES,
                 numAfter = 0,
@@ -104,7 +103,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
                     addReaction(
                         ReactionItem(
                             typeId = R.layout.emoji_for_select_view,
-                            userId = MyUserId,
+                            userId = myUserId.value,
                             emojiUnicode = emojiUnicode,
                             emojiName = emojiHelper.getNameByUnicode(emojiUnicode)
                         ),
@@ -140,7 +139,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     }
 
     private fun sendMessage(message: String) {
-        messagesSender.sendMessageToStream(streamId, topicName, message)
+        messagesSender.sendMessageToStream(streamId.value, topicName.value, message)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { goToState(ChatState.LoadingState) }
@@ -155,7 +154,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     }
 
     private fun loadingNewMessages(scrollToEnd: Boolean = false) {
-        messagesLoader.getMessages(
+        messagesLoader.value.getMessages(
             messageId = chatHistoryAdapter.dataList.last().id.toLong(),
             numBefore = 0,
             numAfter = MAX_COUNT_LOAD_MESSAGES,
@@ -169,7 +168,7 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
                     goToState(
                         ChatState.AddingMessagesState(
                             position = chatHistoryAdapter.dataList.size,
-                            messages = it,
+                            messages = it.subList(1, it.size),
                         )
                     )
 
@@ -195,15 +194,32 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     }
 
     private fun createFilterForMessages(): String {
-        return "["+
-                """{"operator": "stream", "operand": "$streamName"}"""+
-                "]"
+        val filter = JSONArray()
+
+        filter.put(
+                JSONObject().apply {
+                    put("operator", "stream")
+                    put("operand", streamId.value)
+                }
+            )
+
+        if(topicName.value != "")
+            filter.put(
+                JSONObject().apply {
+                    put("operator", "topic")
+                    put("operand", "${topicName.value}")
+                }
+            )
+
+        return filter.toString()
+
+
     }
 
     private fun clickOnReaction(adapterPos: Int, emojiView: EmojiReactionCounter) {
         val reaction = ReactionItem(
             typeId = R.layout.emoji_for_select_view,
-            userId = MyUserId,
+            userId = myUserId.value,
             emojiUnicode = emojiView.displayEmoji,
             emojiName = emojiHelper.getNameByUnicode(emojiView.displayEmoji)
         )
@@ -294,16 +310,16 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
         private const val MAX_COUNT_LOAD_MESSAGES = 1000
         @JvmStatic
         fun newInstance(
-                topicName: String = "swimming turtles",
-                streamName: String = "general",
-                streamId: Int = 306312,
-                MyUserId: Int = 456094
+            topicName: String = "",
+            streamName: String,
+            streamId: Int,
+            myUserId: Int
         ) = ChatFragment().apply {
             arguments = Bundle().apply {
                 putString(ARGUMENT_TOPIC_NAME, topicName)
                 putString(ARGUMENT_STREAM_NAME, streamName)
                 putInt(ARGUMENT_STREAM_ID, streamId)
-                putInt(ARGUMENT_MY_USER_ID, MyUserId)
+                putInt(ARGUMENT_MY_USER_ID, myUserId)
             }
         }
     }

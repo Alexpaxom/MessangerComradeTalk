@@ -6,12 +6,12 @@ import com.alexpaxom.homework_2.databinding.TopicInfoItemBinding
 
 class TopicInfoHolder(
     private val topicInfoItemBinding: TopicInfoItemBinding,
-    private val onMessageClickListener: (topicPos: Int) -> Unit
+    private val onExpandableChannelItemClickListener: (position: Int) -> Unit
 ): BaseViewHolder<TopicItem>(topicInfoItemBinding) {
 
     init {
         itemView.setOnClickListener {
-            onMessageClickListener(bindingAdapterPosition)
+            onExpandableChannelItemClickListener(bindingAdapterPosition)
         }
     }
 

@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private var ownUserId = 0
+    var ownUserId = 0
 
     private val compositeDisposable = CompositeDisposable()
 

@@ -14,7 +14,7 @@ import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListAdapter
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListFactoryHolders
 import com.alexpaxom.homework_2.data.models.UserItem
-import com.alexpaxom.homework_2.data.usecases.testusecases.SearchUsersTestImpl
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulipApiImpl
 import com.alexpaxom.homework_2.databinding.FragmentUsersBinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -33,6 +33,7 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
     private val compositeDisposable = CompositeDisposable()
 
     private val searchUsersSubject: BehaviorSubject<String> = BehaviorSubject.create()
+    private val searchUsers = SearchUsersZulipApiImpl()
 
     override fun createBinding(): FragmentUsersBinding =
         FragmentUsersBinding.inflate(layoutInflater)
@@ -73,7 +74,7 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
                 .distinctUntilChanged()
                 .doOnNext { goToState(UsersState.LoadingState) }
                 .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-                .switchMap { SearchUsersTestImpl().search(it).toObservable() }
+                .switchMap { searchUsers.search(it).toObservable() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onNext = { goToState(UsersState.ResultState(it)) },

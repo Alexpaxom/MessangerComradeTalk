@@ -10,7 +10,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.UserItem
-import com.alexpaxom.homework_2.data.usecases.testusecases.UserProfileUseCaseTestImpl
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserProfileUseCaseZulipApiImpl
 import com.alexpaxom.homework_2.databinding.FragmentProfileBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -29,6 +29,8 @@ class ProfileFragment: DialogFragment(), ProfileStateMachine {
     override var currentState: ProfileState = ProfileState.InitialState
     private var loadedUser: UserItem? = null
     private val compositeDisposable = CompositeDisposable()
+
+    private val searchUsers = UserProfileUseCaseZulipApiImpl()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +55,7 @@ class ProfileFragment: DialogFragment(), ProfileStateMachine {
     }
 
     private fun loadUserData(userId: Int) {
-        UserProfileUseCaseTestImpl().getUserByID(userId)
+        searchUsers.getUserByID(userId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { goToState(ProfileState.LoadingState) }
@@ -69,7 +71,6 @@ class ProfileFragment: DialogFragment(), ProfileStateMachine {
 
     override fun toResult(resultState: ProfileState.ResultState) {
         binding.profileLoadProgress.isVisible = false
-        binding.onlineStatus.isVisible = resultState.user.online
         binding.userName.text = resultState.user.name
         binding.status.text = resultState.user.status
         binding.profileLogoutBtn.isVisible = arguments?.getBoolean(ARGUMENT_OWNER_PARAMETER) ?: false

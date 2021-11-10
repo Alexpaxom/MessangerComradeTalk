@@ -4,5 +4,6 @@ import com.alexpaxom.homework_2.data.models.UserItem
 import io.reactivex.Single
 
 interface UserProfileUseCase {
-    fun getUserByID(userId: Int): Single<UserItem>
+    // if null return own user
+    fun getUserByID(userId: Int? = null): Single<UserItem>
 }

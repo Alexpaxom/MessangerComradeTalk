@@ -10,7 +10,7 @@ import java.util.*
 
 class MessageConverter {
 
-    val reactionConverter = ReactionConverter()
+    private val reactionConverter = ReactionConverter()
 
     fun convert(message: Message): MessageItem {
         val text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
@@ -28,7 +28,7 @@ class MessageConverter {
                 id = message.id,
                 userId = message.senderId,
                 userName = message.senderFullName,
-                text = text.toString(),
+                text = text.toString().trim(),
                 datetime = Date(message.timestamp*CONVERT_FROM_UTC_SECONDS),
                 avatarUrl = message.avatarUrl,
                 reactionsGroup = ReactionsGroup(reactionsList)

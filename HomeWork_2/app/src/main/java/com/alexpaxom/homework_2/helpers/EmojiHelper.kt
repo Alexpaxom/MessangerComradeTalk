@@ -5,6 +5,23 @@ class EmojiHelper {
         return emojiMap[unicodeEmoji] ?: "grinning"
     }
 
+    fun getUnicodeByName(emojiName: String): String? {
+        return invertEmojiMap[emojiName]
+    }
+
+    // Собираем несколько символов в 1 эмоджи
+    fun combineStringToEmoji(emojiString: String): String {
+        return emojiString
+            .split('-')
+            .fold("") { emoji, elem ->
+                emoji + hexToUnitcode(elem)
+            }
+    }
+
+    fun hexToUnitcode(hex:String, radix:Int = 16): String {
+        return String(Character.toChars(hex.toInt(radix)))
+    }
+
     val emojiMap = mapOf(
         "1f600" to "grinning",
         "1f603" to "smiley",
@@ -943,20 +960,20 @@ class EmojiHelper {
         "1f192" to "cool",
         "1f195" to "new",
         "1f193" to "free",
-//        "0030-20e3" to "zero",
-//        "0031-20e3" to "one",
-//        "0032-20e3" to "two",
-//        "0033-20e3" to "three",
-//        "0034-20e3" to "four",
-//        "0035-20e3" to "five",
-//        "0036-20e3" to "six",
-//        "0037-20e3" to "seven",
-//        "0038-20e3" to "eight",
-//        "0039-20e3" to "nine",
-//        "1f51f" to "ten",
-//        "1f522" to "1234",
-//        "0023-20e3" to "hash",
-//        "002a-20e3" to "asterisk",
+        "0030-20e3" to "zero",
+        "0031-20e3" to "one",
+        "0032-20e3" to "two",
+        "0033-20e3" to "three",
+        "0034-20e3" to "four",
+        "0035-20e3" to "five",
+        "0036-20e3" to "six",
+        "0037-20e3" to "seven",
+        "0038-20e3" to "eight",
+        "0039-20e3" to "nine",
+        "1f51f" to "ten",
+        "1f522" to "1234",
+        "0023-20e3" to "hash",
+        "002a-20e3" to "asterisk",
         "25b6" to "play",
         "23f8" to "pause",
         "23ef" to "play_pause",
@@ -1056,6 +1073,8 @@ class EmojiHelper {
         "1f6a9" to "triangular_flag",
         "1f38c" to "crossed_flags"
     ).map {
-            String(Character.toChars(it.key.toInt(16))) to it.value
+        combineStringToEmoji(it.key) to it.value
     }.toMap()
+
+    private val invertEmojiMap = emojiMap.map { it.value to it.key }.toMap()
 }

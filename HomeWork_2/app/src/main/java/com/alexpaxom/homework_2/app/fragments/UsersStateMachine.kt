@@ -7,18 +7,26 @@ sealed interface UsersState {
     fun toResultState(): Boolean = defaultAction
     fun toLoadingState(): Boolean = defaultAction
     fun toErrorState(): Boolean = defaultAction
+    fun toStatusRefresh(): Boolean = defaultAction
 
     object InitialState : UsersState {
         override fun toLoadingState(): Boolean = true
     }
 
-    class ResultState(val items: List<UserItem>): UsersState {
+    class ResultState(val users: List<UserItem>): UsersState {
+        override fun toResultState(): Boolean = true
+        override fun toLoadingState(): Boolean = true
+        override fun toErrorState(): Boolean = true
+        override fun toStatusRefresh(): Boolean = true
+    }
+
+    object LoadingState : UsersState {
         override fun toResultState(): Boolean = true
         override fun toLoadingState(): Boolean = true
         override fun toErrorState(): Boolean = true
     }
 
-    object LoadingState : UsersState {
+    class StatusRefreshState(val users: List<UserItem>) : UsersState {
         override fun toResultState(): Boolean = true
         override fun toLoadingState(): Boolean = true
         override fun toErrorState(): Boolean = true
@@ -53,6 +61,11 @@ interface UsersStateMachine {
                 currentState.toErrorState()
             }
 
+            is UsersState.StatusRefreshState -> {
+                if(currentState.toStatusRefresh()) toStatusRefresh(newState)
+                currentState.toStatusRefresh()
+            }
+
             is UsersState.InitialState -> { currentState.toInitialState() }
         }
 
@@ -66,6 +79,7 @@ interface UsersStateMachine {
     fun toResult(resultState: UsersState.ResultState){}
     fun toLoading(loadingState: UsersState.LoadingState){}
     fun toError(errorState: UsersState.ErrorState){}
+    fun toStatusRefresh(refreshState:  UsersState.StatusRefreshState){}
 
     fun defaultToStateCallback(nextState: UsersState): Boolean {
         error("Try to go from state ${currentState::class.java.name} to ${nextState::class.java.name} this transition not defined")

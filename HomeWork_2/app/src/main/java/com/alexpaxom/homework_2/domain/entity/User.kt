@@ -18,9 +18,9 @@ class User (
 
     @field:Json(name = "full_name")
     var fullName: String,
-//
-//    @field:Json(name = "is_active")
-//    var isActive: Boolean? = null
+
+    @field:Json(name = "is_active")
+    var isActive: Boolean,
 //
 //    @field:Json(name = "is_admin")
 //    var isAdmin: Boolean? = null
@@ -28,9 +28,9 @@ class User (
 //    @field:Json(name = "is_billing_admin")
 //    var isBillingAdmin: Boolean? = null
 //
-//    @field:Json(name = "is_bot")
-//    var isBot: Boolean? = null
-//
+    @field:Json(name = "is_bot")
+    var isBot: Boolean,
+
 //    @field:Json(name = "is_guest")
 //    var isGuest: Boolean? = null
 //

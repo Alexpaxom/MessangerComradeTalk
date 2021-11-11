@@ -20,6 +20,8 @@ interface UsersZulipApiRequests {
     @GET("/api/v1/users/me")
     fun getOwnUser(): Single<User>
 
-    @GET("/api/v1/users/{user_id_or_email}/presence")
-    fun getUserPresence(): Single<UserPresence>
+    @GET("/api/v1/users/{user_id}/presence")
+    fun getUserPresence(
+        @Path("user_id") userId: Int
+    ): Single<UserPresence>
 }

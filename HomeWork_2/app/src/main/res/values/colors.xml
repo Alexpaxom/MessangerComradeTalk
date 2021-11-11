@@ -23,6 +23,8 @@
     <color name="user_info_email_color">#A2A2A2</color>
     <color name="profile_status_color">#BCBCBC</color>
     <color name="profile_online_status_color">#4AB54D</color>
+    <color name="profile_idle_status_color">#EB7E19</color>
+    <color name="profile_offline_status_color">#FF0000</color>
     <color name="profile_logout_btn_back_color">#1B1B1B</color>
     <color name="profile_logout_btn_text_color">#FFFFFF</color>
     <color name="bottom_nav_main_menu_background">#1E1E1E</color>

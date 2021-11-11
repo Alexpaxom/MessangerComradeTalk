@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -15,7 +16,9 @@ import com.alexpaxom.homework_2.app.adapters.userslist.UsersListAdapter
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListFactoryHolders
 import com.alexpaxom.homework_2.data.models.UserItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulipApiImpl
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApiImpl
 import com.alexpaxom.homework_2.databinding.FragmentUsersBinding
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -23,6 +26,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMachine {
 
@@ -34,6 +38,7 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
 
     private val searchUsersSubject: BehaviorSubject<String> = BehaviorSubject.create()
     private val searchUsers = SearchUsersZulipApiImpl()
+    private val userStatusInfo = UserStatusUseCaseZulipApiImpl()
 
     override fun createBinding(): FragmentUsersBinding =
         FragmentUsersBinding.inflate(layoutInflater)
@@ -50,7 +55,14 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
             context,
             RecyclerView.VERTICAL
         )
-        channelsDividerItemDecoration.setDrawable(resources.getDrawable(R.drawable.users_list_decoration_divider))
+
+        ResourcesCompat.getDrawable(
+            resources,
+            R.drawable.users_list_decoration_divider, activity?.theme
+        )?.let {
+                channelsDividerItemDecoration.setDrawable(it)
+        }
+
 
         binding.usersList.addItemDecoration(channelsDividerItemDecoration)
 
@@ -77,7 +89,10 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
                 .switchMap { searchUsers.search(it).toObservable() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onNext = { goToState(UsersState.ResultState(it)) },
+                    onNext = {
+                        goToState(UsersState.ResultState(it))
+                        loadUsersStates(it)
+                    },
                     onError = { goToState(UsersState.ErrorState(it)) }
                 )
                 .addTo(compositeDisposable)
@@ -93,6 +108,30 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
 
     private fun searchUsers(searchString: String) {
         searchUsersSubject.onNext(searchString)
+    }
+
+    private fun loadUsersStates(users: List<UserItem>){
+
+        val usersMap = users.map { it.id to it}.toMap()
+
+        Observable.fromIterable(users)
+            .subscribeOn(Schedulers.io())
+            .concatMapSingle {
+                userStatusInfo.getStatusForUser(it.id)
+            }
+            .toList()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { statuses ->
+                    val usersWithStatus = statuses.map { status ->
+                        usersMap[status.userId]!!.copy(status = status.aggregatedStatus)
+                    }
+                    goToState(UsersState.StatusRefreshState(usersWithStatus))
+                },
+                onError = { goToState(UsersState.ErrorState(it)) }
+            )
+            .addTo(compositeDisposable)
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -112,7 +151,7 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
 
     override fun toResult(resultState: UsersState.ResultState) {
         binding.usersProgress.isVisible = false
-        usersListAdapter.dataList = resultState.items
+        usersListAdapter.dataList = resultState.users
     }
 
     override fun toLoading(loadingState: UsersState.LoadingState) {
@@ -122,6 +161,10 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
     override fun toError(errorState: UsersState.ErrorState) {
         binding.usersProgress.isVisible = false
         Toast.makeText(context, errorState.error.localizedMessage, Toast.LENGTH_LONG).show()
+    }
+
+    override fun toStatusRefresh(refreshState: UsersState.StatusRefreshState) {
+        usersListAdapter.dataList = refreshState.users
     }
 
     override fun onDestroy() {

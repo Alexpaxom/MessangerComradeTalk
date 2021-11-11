@@ -4,17 +4,18 @@ import com.squareup.moshi.Json
 
 class UserPresence (
     @field:Json(name = "presence")
-    var presence: UserPresence.Presence
-){
-    inner class Presence (
-        @field:Json(name = "aggregated")
-        var aggregated: Aggregated
-    )
+    var presence: Presence
+)
 
-    inner class Aggregated (
-        @field:Json(name = "status")
-        var status: String
-    )
-}
+class Presence (
+    @field:Json(name = "aggregated")
+    var aggregated: Aggregated
+)
+
+class Aggregated (
+    @field:Json(name = "status")
+    var status: String
+)
+
 
 

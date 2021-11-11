@@ -2,7 +2,7 @@ package com.alexpaxom.homework_2.domain.repositories.testrepositories
 
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.UserItem
-import com.alexpaxom.homework_2.domain.entity.UserPresence
+import com.alexpaxom.homework_2.data.models.UserStatus
 import com.alexpaxom.homework_2.domain.repositories.UsersRepository
 import io.reactivex.Single
 
@@ -50,7 +50,7 @@ class UsersTestDataRepositoryImpl: UsersRepository {
         error("cant find user with id $userId")
     }
 
-    override fun getUserPresence(userId: Int): Single<UserPresence> {
+    override fun getUserPresence(userId: Int): Single<UserStatus> {
         TODO("Not yet implemented")
     }
 

@@ -25,8 +25,6 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.ReplaySubject
-import java.text.FieldPosition
 import java.util.concurrent.TimeUnit
 
 class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>(),

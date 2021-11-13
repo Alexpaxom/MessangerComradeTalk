@@ -24,7 +24,7 @@ class ChannelsZulipDataRepositoryImpl: ChannelsRepository {
     override fun getAllChannels(): Single<List<ChannelItem>> {
         return channelsZulipApiRequests.getAllStreams()
             .map { channelsWrap ->
-                channelsWrap.subscriptions.map {
+                channelsWrap.streams.map {
                     channelConverter.convert(it)
                 }
             }

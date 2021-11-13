@@ -1,5 +1,6 @@
 package com.alexpaxom.homework_2.domain.remote
 
+import com.alexpaxom.homework_2.domain.entity.AllStreamsResult
 import com.alexpaxom.homework_2.domain.entity.StreamsResult
 import com.alexpaxom.homework_2.domain.entity.TopicsResult
 import io.reactivex.Single
@@ -11,7 +12,7 @@ interface ChannelsZulipApiRequests {
     fun getSubscribedStreams(): Single<StreamsResult>
 
     @GET("/api/v1/streams")
-    fun getAllStreams(): Single<StreamsResult>
+    fun getAllStreams(): Single<AllStreamsResult>
 
     @GET("/api/v1/users/me/{stream_id}/topics")
     fun getTopicsByStreamId(

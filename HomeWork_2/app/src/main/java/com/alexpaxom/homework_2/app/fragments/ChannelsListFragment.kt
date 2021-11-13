@@ -79,12 +79,12 @@ ChannelsStateMachine {
             .doOnNext { goToState(LoadingState) }
             .observeOn(Schedulers.io())
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-            .switchMap {
+            .switchMapSingle {
                 val subscribedFilterFlag = arguments?.getBoolean(SUBSCRIBED_FILTER_FLAG) ?: false
                 if(subscribedFilterFlag)
-                    searchExpandedChannelGroup.searchInSubscribedChannelGroups(it).toObservable()
+                    searchExpandedChannelGroup.searchInSubscribedChannelGroups(it)
                 else
-                    searchExpandedChannelGroup.searchInAllChannelGroups(it).toObservable()
+                    searchExpandedChannelGroup.searchInAllChannelGroups(it)
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

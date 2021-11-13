@@ -23,12 +23,14 @@ sealed interface UsersState {
     object LoadingState : UsersState {
         override fun toResultState(): Boolean = true
         override fun toLoadingState(): Boolean = true
+        override fun toStatusRefresh(): Boolean = true
         override fun toErrorState(): Boolean = true
     }
 
     class StatusRefreshState(val users: List<UserItem>) : UsersState {
         override fun toResultState(): Boolean = true
         override fun toLoadingState(): Boolean = true
+        override fun toStatusRefresh(): Boolean = true
         override fun toErrorState(): Boolean = true
     }
 

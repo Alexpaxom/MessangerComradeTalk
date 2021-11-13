@@ -1,6 +1,7 @@
 package com.alexpaxom.homework_2.app.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,10 +16,12 @@ import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListAdapter
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListFactoryHolders
 import com.alexpaxom.homework_2.data.models.UserItem
+import com.alexpaxom.homework_2.data.models.UserStatus
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulipApiImpl
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApiImpl
 import com.alexpaxom.homework_2.databinding.FragmentUsersBinding
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -83,17 +86,21 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
         if(savedInstanceState==null) {
             searchUsersSubject
                 .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
                 .distinctUntilChanged()
-                .doOnNext { goToState(UsersState.LoadingState) }
                 .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-                .switchMap { searchUsers.search(it).toObservable() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext { goToState(UsersState.LoadingState) }
+                .observeOn(Schedulers.io())
+                .switchMapSingle { searchUsers.search(it).flatMap { users -> loadUsersStates(users) } }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onNext = {
                         goToState(UsersState.ResultState(it))
-                        loadUsersStates(it)
                     },
-                    onError = { goToState(UsersState.ErrorState(it)) }
+                    onError = {
+                        goToState(UsersState.ErrorState(it))
+                    }
                 )
                 .addTo(compositeDisposable)
 
@@ -110,28 +117,21 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
         searchUsersSubject.onNext(searchString)
     }
 
-    private fun loadUsersStates(users: List<UserItem>){
+    private fun loadUsersStates(users: List<UserItem>): Single<List<UserItem>> {
 
-        val usersMap = users.map { it.id to it}.toMap()
+        val usersMap = users.map { it.id to it }.toMap()
 
-        Observable.fromIterable(users)
+        return Observable.fromIterable(users)
             .subscribeOn(Schedulers.io())
             .concatMapSingle {
                 userStatusInfo.getStatusForUser(it.id)
             }
             .toList()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { statuses ->
-                    val usersWithStatus = statuses.map { status ->
-                        usersMap[status.userId]!!.copy(status = status.aggregatedStatus)
-                    }
-                    goToState(UsersState.StatusRefreshState(usersWithStatus))
-                },
-                onError = { goToState(UsersState.ErrorState(it)) }
-            )
-            .addTo(compositeDisposable)
-
+            .map { statuses ->
+                statuses.map { status ->
+                    usersMap[status.userId]!!.copy(status = status.aggregatedStatus)
+                }
+            }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -164,7 +164,7 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
     }
 
     override fun toStatusRefresh(refreshState: UsersState.StatusRefreshState) {
-        usersListAdapter.dataList = refreshState.users
+        loadUsersStates(refreshState.users)
     }
 
     override fun onDestroy() {

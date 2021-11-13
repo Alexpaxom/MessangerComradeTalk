@@ -17,7 +17,6 @@ import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListHoldersFact
 import com.alexpaxom.homework_2.data.models.ChannelItem
 import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
 import com.alexpaxom.homework_2.data.models.TopicItem
-import com.alexpaxom.homework_2.data.usecases.testusecases.SearchExpandedChannelGroupTestImpl
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchExpandedChannelGroupZulipImpl
 import com.alexpaxom.homework_2.databinding.CnannelsListFragmentBinding
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -74,6 +73,7 @@ ChannelsStateMachine {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         searchChannelsSubject
             .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
             .distinctUntilChanged()
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { goToState(LoadingState) }

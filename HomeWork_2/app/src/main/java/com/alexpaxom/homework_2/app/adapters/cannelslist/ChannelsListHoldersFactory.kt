@@ -28,8 +28,8 @@ class ChannelsListHoldersFactory(
                     LayoutInflater.from(viewGroup.context),
                     viewGroup,
                     false
-                ),
-                onExpandableChannelItemClickListener
+                )//,
+                //onExpandableChannelItemClickListener
             )
             else -> error("Bad type channel list holder")
         }

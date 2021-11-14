@@ -23,6 +23,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import retrofit2.HttpException
 
 class ProfileFragment: DialogFragment(), ProfileStateMachine {
 
@@ -111,7 +112,14 @@ class ProfileFragment: DialogFragment(), ProfileStateMachine {
 
     override fun toError(errorState: ProfileState.ErrorState) {
         binding.profileLoadProgress.isVisible = false
-        Toast.makeText(context, errorState.error.localizedMessage, Toast.LENGTH_LONG).show()
+
+        var error = errorState.error.localizedMessage
+
+        if(errorState.error is HttpException) {
+            error = errorState.error.response()?.errorBody()?.string()
+        }
+
+        Toast.makeText( context, error, Toast.LENGTH_LONG).show()
     }
 
     override fun onDestroyView() {

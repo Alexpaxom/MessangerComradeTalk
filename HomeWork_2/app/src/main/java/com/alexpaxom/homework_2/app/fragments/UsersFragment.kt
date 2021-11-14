@@ -28,6 +28,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
@@ -160,7 +161,14 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
 
     override fun toError(errorState: UsersState.ErrorState) {
         binding.usersProgress.isVisible = false
-        Toast.makeText(context, errorState.error.localizedMessage, Toast.LENGTH_LONG).show()
+
+        var error = errorState.error.localizedMessage
+
+        if(errorState.error is HttpException) {
+            error = errorState.error.response()?.errorBody()?.string()
+        }
+
+        Toast.makeText( context, error, Toast.LENGTH_LONG).show()
     }
 
     override fun toStatusRefresh(refreshState: UsersState.StatusRefreshState) {

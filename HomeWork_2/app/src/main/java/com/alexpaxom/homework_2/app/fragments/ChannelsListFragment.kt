@@ -25,6 +25,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
 
 class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>(),
@@ -115,9 +116,16 @@ ChannelsStateMachine {
         super.onSaveInstanceState(outState)
     }
 
-    override fun toError(resultState: ErrorState){
+    override fun toError(errorState: ErrorState){
         binding.progressChannelsLoading.isVisible = false
-        Toast.makeText(context, resultState.error.localizedMessage, Toast.LENGTH_LONG).show()
+
+        var error = errorState.error.localizedMessage
+
+        if(errorState.error is HttpException) {
+            error = errorState.error.response()?.errorBody()?.string()
+        }
+
+        Toast.makeText( context, error, Toast.LENGTH_LONG).show()
     }
 
     override fun toResult(resultState: ResultState){

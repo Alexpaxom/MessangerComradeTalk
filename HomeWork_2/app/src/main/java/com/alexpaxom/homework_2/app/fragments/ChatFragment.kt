@@ -27,6 +27,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONArray
 import org.json.JSONObject
+import retrofit2.HttpException
 import java.util.*
 
 
@@ -275,7 +276,14 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
 
     override fun toError(errorState: ChatState.ErrorState) {
         binding.messagesLoadingProgress.isVisible = false
-        Toast.makeText(context, errorState.error.localizedMessage, Toast.LENGTH_LONG).show()
+
+        var error = errorState.error.localizedMessage
+
+        if(errorState.error is HttpException) {
+            error = errorState.error.response()?.errorBody()?.string()
+        }
+
+        Toast.makeText( context, error, Toast.LENGTH_LONG).show()
     }
 
     override fun toAddingMessages(newMessages: ChatState.AddingMessagesState) {

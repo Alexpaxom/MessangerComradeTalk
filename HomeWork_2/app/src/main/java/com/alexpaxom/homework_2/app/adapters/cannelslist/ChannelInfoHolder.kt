@@ -7,7 +7,7 @@ import com.alexpaxom.homework_2.databinding.ChannelInfoItemBinding
 
 class ChannelInfoHolder(
     private val channelInfoItemBinding: ChannelInfoItemBinding,
-    private val onExpandableChannelItemClickListener: (topicPos: Int) -> Unit
+    //private val onExpandableChannelItemClickListener: (topicPos: Int) -> Unit
 ): BaseViewHolder<ChannelItem>(channelInfoItemBinding) {
 
     init {
@@ -32,9 +32,9 @@ class ChannelInfoHolder(
             }
         }
 
-        itemView.setOnClickListener {
-            onExpandableChannelItemClickListener(bindingAdapterPosition)
-        }
+        //itemView.setOnClickListener {
+        //    onExpandableChannelItemClickListener(bindingAdapterPosition)
+        //}
 
     }
 

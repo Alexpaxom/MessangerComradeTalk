@@ -1,7 +1,6 @@
 package com.alexpaxom.homework_2.app.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,6 @@ import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListAdapter
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListFactoryHolders
 import com.alexpaxom.homework_2.data.models.UserItem
-import com.alexpaxom.homework_2.data.models.UserStatus
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulipApiImpl
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApiImpl
 import com.alexpaxom.homework_2.databinding.FragmentUsersBinding

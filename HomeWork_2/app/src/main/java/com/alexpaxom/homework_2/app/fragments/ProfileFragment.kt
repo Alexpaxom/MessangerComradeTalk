@@ -1,8 +1,6 @@
 package com.alexpaxom.homework_2.app.fragments
 
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +9,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.data.modelconverters.UserConverter
 import com.alexpaxom.homework_2.data.models.UserItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserProfileUseCaseZulipApiImpl
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApiImpl
@@ -82,16 +81,16 @@ class ProfileFragment: DialogFragment(), ProfileStateMachine {
         binding.userName.text = resultState.user.name
         val userStatus = resultState.user.status
         binding.onlineStatus.text = when(userStatus) {
-            "active" -> resources.getString(R.string.profile_user_online_status)
-            "idle" -> resources.getString(R.string.profile_user_idle_status)
-            "offline" -> resources.getString(R.string.profile_user_offline_status)
+            UserConverter.OriginalZulipStatus.ONLINE_STATUS -> resources.getString(R.string.profile_user_online_status)
+            UserConverter.OriginalZulipStatus.IDLE_STATUS -> resources.getString(R.string.profile_user_idle_status)
+            UserConverter.OriginalZulipStatus.OFFLINE_STATUS -> resources.getString(R.string.profile_user_offline_status)
             else -> ""
         }
 
         val rColor = when(userStatus) {
-            "active" -> R.color.profile_online_status_color
-            "idle" -> R.color.profile_idle_status_color
-            "offline" -> R.color.profile_offline_status_color
+            UserConverter.OriginalZulipStatus.ONLINE_STATUS -> R.color.profile_online_status_color
+            UserConverter.OriginalZulipStatus.IDLE_STATUS -> R.color.profile_idle_status_color
+            UserConverter.OriginalZulipStatus.OFFLINE_STATUS -> R.color.profile_offline_status_color
             else -> R.color.white
         }
 

@@ -91,7 +91,10 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext { goToState(UsersState.LoadingState) }
                 .observeOn(Schedulers.io())
-                .switchMapSingle { searchUsers.search(it).flatMap { users -> loadUsersStates(users) } }
+                .switchMapSingle { searchUsers.search(it)
+                    .subscribeOn(Schedulers.io())
+                    .flatMap { users -> loadUsersStates(users) }
+                }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onNext = {

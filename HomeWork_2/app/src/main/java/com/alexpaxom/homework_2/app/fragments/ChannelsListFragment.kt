@@ -81,9 +81,9 @@ ChannelsStateMachine {
             .switchMapSingle {
                 val subscribedFilterFlag = arguments?.getBoolean(SUBSCRIBED_FILTER_FLAG) ?: false
                 if(subscribedFilterFlag)
-                    searchExpandedChannelGroup.searchInSubscribedChannelGroups(it)
+                    searchExpandedChannelGroup.searchInSubscribedChannelGroups(it).subscribeOn(Schedulers.io())
                 else
-                    searchExpandedChannelGroup.searchInAllChannelGroups(it)
+                    searchExpandedChannelGroup.searchInAllChannelGroups(it).subscribeOn(Schedulers.io())
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

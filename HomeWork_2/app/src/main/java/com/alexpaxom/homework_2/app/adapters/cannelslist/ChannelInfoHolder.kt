@@ -7,12 +7,12 @@ import com.alexpaxom.homework_2.databinding.ChannelInfoItemBinding
 
 class ChannelInfoHolder(
     private val channelInfoItemBinding: ChannelInfoItemBinding,
-    //private val onExpandableChannelItemClickListener: (topicPos: Int) -> Unit
+    private val channelClickListener: (channel: ChannelItem) -> Unit,
 ): BaseViewHolder<ChannelItem>(channelInfoItemBinding) {
 
     init {
         // обрабатываем нажатие на канал (показываем/скрываем топики)
-        channelInfoItemBinding.channelInfoExpandList.setOnClickListener {
+        channelInfoItemBinding.channelInfoLayout.setOnClickListener {
             (bindingAdapter as ChannelsListAdapter).apply {
                 val groupItemPosition =
                 dataList.indexOfLast {
@@ -27,15 +27,12 @@ class ChannelInfoHolder(
                             )
                         )
                         updateItem(groupItemPosition, groupItemInvertIsExpanded)
+                        // Внешний обработчик нажатия
+                        channelClickListener(groupItemInvertIsExpanded.channel)
                     }
                 }
             }
         }
-
-        //itemView.setOnClickListener {
-        //    onExpandableChannelItemClickListener(bindingAdapterPosition)
-        //}
-
     }
 
     override fun bind(model: ChannelItem) {

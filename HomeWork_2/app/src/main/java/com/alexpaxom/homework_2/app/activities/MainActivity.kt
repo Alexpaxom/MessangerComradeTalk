@@ -41,18 +41,26 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         super.onCreate(savedInstanceState)
 
-        usersRepository.getUserById()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    ownUserId = it.id
-                    createAdapter()
-                },
-                onError = { error(it.localizedMessage) }
-            )
-            .addTo(compositeDisposable)
+        if(savedInstanceState == null || savedInstanceState.getInt(SAVE_BUNDLE_MY_USER_ID_KEY) == 0) {
+            usersRepository.getUserById()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = {
+                        init(it.id)
+                    },
+                    onError = { error(it.localizedMessage) }
+                )
+                .addTo(compositeDisposable)
+        }
+        else
+            init(savedInstanceState.getInt(SAVE_BUNDLE_MY_USER_ID_KEY))
+    }
 
+    private fun init(ownUserId: Int) {
+        this.ownUserId = ownUserId
+        binding.mainNavigatinViewPager.adapter = mainNavigationViewpageAdapter.value
+        binding.mainNavigatinViewPager.isUserInputEnabled = false
 
         // Обработчик нажатий основного нижнего меню
         binding.mainBottomNavMenu.setOnItemSelectedListener {
@@ -72,11 +80,6 @@ class MainActivity : AppCompatActivity() {
 
             true
         }
-    }
-
-    private fun createAdapter() {
-        binding.mainNavigatinViewPager.adapter = mainNavigationViewpageAdapter.value
-        binding.mainNavigatinViewPager.isUserInputEnabled = false;
     }
 
     private fun getMainNavigationFragments(): Map<Int, Fragment> {
@@ -101,6 +104,11 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(SAVE_BUNDLE_MY_USER_ID_KEY, ownUserId)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onDestroy() {
         compositeDisposable.dispose()
         super.onDestroy()
@@ -111,6 +119,7 @@ class MainActivity : AppCompatActivity() {
         private const val POSITION_CHANNELS_BOTTOM_NAVIGATION = 0
         private const val POSITION_PEOPLE_BOTTOM_NAVIGATION = 1
         private const val POSITION_PROFILE_BOTTOM_NAVIGATION = 2
+        private const val SAVE_BUNDLE_MY_USER_ID_KEY = "com.alexpaxom.SAVE_BUNDLE_MY_USER_ID_KEY"
         private const val VIEW_PAGER_TAG = "f"
     }
 }

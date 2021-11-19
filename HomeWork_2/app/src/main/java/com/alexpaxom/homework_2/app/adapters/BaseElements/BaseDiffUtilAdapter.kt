@@ -13,12 +13,13 @@ abstract class BaseDiffUtilAdapter<P: ListItem>(
     open var dataList: List<P>
         get() = diffUtil.currentList
         set(value) {
-            diffUtil.submitList(value)
+            diffUtil.submitList(value, doAfterUpdateData)
         }
 
     protected var diffUtil: AsyncListDiffer<P> = AsyncListDiffer(this, BaseDiffUtilCallback<P>())
 
-    private var mCallback: ((Int, ViewBinding)->Unit)? = null
+    private var doAfterUpdateData: Runnable? = null
+
 
     override fun getItemViewType(position: Int): Int {
         return dataList[position].typeId
@@ -28,12 +29,12 @@ abstract class BaseDiffUtilAdapter<P: ListItem>(
         return holdersFactory(parent, viewType)
     }
 
-    open fun attachCallback(callback: ((Int, ViewBinding)->Unit)) {
-        this.mCallback = callback
+    open fun setAfterUpdateDataCallBack(callback: Runnable) {
+        this.doAfterUpdateData = callback
     }
 
-    open fun detachCallback() {
-        this.mCallback = null
+    open fun detachAfterUpdateDataCallBack() {
+        this.doAfterUpdateData = null
     }
 
     open fun updateItem(pos: Int, newItem: P) {

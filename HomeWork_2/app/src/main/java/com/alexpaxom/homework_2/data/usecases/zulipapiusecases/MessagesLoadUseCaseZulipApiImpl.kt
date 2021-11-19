@@ -31,10 +31,4 @@ class MessagesLoadUseCaseZulipApiImpl(
                 }
             }
     }
-
-    companion object {
-        // get from documentation api
-        const val NEWEST_MESSAGE = 10000000000000000L
-        const val OLDEST_MESSAGE = 0L
-    }
 }

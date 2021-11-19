@@ -23,7 +23,7 @@ class UserInfoHolder(val userInfoItemBinding: UserInfoItemBinding): BaseViewHold
             .circleCrop()
             .into(userInfoItemBinding.userItemAvatarImg)
 
-        val rColor = when(model.status) {
+        val rColor = when(model.status.aggregatedStatus) {
             UserConverter.OriginalZulipStatus.ONLINE_STATUS -> R.color.profile_online_status_color
             UserConverter.OriginalZulipStatus.IDLE_STATUS -> R.color.profile_idle_status_color
             UserConverter.OriginalZulipStatus.OFFLINE_STATUS -> R.color.profile_offline_status_color

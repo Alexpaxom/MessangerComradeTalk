@@ -19,7 +19,7 @@ class UsersTestDataRepositoryImpl: UsersRepository {
                     name = userParam[0],
                     email = "test@test.com",
                     avatarUrl = userParam[1],
-                    status = "On meeting"
+                    status = UserStatus(user.hashCode(), "")
                 )
             )
         }
@@ -39,7 +39,7 @@ class UsersTestDataRepositoryImpl: UsersRepository {
                     name = userParam[0],
                     email = "test@test.com",
                     avatarUrl = userParam[1],
-                    status = "On meeting"
+                    status = UserStatus(user.hashCode(), "")
                 )
             }
         }

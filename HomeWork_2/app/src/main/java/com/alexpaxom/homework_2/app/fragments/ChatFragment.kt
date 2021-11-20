@@ -8,20 +8,16 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.adapters.BaseElements.PagingRecyclerUtil
 import com.alexpaxom.homework_2.app.adapters.chathistory.ChatHistoryAdapter
 import com.alexpaxom.homework_2.app.adapters.chathistory.ChatMessageFactory
 import com.alexpaxom.homework_2.app.adapters.decorators.ChatDateDecorator
 import com.alexpaxom.homework_2.customview.EmojiReactionCounter
-import com.alexpaxom.homework_2.data.models.MessageItem
-import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.databinding.FragmentChatBinding
-import com.alexpaxom.homework_2.helpers.EmojiHelper
 import moxy.MvpAppCompatDialogFragment
 import moxy.presenter.InjectPresenter
-import retrofit2.HttpException
-import java.util.*
 
 import moxy.presenter.ProvidePresenter
 
@@ -37,6 +33,8 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
 
     private val chatHistoryAdapter = ChatHistoryAdapter(chatMessageFactory)
 
+    private var chatPager: ChatPager? = null
+
     @InjectPresenter
     lateinit var presenter: ChatPresenter
 
@@ -49,9 +47,6 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
             myUserId = arguments?.getInt(ARGUMENT_MY_USER_ID) ?: error("Bad parameter 'user id' ")
         )
     }
-
-    private var needScroll: Boolean = false
-    private var scrollMessageId: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,6 +61,7 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
 
         binding.chatingHistory.layoutManager = LinearLayoutManager(context)
         binding.chatingHistory.adapter = chatHistoryAdapter
+        chatPager = ChatPager(binding.chatingHistory)
 
 
         val decorator = ChatDateDecorator(binding.chatingHistory)
@@ -194,6 +190,12 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
                 putInt(ARGUMENT_STREAM_ID, streamId)
                 putInt(ARGUMENT_MY_USER_ID, myUserId)
             }
+        }
+    }
+
+    inner class ChatPager(recyclerView: RecyclerView) : PagingRecyclerUtil(recyclerView) {
+        override fun checkLoadData(bottomPos: Int, topPos: Int) {
+            presenter.processEvent(ChatEvent.ChangedScrollPosition(bottomPos, topPos))
         }
     }
 }

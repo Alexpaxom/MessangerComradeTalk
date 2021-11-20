@@ -9,7 +9,7 @@ data class ChatViewState(
 
 sealed interface ChatEvent {
     object LoadHistory: ChatEvent
-    class LoadNextPageMessages(val lastMessageId: Int): ChatEvent
+    class ChangedScrollPosition(val bottomPos: Int, val topPos: Int): ChatEvent
     class SendMessage(val message: String): ChatEvent
     class EmojiStateChange(val emojiUnicode: String, val messageId: Int, val isAdd: Boolean): ChatEvent
     object MessagesInserted: ChatEvent

@@ -7,37 +7,37 @@ abstract class PagingRecyclerUtil(
     recyclerView: RecyclerView
 ) {
 
-    abstract fun loadNewData(params: PageLoadingParams)
-
-    abstract fun checkLoadData(bottomPos: Int, topPos: Int): PageLoadingParams
+    abstract fun checkLoadData(bottomPos: Int, topPos: Int)
 
     init {
         recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            var prevBottom = -1
+            var prevTop = -1
+
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
                 val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
-
                 if(layoutManager != null) {
+                    val newBottomPos = layoutManager.findLastVisibleItemPosition()
+                    val newTopPos = layoutManager.findFirstVisibleItemPosition()
+
+                    // Если значения не поменялись незачем проверять их на условие загрузки новой страницы
+                    if(prevBottom == newBottomPos && prevTop == newTopPos)
+                        return
+
+                    prevBottom = newBottomPos
+                    prevTop = newTopPos
+
+
                     checkLoadData(
-                        bottomPos = layoutManager.findLastVisibleItemPosition(),
-                        topPos = layoutManager.findFirstVisibleItemPosition()
-                    ).let {
-                        if(it.loadNextPage)
-                            loadNewData(it)
-                    }
+                        bottomPos = newBottomPos,
+                        topPos = newTopPos
+                    )
                 }
                 else
                     error("Paging adapter can work only with LinearLayoutManager!")
             }
         })
-    }
-}
-
-open class PageLoadingParams (
-    val loadNextPage: Boolean = true
-) {
-    companion object {
-        val noLoadNextPage = object : PageLoadingParams(false){}
     }
 }

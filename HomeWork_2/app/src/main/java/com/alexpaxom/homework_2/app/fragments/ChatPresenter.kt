@@ -43,10 +43,14 @@ class ChatPresenter(
 
     private val emojiHelper = EmojiHelper()
 
+    private var hasOldMessages = true
+
     fun processEvent(event: ChatEvent) {
         when(event) {
             ChatEvent.LoadHistory -> loadChatHistory()
-            is ChatEvent.LoadNextPageMessages -> loadNextPageMessages(event.lastMessageId)
+            is ChatEvent.ChangedScrollPosition ->
+                if(!currentViewState.isEmptyLoading)
+                    checkLoadNewPage(event.bottomPos, event.topPos)
             is ChatEvent.SendMessage -> sendMessage(event.message)
             is ChatEvent.EmojiStateChange -> {
                 if(event.isAdd)
@@ -88,6 +92,39 @@ class ChatPresenter(
             .addTo(compositeDisposable)
     }
 
+    private fun loadPreviousPageMessages(lastMessageId: Int) {
+        messagesLoader.value.getMessages(
+            messageId = lastMessageId.toLong(),
+            numBefore = DEFAULT_COUNT_LOAD_MESSAGES_PER_PAGE,
+            numAfter = 0,
+            filter = createFilterForMessages()
+        )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                currentViewState = currentViewState.copy(
+                    isEmptyLoading = true
+                )
+            }
+            .subscribeBy(
+                onSuccess = {
+                    if(it.size == 1 && it.first().id == lastMessageId)
+                        hasOldMessages = false
+
+                    currentViewState = currentViewState.copy(
+                        messages = chatHandler.addMessagesToPosition(
+                            position = 0,
+                            newMessages = it.subList(0, it.size-1),
+                            messages = currentViewState.messages
+                        ),
+                        isEmptyLoading = false
+                    )
+                },
+                onError = { processError(it) }
+            )
+            .addTo(compositeDisposable)
+    }
+
     private fun loadNextPageMessages(lastMessageId: Int) {
         messagesLoader.value.getMessages(
             messageId = lastMessageId.toLong(),
@@ -106,7 +143,11 @@ class ChatPresenter(
                 onSuccess = {
 
                     currentViewState = currentViewState.copy(
-                        messages = chatHandler.addMessagesToPosition( currentViewState.messages.size, it, currentViewState.messages),
+                        messages = chatHandler.addMessagesToPosition(
+                            position = currentViewState.messages.size,
+                            newMessages = it.subList(1, it.size),
+                            messages = currentViewState.messages
+                        ),
                         isEmptyLoading = false
                     )
                 },
@@ -147,12 +188,12 @@ class ChatPresenter(
             }
             .subscribeBy(
                 onSuccess = {
-                    loadNextPageMessages(
-                        lastMessageId = currentViewState.messages.last().id,
-                    )
-
                     afterInsertEffectsList.add(
                         ChatEffect.ScrollToPosition(it.id, true)
+                    )
+
+                    loadNextPageMessages(
+                        lastMessageId = currentViewState.messages.last().id,
                     )
                 },
                 onError = { processError(it) }
@@ -216,6 +257,13 @@ class ChatPresenter(
             .addTo(compositeDisposable)
     }
 
+    private fun checkLoadNewPage(bottomPos: Int, topPos: Int) {
+        if(topPos < LOADING_THRESHOLD_START && hasOldMessages)
+            loadPreviousPageMessages(currentViewState.messages.first().id)
+        else if(bottomPos > currentViewState.messages.size-LOADING_THRESHOLD_START)
+            loadNextPageMessages(currentViewState.messages.last().id)
+    }
+
     private fun processError(error: Throwable) {
         val errorMsg = if(error is HttpException)
             error.response()?.errorBody()?.string() ?: "Http Error!"
@@ -233,12 +281,14 @@ class ChatPresenter(
     }
 
     companion object {
-        private const val DEFAULT_COUNT_LOAD_MESSAGES = 100
+        private const val DEFAULT_COUNT_LOAD_MESSAGES = 50
+        private const val DEFAULT_COUNT_LOAD_MESSAGES_PER_PAGE = 20
         private const val MAX_COUNT_LOAD_MESSAGES = 1000
 
         // get from documentation api
         const val NEWEST_MESSAGE = 10000000000000000L
         const val OLDEST_MESSAGE = 0L
-    }
 
+        const val LOADING_THRESHOLD_START = 5
+    }
 }

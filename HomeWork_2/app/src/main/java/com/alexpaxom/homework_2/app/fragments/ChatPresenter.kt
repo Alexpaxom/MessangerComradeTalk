@@ -2,11 +2,9 @@ package com.alexpaxom.homework_2.app.fragments
 
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.ReactionItem
-import com.alexpaxom.homework_2.data.usecases.MessageSendUseCase
-import com.alexpaxom.homework_2.data.usecases.MessagesLoadUseCase
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.ChatUseCase
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessageSendUseCaseZulipApiImpl
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessagesLoadUseCaseZulipApiImpl
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessageSendUseCaseZulipApi
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessagesLoadUseCaseZulipApi
 import com.alexpaxom.homework_2.helpers.EmojiHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -34,8 +32,8 @@ class ChatPresenter(
 
     private val afterInsertEffectsList: ArrayList<ChatEffect> = arrayListOf()
 
-    private var messagesLoader: Lazy<MessagesLoadUseCase> = lazy { MessagesLoadUseCaseZulipApiImpl(myUserId) }
-    private val messagesSender: MessageSendUseCase = MessageSendUseCaseZulipApiImpl()
+    private var messagesLoader: Lazy<MessagesLoadUseCaseZulipApi> = lazy { MessagesLoadUseCaseZulipApi(myUserId) }
+    private val messagesSender: MessageSendUseCaseZulipApi = MessageSendUseCaseZulipApi()
 
     private val compositeDisposable = CompositeDisposable()
 

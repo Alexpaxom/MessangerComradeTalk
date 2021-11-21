@@ -9,7 +9,7 @@ import com.alexpaxom.homework_2.app.fragments.ChannelsFragment
 import com.alexpaxom.homework_2.app.fragments.ProfileFragment
 import com.alexpaxom.homework_2.app.fragments.UsersFragment
 import com.alexpaxom.homework_2.databinding.ActivityMainBinding
-import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.UsersZulipDateRepositoryImpl
+import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.UsersZulipDateRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val usersRepository = UsersZulipDateRepositoryImpl()
+    private val usersRepository = UsersZulipDateRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 

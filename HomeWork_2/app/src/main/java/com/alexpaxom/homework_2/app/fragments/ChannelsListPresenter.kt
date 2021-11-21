@@ -2,7 +2,7 @@ package com.alexpaxom.homework_2.app.fragments
 
 import com.alexpaxom.homework_2.data.models.ChannelItem
 import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchExpandedChannelGroupZulipImpl
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchExpandedChannelGroupZulip
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -25,7 +25,7 @@ class ChannelsListPresenter(
     private val compositeDisposable = CompositeDisposable()
 
     private val searchChannelsSubject: BehaviorSubject<String> = BehaviorSubject.create()
-    private val searchExpandedChannelGroup = SearchExpandedChannelGroupZulipImpl()
+    private val searchExpandedChannelGroup = SearchExpandedChannelGroupZulip()
 
     init {
         initChannelsGroupSearchListener()

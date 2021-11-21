@@ -2,15 +2,14 @@ package com.alexpaxom.homework_2.data.usecases.zulipapiusecases
 
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.MessageItem
-import com.alexpaxom.homework_2.data.usecases.MessagesLoadUseCase
-import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.MessagesZulipDataRepositoryImpl
+import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.MessagesZulipDataRepository
 import io.reactivex.Single
 
-class MessagesLoadUseCaseZulipApiImpl(
+class MessagesLoadUseCaseZulipApi(
     val ownUserId: Int,
-    val messagesZulipDataRepository: MessagesZulipDataRepositoryImpl = MessagesZulipDataRepositoryImpl(),
-): MessagesLoadUseCase {
-    override fun getMessages(
+    val messagesZulipDataRepository: MessagesZulipDataRepository = MessagesZulipDataRepository(),
+) {
+    fun getMessages(
         messageId: Long,
         numBefore:Int,
         numAfter:Int,

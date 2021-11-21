@@ -5,16 +5,15 @@ import com.alexpaxom.homework_2.data.models.MessageItem
 import com.alexpaxom.homework_2.domain.entity.ReactionResult
 import com.alexpaxom.homework_2.domain.entity.SendResult
 import com.alexpaxom.homework_2.domain.remote.MessagesZulipApiRequests
-import com.alexpaxom.homework_2.domain.repositories.MessagesRepository
 import io.reactivex.Single
 
-class MessagesZulipDataRepositoryImpl: MessagesRepository {
+class MessagesZulipDataRepository {
 
     private val retrofit = GetRetrofitObject.retrofit
     private val messagesZulipApiRequests = retrofit.create(MessagesZulipApiRequests::class.java)
     private val messagesConverter = MessageConverter()
 
-    override fun getMessages(
+    fun getMessages(
         messageId: Long,
         numBefore:Int,
         numAfter:Int,
@@ -27,7 +26,7 @@ class MessagesZulipDataRepositoryImpl: MessagesRepository {
         }
     }
 
-    override fun sendMessageToStream(
+    fun sendMessageToStream(
         streamId: Int,
         topic: String,
         message: String
@@ -35,15 +34,15 @@ class MessagesZulipDataRepositoryImpl: MessagesRepository {
         return messagesZulipApiRequests.sendMessageToStream(streamId, topic, message)
     }
 
-    override fun sendMessageToUsers(usersIds: List<Int>, message: String): Single<SendResult> {
+    fun sendMessageToUsers(usersIds: List<Int>, message: String): Single<SendResult> {
         return messagesZulipApiRequests.sendMessageToUsers(usersIds, message)
     }
 
-    override fun addReaction(messageId: Int, emojiName: String): Single<ReactionResult> {
+    fun addReaction(messageId: Int, emojiName: String): Single<ReactionResult> {
         return messagesZulipApiRequests.addReaction(messageId, emojiName)
     }
 
-    override fun removeReaction(messageId: Int, emojiName: String): Single<ReactionResult> {
+    fun removeReaction(messageId: Int, emojiName: String): Single<ReactionResult> {
         return messagesZulipApiRequests.removeReaction(messageId, emojiName)
     }
 }

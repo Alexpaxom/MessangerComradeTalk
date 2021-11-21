@@ -1,8 +1,8 @@
 package com.alexpaxom.homework_2.app.fragments
 
 import com.alexpaxom.homework_2.data.models.UserItem
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulipApiImpl
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApiImpl
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulipApi
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApi
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -25,8 +25,8 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
     private val compositeDisposable = CompositeDisposable()
 
     private val searchUsersSubject: BehaviorSubject<String> = BehaviorSubject.create()
-    private val searchUsers = SearchUsersZulipApiImpl()
-    private val userStatusInfo = UserStatusUseCaseZulipApiImpl()
+    private val searchUsers = SearchUsersZulipApi()
+    private val userStatusInfo = UserStatusUseCaseZulipApi()
 
     init {
         initUsersSearchListener()

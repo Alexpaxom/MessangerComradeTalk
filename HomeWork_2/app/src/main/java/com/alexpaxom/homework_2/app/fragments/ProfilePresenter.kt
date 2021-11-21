@@ -1,7 +1,7 @@
 package com.alexpaxom.homework_2.app.fragments
 
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserProfileUseCaseZulipApiImpl
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApiImpl
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserProfileUseCaseZulipApi
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApi
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -20,8 +20,8 @@ class ProfilePresenter : MvpPresenter<BaseView<ProfileViewState, ProfileEffect>>
             viewState.processState(value)
         }
 
-    private val searchUsers = UserProfileUseCaseZulipApiImpl()
-    private val userStatusInfo = UserStatusUseCaseZulipApiImpl()
+    private val searchUsers = UserProfileUseCaseZulipApi()
+    private val userStatusInfo = UserStatusUseCaseZulipApi()
 
     private val compositeDisposable = CompositeDisposable()
 

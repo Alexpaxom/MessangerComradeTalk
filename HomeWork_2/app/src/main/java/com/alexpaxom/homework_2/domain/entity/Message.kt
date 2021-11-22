@@ -1,67 +1,50 @@
 package com.alexpaxom.homework_2.domain.entity
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.alexpaxom.homework_2.domain.converters.ReactionsSerializeConverter
 import com.squareup.moshi.Json
 
+@Entity(tableName = "Messages")
+@TypeConverters(ReactionsSerializeConverter::class)
 class Message (
+
+    @PrimaryKey
     @field:Json(name = "id")
     val id: Int = 0,
 
+    @ColumnInfo(name = "sender_id")
     @field:Json(name = "sender_id")
     val senderId: Int = 0,
 
+    @ColumnInfo(name = "content")
     @field:Json(name = "content")
     val content: String = "",
 
-//    @field:Json(name = "recipient_id")
-//        val recipientId: Int? = null
-//
-
     // UNIX time in UTC SECONDS
+    @ColumnInfo(name = "timestamp")
     @field:Json(name = "timestamp")
     val timestamp: Int = 0,
 
-//    @field:Json(name = "client")
-//        val client: String? = null
-//
-//    @field:Json(name = "subject")
-//        val subject: String? = null
-//
-//    @field:Json(name = "topic_links")
-//        val topicLinks: List<Any>? = null
-//
-//    @field:Json(name = "is_me_message")
-//    val isMeMessage: Boolean = false,
-
+    @ColumnInfo(name = "reactions")
     @field:Json(name = "reactions")
     val reactions: List<DomainReaction> = listOf(),
 
-//    @field:Json(name = "submessages")
-//        val submessages: List<Any>? = null
-//
-//    @field:Json(name = "flags")
-//        val flags: List<String>? = null
-
+    @ColumnInfo(name = "sender_full_name")
     @field:Json(name = "sender_full_name")
     val senderFullName: String = "",
-//
-//    @field:Json(name = "sender_email")
-//        val senderEmail: String? = null
-//
-//    @field:Json(name = "sender_realm_str")
-//        val senderRealmStr: String? = null
-//
-//    @field:Json(name = "display_recipient")
-//        val displayRecipient: String? = null
-//
-//    @field:Json(name = "type")
-//        val type: String? = null
-//
-//    @field:Json(name = "stream_id")
-//        val streamId: Int? = null
 
+    @ColumnInfo(name = "avatar_url")
     @field:Json(name = "avatar_url")
     val avatarUrl: String? = null,
 
-//    @field:Json(name = "content_type")
-//        val contentType: String? = null
+    @ColumnInfo(name = "stream_id")
+    @field:Json(name = "stream_id")
+    val streamId: Int? = null,
+
+    @ColumnInfo(name = "subject")
+    @field:Json(name = "subject")
+    val topicName: String? = null,
 )

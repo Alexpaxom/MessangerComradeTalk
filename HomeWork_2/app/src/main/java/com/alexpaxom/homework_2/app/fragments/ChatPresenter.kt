@@ -1,19 +1,20 @@
 package com.alexpaxom.homework_2.app.fragments
 
+import android.util.Log
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.ChatUseCase
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessageSendUseCaseZulipApi
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessagesLoadUseCaseZulipApi
+import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.NarrowParams
 import com.alexpaxom.homework_2.helpers.EmojiHelper
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import moxy.MvpPresenter
-import org.json.JSONArray
-import org.json.JSONObject
 import retrofit2.HttpException
 import java.util.*
 
@@ -63,11 +64,10 @@ class ChatPresenter(
     }
 
     private fun loadChatHistory() {
-        messagesLoader.value.getMessages(
+        messagesLoader.value.getHistory(
             messageId = NEWEST_MESSAGE,
-            numBefore = DEFAULT_COUNT_LOAD_MESSAGES,
-            numAfter = 0,
-            filter = createFilterForMessages()
+            countMessages = DEFAULT_COUNT_LOAD_MESSAGES,
+            filter = createFilterForMessages(),
         )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -78,23 +78,23 @@ class ChatPresenter(
                 )
             }
             .subscribeBy(
-                onSuccess = {
+                onNext = {
                     currentViewState = ChatViewState(
                         messages = chatHandler.addMessagesToPosition(0, it, currentViewState.messages)
                     )
                     if(it.isNotEmpty())
                         afterInsertEffectsList.add(ChatEffect.ScrollToPosition(it.last().id))
                 },
-                onError = { processError(it) }
+                onError = { processError(it) },
+                onComplete = { Log.e("TEST", "Complete")}
             )
             .addTo(compositeDisposable)
     }
 
     private fun loadPreviousPageMessages(lastMessageId: Int) {
-        messagesLoader.value.getMessages(
+        messagesLoader.value.getPrevPage(
             messageId = lastMessageId.toLong(),
-            numBefore = DEFAULT_COUNT_LOAD_MESSAGES_PER_PAGE,
-            numAfter = 0,
+            countMessages = DEFAULT_COUNT_LOAD_MESSAGES_PER_PAGE,
             filter = createFilterForMessages()
         )
             .subscribeOn(Schedulers.io())
@@ -105,7 +105,7 @@ class ChatPresenter(
                 )
             }
             .subscribeBy(
-                onSuccess = {
+                onNext = {
                     if(it.size == 1 && it.first().id == lastMessageId)
                         hasOldMessages = false
 
@@ -124,10 +124,9 @@ class ChatPresenter(
     }
 
     private fun loadNextPageMessages(lastMessageId: Int) {
-        messagesLoader.value.getMessages(
+        messagesLoader.value.getNextPage(
             messageId = lastMessageId.toLong(),
-            numBefore = 0,
-            numAfter = MAX_COUNT_LOAD_MESSAGES,
+            countMessages = MAX_COUNT_LOAD_MESSAGES,
             filter = createFilterForMessages()
         )
             .subscribeOn(Schedulers.io())
@@ -138,7 +137,7 @@ class ChatPresenter(
                 )
             }
             .subscribeBy(
-                onSuccess = {
+                onNext = {
 
                     currentViewState = currentViewState.copy(
                         messages = chatHandler.addMessagesToPosition(
@@ -154,26 +153,8 @@ class ChatPresenter(
             .addTo(compositeDisposable)
     }
 
-    private fun createFilterForMessages(): String {
-        val filter = JSONArray()
+    private fun createFilterForMessages(): NarrowParams = NarrowParams(streamId, topicName)
 
-        filter.put(
-            JSONObject().apply {
-                put("operator", "stream")
-                put("operand", streamId)
-            }
-        )
-
-        if(topicName != "")
-            filter.put(
-                JSONObject().apply {
-                    put("operator", "topic")
-                    put("operand", "${topicName}")
-                }
-            )
-
-        return filter.toString()
-    }
 
     private fun sendMessage(message: String) {
         messagesSender.sendMessageToStream(streamId, topicName, message)

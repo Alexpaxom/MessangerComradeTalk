@@ -2,6 +2,7 @@ package com.alexpaxom.homework_2.app.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.MainNavigationViewpageAdapter
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity() {
                     onSuccess = {
                         init(it.id)
                     },
-                    onError = { error(it.localizedMessage) }
+                    onError = { Toast.makeText(applicationContext, it.localizedMessage, Toast.LENGTH_SHORT).show() }
                 )
                 .addTo(compositeDisposable)
         }

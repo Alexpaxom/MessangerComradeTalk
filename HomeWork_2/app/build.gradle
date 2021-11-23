@@ -75,4 +75,10 @@ dependencies {
     implementation "com.github.moxy-community:moxy-androidx:$moxyVersion"
     kapt "com.github.moxy-community:moxy-compiler:$moxyVersion"
 
+    // Elmslie
+    def elmslieVersion = '1.2.0'
+    implementation "com.github.vivid-money.elmslie:elmslie-core:$elmslieVersion"
+    implementation "com.github.vivid-money.elmslie:elmslie-android:$elmslieVersion"
+    implementation "com.github.vivid-money.elmslie:elmslie-rxjava-2:$elmslieVersion"
+
 }

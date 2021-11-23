@@ -8,10 +8,10 @@ class UserConverter {
     fun convert(user: User): UserItem {
         return UserItem (
             typeId = R.layout.user_info_item,
-            id = user.userId,
-            name = user.fullName ?: "",
-            email = user.email ?: "",
-            avatarUrl = user.avatarUrl ?: ""
+            id = user.userId ?: -1,
+            name = user.fullName ?: "No name",
+            email = user.email ?: "No email",
+            avatarUrl = user.avatarUrl ?: "No avatar"
         )
     }
 

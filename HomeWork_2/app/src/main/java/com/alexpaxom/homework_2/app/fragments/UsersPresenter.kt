@@ -3,6 +3,7 @@ package com.alexpaxom.homework_2.app.fragments
 import com.alexpaxom.homework_2.data.models.UserItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulipApi
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApi
+import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -53,27 +54,29 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
                 )
             }
             .observeOn(Schedulers.io())
-            .switchMapSingle { searchUsers.search(it)
+            .switchMap { searchUsers.search(it)
                 .subscribeOn(Schedulers.io())
-                .flatMap { users -> loadUsersStates(users) }
+                .flatMapSingle { usersWrap ->
+                    when(usersWrap) {
+                        is CachedWrapper.CachedData,
+                        is CachedWrapper.ErrorResult-> Single.just(usersWrap)
+
+                        is CachedWrapper.OriginalData ->
+                            loadUsersStates(usersWrap.data).map{ CachedWrapper.OriginalData(it) }
+                    }
+                }.onErrorReturn { CachedWrapper.CachedData(listOf()) }
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = {
-                    currentViewState = UsersViewState(
-                        users = it
-                    )
-                },
-                onError = { error ->
-                    val errorMsg = if(error is HttpException)
-                        error.response()?.errorBody()?.string() ?: "Http Error!"
+                onNext = {usersWrap->
+                    if(usersWrap !is CachedWrapper.ErrorResult)
+                        currentViewState = UsersViewState(
+                            users = usersWrap.data
+                        )
                     else
-                        error.localizedMessage ?: "Error!"
-
-                    viewState.processEffect(
-                        UsersEffect.ShowError(errorMsg)
-                    )
-                }
+                        processError(usersWrap.error)
+                },
+                onError = { processError(it) }
             )
             .addTo(compositeDisposable)
     }
@@ -97,6 +100,17 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
                     usersMap[status.userId]!!.copy(status = status)
                 }
             }
+    }
+
+    private fun processError(error: Throwable) {
+        val errorMsg = if(error is HttpException)
+            error.response()?.errorBody()?.string() ?: "Http Error!"
+        else
+            error.localizedMessage ?: "Error!"
+
+        viewState.processEffect(
+            UsersEffect.ShowError(errorMsg)
+        )
     }
 
     override fun onDestroy() {

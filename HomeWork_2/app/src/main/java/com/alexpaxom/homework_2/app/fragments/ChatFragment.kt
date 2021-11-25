@@ -48,6 +48,11 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
         )
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NO_FRAME, R.style.Theme_DialogFragment)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -128,10 +133,6 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
                 emojiView.isSelected
             )
         )
-    }
-
-    override fun getTheme(): Int {
-        return R.style.Theme_DialogFragment
     }
 
     override fun onDestroyView() {

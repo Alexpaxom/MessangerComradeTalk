@@ -30,12 +30,19 @@ class TopicsZulipDataRepository {
             if(useApi)
             {
                 // Запрашиваем данные с сервера и возвращаем следом за кэшем
-                val topics = topicsZulipApiRequests.getTopicsByStreamId(channelId).execute().body()?.topics ?: listOf()
+                val topics =
+                    topicsZulipApiRequests
+                        .getTopicsByStreamId(channelId)
+                        .execute()
+                        .body()
+                        ?.topics
+                        ?.map { it.copy(channelId = channelId) } ?: listOf()
+
                 emitter.onNext(CachedWrapper.OriginalData(topics))
 
                 // обновляем кэш
                 if(refreshCache)
-                    topicsDAO.insertAll(topics.map { it.copy(channelId = channelId) })
+                    topicsDAO.insertAll(topics)
             }
 
             emitter.onComplete()

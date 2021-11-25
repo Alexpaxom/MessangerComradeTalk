@@ -1,14 +1,13 @@
 package com.alexpaxom.homework_2.app.fragments
 
-import android.util.Log
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.ChatUseCase
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessageSendUseCaseZulipApi
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessagesLoadUseCaseZulipApi
+import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.NarrowParams
 import com.alexpaxom.homework_2.helpers.EmojiHelper
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -70,7 +69,7 @@ class ChatPresenter(
             filter = createFilterForMessages(),
         )
             .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread(), true)
             .doOnSubscribe {
                 currentViewState = ChatViewState(
                     messages = listOf(),
@@ -78,15 +77,21 @@ class ChatPresenter(
                 )
             }
             .subscribeBy(
-                onNext = {
+                onNext = { messagesWrap ->
+                    if(messagesWrap is CachedWrapper.CachedData && messagesWrap.data.isNotEmpty())
+                        afterInsertEffectsList.add(
+                            ChatEffect.ScrollToPosition(messagesWrap.data.last().id)
+                        )
+
                     currentViewState = ChatViewState(
-                        messages = chatHandler.addMessagesToPosition(0, it, currentViewState.messages)
+                        messages = chatHandler.addMessagesToPosition(
+                            0,
+                            messagesWrap.data,
+                            listOf()
+                        )
                     )
-                    if(it.isNotEmpty())
-                        afterInsertEffectsList.add(ChatEffect.ScrollToPosition(it.last().id))
                 },
                 onError = { processError(it) },
-                onComplete = { Log.e("TEST", "Complete")}
             )
             .addTo(compositeDisposable)
     }
@@ -105,18 +110,20 @@ class ChatPresenter(
                 )
             }
             .subscribeBy(
-                onNext = {
-                    if(it.size == 1 && it.first().id == lastMessageId)
-                        hasOldMessages = false
+                onNext = { messagesWrap ->
+                    messagesWrap.data.let{
+                        if(it.size == 1 && it.first().id == lastMessageId)
+                            hasOldMessages = false
 
-                    currentViewState = currentViewState.copy(
-                        messages = chatHandler.addMessagesToPosition(
-                            position = 0,
-                            newMessages = it.subList(0, it.size-1),
-                            messages = currentViewState.messages
-                        ),
-                        isEmptyLoading = false
-                    )
+                        currentViewState = currentViewState.copy(
+                            messages = chatHandler.addMessagesToPosition(
+                                position = 0,
+                                newMessages = it.subList(0, it.size-1),
+                                messages = currentViewState.messages
+                            ),
+                            isEmptyLoading = false
+                        )
+                    }
                 },
                 onError = { processError(it) }
             )
@@ -137,12 +144,11 @@ class ChatPresenter(
                 )
             }
             .subscribeBy(
-                onNext = {
-
+                onNext = { messagesWrap ->
                     currentViewState = currentViewState.copy(
                         messages = chatHandler.addMessagesToPosition(
                             position = currentViewState.messages.size,
-                            newMessages = it.subList(1, it.size),
+                            newMessages = messagesWrap.data.subList(1, messagesWrap.data.size),
                             messages = currentViewState.messages
                         ),
                         isEmptyLoading = false
@@ -245,9 +251,9 @@ class ChatPresenter(
 
     private fun processError(error: Throwable) {
         val errorMsg = if(error is HttpException)
-            error.response()?.errorBody()?.string() ?: "Http Error!"
+            error.response()?.errorBody()?.string() ?: "Load messages http Error!"
         else
-            error.localizedMessage ?: "Error!"
+            error.localizedMessage ?: "Load messages error!"
 
         viewState.processEffect(
             ChatEffect.ShowError(errorMsg)

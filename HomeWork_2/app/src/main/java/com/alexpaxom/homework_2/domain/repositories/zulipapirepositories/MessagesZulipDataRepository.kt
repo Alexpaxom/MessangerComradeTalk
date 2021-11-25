@@ -1,6 +1,7 @@
 package com.alexpaxom.homework_2.domain.repositories.zulipapirepositories
 
 import com.alexpaxom.homework_2.domain.cache.GetDatabaseObject
+import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.entity.Message
 import com.alexpaxom.homework_2.domain.entity.ReactionResult
 import com.alexpaxom.homework_2.domain.entity.SendResult
@@ -23,12 +24,14 @@ class MessagesZulipDataRepository {
         filter: NarrowParams,
         useCache: Boolean = false,
         refreshCache: Boolean = false,
-    ): Observable<List<Message>> {
+    ): Observable<CachedWrapper<List<Message>>> {
         return Observable.create { emiter->
            // Возвращаем кэш если если он есть
-            messagesDao.getAll(filter.streamId, filter.topicName).let { msgs->
-                if(msgs.isNotEmpty() && useCache)
-                    emiter.onNext(msgs)
+            if(useCache) {
+                messagesDao.getAll(filter.streamId, filter.topicName).let { msgs ->
+                    if (msgs.isNotEmpty())
+                        emiter.onNext(CachedWrapper.CachedData(msgs))
+                }
             }
 
             try {
@@ -39,7 +42,7 @@ class MessagesZulipDataRepository {
                     numAfter,
                     filter.createFilterForMessages()
                 ).execute().body()?.messages ?: listOf()
-                emiter.onNext(apiMessages)
+                emiter.onNext(CachedWrapper.OriginalData(apiMessages))
 
                 // обновляем кэш
                 if (refreshCache)
@@ -49,15 +52,12 @@ class MessagesZulipDataRepository {
                 emiter.onComplete()
 
             } catch (e: Exception) {
-                // костыль, если бросать ошибку сразу то не успее отработать onNext для кэша в subscribe
-                Timer("Wait cache apply", false).schedule(2000) {
-                    emiter.onError(e)
-                }
+                emiter.onError(e)
             }
         }
     }
 
-    fun getNextPage(messageId: Long, countMessages: Int, filter: NarrowParams): Observable<List<Message>> {
+    fun getNextPage(messageId: Long, countMessages: Int, filter: NarrowParams): Observable<CachedWrapper<List<Message>>> {
         return getMessages(
             messageId = messageId,
             numBefore = 0,
@@ -66,7 +66,7 @@ class MessagesZulipDataRepository {
         )
     }
 
-    fun getPrevPage(messageId: Long, countMessages: Int, filter: NarrowParams): Observable<List<Message>> {
+    fun getPrevPage(messageId: Long, countMessages: Int, filter: NarrowParams): Observable<CachedWrapper<List<Message>>> {
         return getMessages(
             messageId = messageId,
             numBefore = countMessages,
@@ -75,7 +75,7 @@ class MessagesZulipDataRepository {
         )
     }
 
-    fun getHistory(messageId: Long, countMessages: Int, filter: NarrowParams): Observable<List<Message>> {
+    fun getHistory(messageId: Long, countMessages: Int, filter: NarrowParams): Observable<CachedWrapper<List<Message>>> {
         return getMessages(
             messageId = messageId,
             numBefore = countMessages,

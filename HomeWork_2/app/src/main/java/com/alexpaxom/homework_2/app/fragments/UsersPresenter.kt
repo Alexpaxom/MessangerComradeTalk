@@ -25,7 +25,7 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val searchUsersSubject: BehaviorSubject<String> = BehaviorSubject.create()
+    private var searchUsersSubject: BehaviorSubject<String>? = null
     private val searchUsers = SearchUsersZulipApi()
     private val userStatusInfo = UserStatusUseCaseZulipApi()
 
@@ -42,7 +42,10 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
     }
 
     private fun initUsersSearchListener() {
-        searchUsersSubject
+
+        searchUsersSubject = BehaviorSubject.create()
+
+        searchUsersSubject!!
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .distinctUntilChanged()
@@ -56,25 +59,24 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
             .observeOn(Schedulers.io())
             .switchMap { searchUsers.search(it)
                 .subscribeOn(Schedulers.io())
-                .flatMapSingle { usersWrap ->
+                .concatMapSingleDelayError { usersWrap ->
                     when(usersWrap) {
-                        is CachedWrapper.CachedData,
-                        is CachedWrapper.ErrorResult-> Single.just(usersWrap)
+                        is CachedWrapper.CachedData ->
+                            Single.just(usersWrap)
 
                         is CachedWrapper.OriginalData ->
-                            loadUsersStates(usersWrap.data).map{ CachedWrapper.OriginalData(it) }
+                            loadUsersStates(usersWrap.data)
+                                .map{ CachedWrapper.OriginalData(it) }
                     }
-                }.onErrorReturn { CachedWrapper.CachedData(listOf()) }
+                }
             }
-            .observeOn(AndroidSchedulers.mainThread())
+            .doOnError { initUsersSearchListener() }
+            .observeOn(AndroidSchedulers.mainThread(), true)
             .subscribeBy(
                 onNext = {usersWrap->
-                    if(usersWrap !is CachedWrapper.ErrorResult)
-                        currentViewState = UsersViewState(
-                            users = usersWrap.data
-                        )
-                    else
-                        processError(usersWrap.error)
+                    currentViewState = UsersViewState(
+                        users = usersWrap.data
+                    )
                 },
                 onError = { processError(it) }
             )
@@ -82,7 +84,7 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
     }
 
     private fun searchUsers(searchString: String) {
-        searchUsersSubject.onNext(searchString)
+        searchUsersSubject?.onNext(searchString)
     }
 
     private fun loadUsersStates(users: List<UserItem>): Single<List<UserItem>> {

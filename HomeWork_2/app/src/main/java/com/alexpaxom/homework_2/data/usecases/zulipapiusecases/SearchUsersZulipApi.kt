@@ -23,7 +23,6 @@ class SearchUsersZulipApi (
                         CachedWrapper.CachedData(searchUsers(users, searchString))
                     is CachedWrapper.OriginalData ->
                         CachedWrapper.OriginalData(searchUsers(users, searchString))
-                    is CachedWrapper.ErrorResult -> CachedWrapper.ErrorResult(users, usersWrap.error)
                 }
             }
 

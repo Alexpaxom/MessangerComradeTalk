@@ -1,5 +1,6 @@
 package com.alexpaxom.homework_2.app.fragments
 
+import android.util.Log
 import com.alexpaxom.homework_2.data.models.ChannelItem
 import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchExpandedChannelGroupZulip
@@ -24,7 +25,7 @@ class ChannelsListPresenter(
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val searchChannelsSubject: BehaviorSubject<String> = BehaviorSubject.create()
+    private var searchChannelsSubject: BehaviorSubject<String>? = null
     private val searchExpandedChannelGroup = SearchExpandedChannelGroupZulip()
 
     init {
@@ -55,7 +56,8 @@ class ChannelsListPresenter(
     }
 
     private fun initChannelsGroupSearchListener() {
-        searchChannelsSubject
+        searchChannelsSubject = BehaviorSubject.create()
+        searchChannelsSubject!!
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .distinctUntilChanged()
@@ -65,34 +67,39 @@ class ChannelsListPresenter(
             }
             .observeOn(Schedulers.io())
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-            .switchMapSingle {
+            .switchMap {
                 if(subscribedFilterFlag)
-                    searchExpandedChannelGroup.searchInSubscribedChannelGroups(it).subscribeOn(
-                        Schedulers.io())
+                    searchExpandedChannelGroup.searchInSubscribedChannelGroups(it)
+                        .subscribeOn(Schedulers.io())
                 else
-                    searchExpandedChannelGroup.searchInAllChannelGroups(it).subscribeOn(Schedulers.io())
+                    searchExpandedChannelGroup.searchInAllChannelGroups(it)
+                        .subscribeOn(Schedulers.io())
             }
-            .observeOn(AndroidSchedulers.mainThread())
+            .doOnError { initChannelsGroupSearchListener() }
+            .observeOn(AndroidSchedulers.mainThread(), true)
             .subscribeBy(
-                onNext = {
-                    currentViewState = ChannelsViewState(channels = it)
-                },
-                onError = {  error ->
-                    val errorMsg = if(error is HttpException)
-                        error.response()?.errorBody()?.string() ?: "Http Error!"
-                    else
-                        error.localizedMessage ?: "Error!"
+                onNext = { channelsGroups ->
 
-                    viewState.processEffect(
-                        ChannelsListEffect.ShowError(errorMsg)
-                    )
-                }
+                    currentViewState = ChannelsViewState(channels = channelsGroups.data)
+                },
+                onError = { processError(it) }
             )
             .addTo(compositeDisposable)
     }
 
     private fun searchChannels(searchString: String) {
-        searchChannelsSubject.onNext(searchString)
+        searchChannelsSubject?.onNext(searchString)
+    }
+
+    private fun processError(error: Throwable) {
+        val errorMsg = if(error is HttpException)
+            error.response()?.errorBody()?.string() ?: "Http Error!"
+        else
+            error.localizedMessage ?: "Error!"
+
+        viewState.processEffect(
+            ChannelsListEffect.ShowError(errorMsg)
+        )
     }
 
     override fun onDestroy() {

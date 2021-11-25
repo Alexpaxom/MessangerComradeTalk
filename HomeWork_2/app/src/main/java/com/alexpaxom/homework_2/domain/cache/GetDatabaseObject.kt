@@ -12,4 +12,6 @@ object GetDatabaseObject {
 
     val messagesDao = db.messagesDao()
     val usersDao = db.usersDao()
+    val channelsDao = db.channelsDao()
+    val topicsDao = db.topicsDao()
 }

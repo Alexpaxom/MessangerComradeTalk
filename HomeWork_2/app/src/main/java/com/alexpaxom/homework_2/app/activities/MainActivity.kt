@@ -47,14 +47,10 @@ class MainActivity : AppCompatActivity() {
         if(savedInstanceState == null || savedInstanceState.getInt(SAVE_BUNDLE_MY_USER_ID_KEY) == 0) {
             profileHandler.getUserByID()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread(), true)
                 .subscribeBy(
                     onNext = {
-                        if(it !is CachedWrapper.ErrorResult)
-                            ownUserId = it.data.id
-                        else
-                            showError(it.error.localizedMessage)
-
+                        ownUserId = it.data.id
                     },
                     onError = {
                         // Если произошла ошибка но мы смогли получить данные из кэша

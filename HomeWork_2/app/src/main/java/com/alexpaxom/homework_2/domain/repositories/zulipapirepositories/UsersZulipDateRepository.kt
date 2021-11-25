@@ -48,7 +48,7 @@ class UsersZulipDateRepository {
                 )
             }
             catch (e: Exception) {
-                emitter.onNext(CachedWrapper.ErrorResult(listOf(), e))
+                emitter.tryOnError(e)
             }
 
             emitter.onComplete()
@@ -90,10 +90,7 @@ class UsersZulipDateRepository {
                 emitter.onComplete()
             }
             catch (e: Exception) {
-                // костыль, если бросать ошибку сразу то не успее отработать onNext для кэша в subscribe
-                Timer("Wait cache apply", false).schedule(2000) {
-                    emitter.onError(e)
-                }
+                emitter.tryOnError(e)
             }
         }
     }

@@ -20,7 +20,6 @@ class UserProfileUseCaseZulipApi (
                      when(userWrap) {
                          is CachedWrapper.CachedData -> CachedWrapper.CachedData(user)
                          is CachedWrapper.OriginalData -> CachedWrapper.OriginalData(user)
-                         is CachedWrapper.ErrorResult -> CachedWrapper.ErrorResult(user, userWrap.error)
                      }
                  }
     }

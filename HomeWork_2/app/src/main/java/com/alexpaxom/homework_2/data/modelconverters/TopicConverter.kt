@@ -5,11 +5,11 @@ import com.alexpaxom.homework_2.data.models.TopicItem
 import com.alexpaxom.homework_2.domain.entity.Topic
 
 class TopicConverter {
-    fun convert(topic: Topic, channelId: Int): TopicItem {
+    fun convert(topic: Topic): TopicItem {
         return TopicItem (
             typeId = R.layout.topic_info_item,
             id = topic.name.hashCode(),
-            channelId = channelId,
+            channelId = topic.channelId,
             name = topic.name,
             countMessages = 0
         )

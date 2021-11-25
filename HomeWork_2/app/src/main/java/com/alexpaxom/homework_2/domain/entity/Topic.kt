@@ -1,11 +1,21 @@
 package com.alexpaxom.homework_2.domain.entity
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 
-class Topic (
-//    @field:Json(name = "max_id")
-//    val maxId: Int? = null
-//
+@Entity(tableName = "Topics")
+data class Topic (
+
+    @PrimaryKey
     @field:Json(name = "name")
-    val name: String
+    val name: String,
+
+    @ColumnInfo(name = "max_id")
+    @field:Json(name = "max_id")
+    val maxMessageId: Int?,
+
+    @ColumnInfo(name = "channel_id")
+    val channelId: Int,
 )

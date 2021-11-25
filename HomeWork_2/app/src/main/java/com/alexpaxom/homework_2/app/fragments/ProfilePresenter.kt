@@ -39,8 +39,7 @@ class ProfilePresenter : MvpPresenter<BaseView<ProfileViewState, ProfileEffect>>
         searchUsers.getUserByID(userId)
             .flatMap { userWrap ->
                 return@flatMap when(userWrap) {
-                    is CachedWrapper.CachedData,
-                    is CachedWrapper.ErrorResult->
+                    is CachedWrapper.CachedData ->
                         Observable.just(userWrap)
 
                     is CachedWrapper.OriginalData ->
@@ -51,16 +50,13 @@ class ProfilePresenter : MvpPresenter<BaseView<ProfileViewState, ProfileEffect>>
                 }
             }
             .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread(), true)
             .doOnSubscribe {
                 currentViewState = ProfileViewState(isEmptyLoading = true)
             }
             .subscribeBy(
                 onNext = {
-                    if(it !is CachedWrapper.ErrorResult)
-                        currentViewState = ProfileViewState(user = it.data)
-                    else
-                        processError(it.error)
+                    currentViewState = ProfileViewState(user = it.data)
                 },
                 onError = { processError(it) }
             )

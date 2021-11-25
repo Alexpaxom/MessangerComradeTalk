@@ -9,7 +9,7 @@ class ChannelConverter {
         return ChannelItem (
             typeId = R.layout.channel_info_item,
             id = channel.streamId,
-            name = channel.name,
+            name = channel.name ?: "not name",
             isExpanded = false
         )
     }

@@ -29,20 +29,26 @@ class TopicsZulipDataRepository {
 
             if(useApi)
             {
-                // Запрашиваем данные с сервера и возвращаем следом за кэшем
-                val topics =
-                    topicsZulipApiRequests
-                        .getTopicsByStreamId(channelId)
-                        .execute()
-                        .body()
-                        ?.topics
-                        ?.map { it.copy(channelId = channelId) } ?: listOf()
+                try {
+                    // Запрашиваем данные с сервера и возвращаем следом за кэшем
+                    val topics =
+                        topicsZulipApiRequests
+                            .getTopicsByStreamId(channelId)
+                            .execute()
+                            .body()
+                            ?.topics
+                            ?.map { it.copy(channelId = channelId) } ?: listOf()
 
-                emitter.onNext(CachedWrapper.OriginalData(topics))
+                    emitter.onNext(CachedWrapper.OriginalData(topics))
 
-                // обновляем кэш
-                if(refreshCache)
-                    topicsDAO.insertAll(topics)
+                    // обновляем кэш
+                    if(refreshCache)
+                        topicsDAO.insertAll(topics)
+
+                }
+                catch (e: Exception) {
+                    emitter.tryOnError(e)
+                }
             }
 
             emitter.onComplete()

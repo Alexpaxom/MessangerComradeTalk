@@ -25,12 +25,14 @@ class SearchExpandedChannelGroupZulip(
         searchString: String
     ): Observable<CachedWrapper<List<ExpandedChanelGroup>>> {
         return searchInChannels(channelsRepository.getSubscribedChannels(), searchString)
+            .subscribeOn(Schedulers.io())
     }
 
     fun searchInAllChannelGroups(
         searchString: String
     ): Observable<CachedWrapper<List<ExpandedChanelGroup>>> {
         return searchInChannels(channelsRepository.getAllChannels(), searchString)
+            .subscribeOn(Schedulers.io())
     }
 
     private fun searchInChannels(

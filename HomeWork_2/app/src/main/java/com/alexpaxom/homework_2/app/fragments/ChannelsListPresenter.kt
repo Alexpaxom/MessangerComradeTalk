@@ -28,6 +28,8 @@ class ChannelsListPresenter(
     private var searchChannelsSubject: BehaviorSubject<String>? = null
     private val searchExpandedChannelGroup = SearchExpandedChannelGroupZulip()
 
+    private val expandedChannelsIds = HashSet<Int>()
+
     init {
         initChannelsGroupSearchListener()
         // загружаем первые данные о пользователях
@@ -42,16 +44,15 @@ class ChannelsListPresenter(
     }
 
     private fun changeExpandGroupState(channel: ChannelItem) {
-        val newChannels = arrayListOf<ExpandedChanelGroup>()
-        newChannels.addAll(currentViewState.channels)
-        newChannels.indexOfLast { it.channel.id == channel.id }.let {
-            newChannels[it] = newChannels[it].copy(
-                channel = channel
-            )
-        }
+        // Сохраняем состояние раскрытости списка в локальном сете
+        if(expandedChannelsIds.contains(channel.id) && !channel.isExpanded)
+            expandedChannelsIds.remove(channel.id)
+        else
+            expandedChannelsIds.add(channel.id)
+
 
         currentViewState = currentViewState.copy(
-            channels = newChannels
+            channels = refreshExpandedState(currentViewState.channels)
         )
     }
 
@@ -80,11 +81,26 @@ class ChannelsListPresenter(
             .subscribeBy(
                 onNext = { channelsGroups ->
 
-                    currentViewState = ChannelsViewState(channels = channelsGroups.data)
+                    currentViewState = ChannelsViewState(
+                        channels = refreshExpandedState(channelsGroups.data)
+                    )
                 },
                 onError = { processError(it) }
             )
             .addTo(compositeDisposable)
+    }
+
+    private fun refreshExpandedState(
+        channelsGroup: List<ExpandedChanelGroup>
+    ) : List<ExpandedChanelGroup> {
+
+        return channelsGroup.map { channelGroup ->
+                channelGroup.copy(
+                    channel = channelGroup.channel.copy(
+                        isExpanded = expandedChannelsIds.contains(channelGroup.channel.id)
+                    )
+                )
+        }
     }
 
     private fun searchChannels(searchString: String) {

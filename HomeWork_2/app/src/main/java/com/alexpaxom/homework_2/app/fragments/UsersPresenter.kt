@@ -65,7 +65,7 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
                             Single.just(usersWrap)
 
                         is CachedWrapper.OriginalData ->
-                            loadUsersStates(usersWrap.data)
+                            loadUsersStates(usersWrap.data )
                                 .map{ CachedWrapper.OriginalData(it) }
                     }
                 }
@@ -75,7 +75,7 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
             .subscribeBy(
                 onNext = {usersWrap->
                     currentViewState = UsersViewState(
-                        users = usersWrap.data
+                        users = usersWrap.data.sortedBy{ it.name}
                     )
                 },
                 onError = { processError(it) }

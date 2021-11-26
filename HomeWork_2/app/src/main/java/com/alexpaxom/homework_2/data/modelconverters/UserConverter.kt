@@ -14,12 +14,4 @@ class UserConverter {
             avatarUrl = user.avatarUrl ?: "No avatar"
         )
     }
-
-    class OriginalZulipStatus  {
-        companion object {
-            val ONLINE_STATUS = "active"
-            val IDLE_STATUS = "idle"
-            val OFFLINE_STATUS =  "offline"
-        }
-    }
 }

@@ -11,9 +11,10 @@ import com.alexpaxom.homework_2.data.modelconverters.UserConverter
 
 
 class UserInfoHolder(val userInfoItemBinding: UserInfoItemBinding): BaseViewHolder<UserItem>(userInfoItemBinding) {
-   private val glide = Glide
-           .with(userInfoItemBinding.userItemAvatarImg.context)
 
+    private val glide = Glide
+           .with(userInfoItemBinding.userItemAvatarImg.context)
+    val wrappedDrawable = DrawableCompat.wrap(userInfoItemBinding.statusIcon.drawable)
 
 
     override fun bind(model: UserItem) {
@@ -23,17 +24,10 @@ class UserInfoHolder(val userInfoItemBinding: UserInfoItemBinding): BaseViewHold
             .circleCrop()
             .into(userInfoItemBinding.userItemAvatarImg)
 
-        val rColor = when(model.status.aggregatedStatus) {
-            UserConverter.OriginalZulipStatus.ONLINE_STATUS -> R.color.profile_online_status_color
-            UserConverter.OriginalZulipStatus.IDLE_STATUS -> R.color.profile_idle_status_color
-            UserConverter.OriginalZulipStatus.OFFLINE_STATUS -> R.color.profile_offline_status_color
-            else -> R.color.white
-        }
 
-        val wrappedDrawable = DrawableCompat.wrap(userInfoItemBinding.statusIcon.drawable)
         DrawableCompat.setTint(
             wrappedDrawable,
-            ContextCompat.getColor(userInfoItemBinding.statusIcon.context, rColor)
+            ContextCompat.getColor(userInfoItemBinding.statusIcon.context, model.status.colorId)
         )
     }
 }

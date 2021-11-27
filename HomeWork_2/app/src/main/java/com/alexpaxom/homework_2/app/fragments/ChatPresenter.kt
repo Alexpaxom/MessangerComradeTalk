@@ -45,10 +45,14 @@ class ChatPresenter(
 
     fun processEvent(event: ChatEvent) {
         when(event) {
-            ChatEvent.LoadHistory -> loadChatHistory()
+            ChatEvent.LoadHistory ->
+                if(!currentViewState.isEmptyLoading)
+                    loadChatHistory()
+
             is ChatEvent.ChangedScrollPosition ->
                 if(!currentViewState.isEmptyLoading)
                     checkLoadNewPage(event.bottomPos, event.topPos)
+
             is ChatEvent.SendMessage -> sendMessage(event.message)
             is ChatEvent.EmojiStateChange -> {
                 if(event.isAdd)
@@ -88,7 +92,8 @@ class ChatPresenter(
                             0,
                             messagesWrap.data,
                             listOf()
-                        )
+                        ),
+                        isEmptyLoading = messagesWrap is CachedWrapper.CachedData
                     )
                 },
                 onError = { processError(it) },

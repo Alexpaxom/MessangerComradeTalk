@@ -9,4 +9,5 @@
     <string name="channels_tab_subscribed">Subscribed</string>
     <string name="channels_tab_all_streams">All Streams</string>
     <string name="empty_string"></string>
+    <string name="search_help_text">Search</string>
 </resources>

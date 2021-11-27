@@ -8,6 +8,7 @@
     android:background="@color/primary">
 
     <com.google.android.material.textfield.TextInputLayout
+        android:theme="@style/TextInputLayoutStyle"
         android:id="@+id/search_field"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -23,17 +24,20 @@
         app:placeholderTextColor="@color/white"
         app:prefixTextColor="@color/white"
         app:suffixTextColor="@color/white"
-        tools:hint="Search">
+        app:hintEnabled="false" >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/search_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#00FFFFFF"
+            android:cursorVisible="true"
             android:textColor="@color/white"
             android:textColorHighlight="@color/white"
             android:textColorHint="@color/white"
-            android:textColorLink="@color/white" />
+            android:textColorLink="@color/white"
+            android:hint="@string/search_help_text"
+            android:textSize="18sp"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 

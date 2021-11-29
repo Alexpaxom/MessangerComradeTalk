@@ -1,6 +1,7 @@
 package com.alexpaxom.homework_2.domain.repositories.zulipapirepositories
 
 import com.alexpaxom.homework_2.domain.cache.GetDatabaseObject
+import com.alexpaxom.homework_2.domain.cache.daos.MessagesDAO
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.entity.Message
 import com.alexpaxom.homework_2.domain.entity.ReactionResult
@@ -11,11 +12,11 @@ import io.reactivex.Single
 import java.util.*
 import kotlin.concurrent.schedule
 
-class MessagesZulipDataRepository {
-
-    private val retrofit = GetRetrofitObject.retrofit
-    private val messagesZulipApiRequests = retrofit.create(MessagesZulipApiRequests::class.java)
-    private val messagesDao = GetDatabaseObject.messagesDao
+class MessagesZulipDataRepository(
+    private val messagesZulipApiRequests: MessagesZulipApiRequests =
+        GetRetrofitObject.retrofit.create(MessagesZulipApiRequests::class.java),
+    private val messagesDao: MessagesDAO = GetDatabaseObject.messagesDao
+) {
 
     private fun getMessages(
         messageId: Long,

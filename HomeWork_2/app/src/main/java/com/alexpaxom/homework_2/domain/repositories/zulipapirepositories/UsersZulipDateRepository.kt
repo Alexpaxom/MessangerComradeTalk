@@ -1,6 +1,7 @@
 package com.alexpaxom.homework_2.domain.repositories.zulipapirepositories
 
 import com.alexpaxom.homework_2.domain.cache.GetDatabaseObject
+import com.alexpaxom.homework_2.domain.cache.daos.UsersDAO
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.entity.User
 import com.alexpaxom.homework_2.domain.entity.UserPresence
@@ -10,11 +11,11 @@ import io.reactivex.Single
 import java.util.*
 import kotlin.concurrent.schedule
 
-class UsersZulipDateRepository {
-
-    private val retrofit = GetRetrofitObject.retrofit
-    private val usersZulipApiRequests = retrofit.create(UsersZulipApiRequests::class.java)
-    private val usersDAO = GetDatabaseObject.usersDao
+class UsersZulipDateRepository(
+    private val usersZulipApiRequests: UsersZulipApiRequests =
+        GetRetrofitObject.retrofit.create(UsersZulipApiRequests::class.java),
+    private val usersDAO: UsersDAO = GetDatabaseObject.usersDao
+) {
 
     fun getUsers(
         useCache: Boolean = true,

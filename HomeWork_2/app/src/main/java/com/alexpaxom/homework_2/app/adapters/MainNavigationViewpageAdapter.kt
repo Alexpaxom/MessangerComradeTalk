@@ -8,17 +8,28 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 class MainNavigationViewpageAdapter(
     private val fragmentManager: FragmentManager,
     lifecycle: Lifecycle,
-    val fragmentsList: Map<Int, Fragment> = mapOf()
+    private val fragmentsIdsList: List<Int> = listOf(),
+    private val createFragmentById: (fragmentId: Int) -> Fragment
 ): FragmentStateAdapter(fragmentManager, lifecycle) {
 
-
-    override fun getItemCount(): Int = fragmentsList.size
+    override fun getItemCount(): Int = fragmentsIdsList.size
 
     override fun createFragment(position: Int): Fragment {
-        return fragmentsList[position] ?: error("Not found fragment for this position")
+        return createFragmentById(fragmentsIdsList[position])
     }
 
-    fun fragmentAt(position: Int): Fragment? {
-        return fragmentsList[position]
+    fun getFragmentPositionById(id: Int): Int {
+        val pos = fragmentsIdsList.indexOfLast { it == id }
+        return if(pos != -1) pos else error("Fragment with this id not exists!")
+    }
+
+    fun getFragmentById(id: Int): Fragment? {
+        return fragmentManager.findFragmentByTag(
+            "$VIEW_PAGER_TAG${getFragmentPositionById(id)}"
+        )
+    }
+
+    companion object {
+        private const val VIEW_PAGER_TAG = "f"
     }
 }

@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
-import com.alexpaxom.homework_2.app.activities.MainActivity
 import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListAdapter
 import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListHoldersFactory
 import com.alexpaxom.homework_2.data.models.ChannelItem
@@ -85,7 +84,7 @@ class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>(),
                 ?.channel
                 ?.name ?: "",
             streamId = topicItem.channelId,
-            myUserId = (requireActivity() as MainActivity).ownUserId
+            myUserId = arguments?.getInt(PARAM_OWNER_USER_ID) ?: error("Required userId for chat!")
 
         )
 
@@ -105,13 +104,18 @@ class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>(),
 
     companion object {
         private const val SUBSCRIBED_FILTER_FLAG = "com.alexpaxom.SUBSCRIBED_FILTER_FLAG"
+        private const val PARAM_OWNER_USER_ID = "com.alexpaxom.USER_ID_PARAM"
         const val FRAGMENT_ID = "com.alexpaxom.CHANNELS_LIST_FRAGMENT_ID"
         const val INITIAL_SEARCH_QUERY: String = ""
 
         @JvmStatic
-        fun newInstance(subscribedFilterFlag: Boolean) = ChannelsListFragment().apply {
+        fun newInstance(
+            subscribedFilterFlag: Boolean,
+            ownerUserId: Int
+        ) = ChannelsListFragment().apply {
             arguments = Bundle().apply {
                 putBoolean(SUBSCRIBED_FILTER_FLAG, subscribedFilterFlag)
+                putInt(PARAM_OWNER_USER_ID, ownerUserId)
             }
         }
     }

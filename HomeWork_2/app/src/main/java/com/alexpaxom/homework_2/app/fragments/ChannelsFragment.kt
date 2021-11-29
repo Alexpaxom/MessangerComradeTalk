@@ -60,14 +60,16 @@ class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
     }
 
     private fun getChannelsTabsFragments(): Map<Int, Fragment> {
+        val ownerUserId = arguments?.getInt(PARAM_OWNER_USER_ID) ?: error("Required userId channels list!")
+
         // При первом заходе создаем новые фрагменты в последующем получаем их из FragmentManager
         val subscribed =
             childFragmentManager.findFragmentByTag("$VIEW_PAGER_TAG$POSITION_SUBSCRIBED_TAB_NAVIGATION")
-                ?: ChannelsListFragment.newInstance(true)
+                ?: ChannelsListFragment.newInstance(true, ownerUserId)
 
         val allStreams =
             childFragmentManager.findFragmentByTag("$VIEW_PAGER_TAG$POSITION_ALL_STREAMS_TAB_NAVIGATION")
-                ?: ChannelsListFragment.newInstance(false)
+                ?: ChannelsListFragment.newInstance(false, ownerUserId)
         return mapOf(
             POSITION_SUBSCRIBED_TAB_NAVIGATION to subscribed,
             POSITION_ALL_STREAMS_TAB_NAVIGATION to allStreams
@@ -75,8 +77,8 @@ class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
     }
 
     companion object {
-        //private const val SAVED_BUNDLE_CHANNELS = "com.alexpaxom.SAVED_BUNDLE_CHANNELS"
         const val FRAGMENT_ID = "com.alexpaxom.CHANNELS_FRAGMENT_ID"
+        private const val PARAM_OWNER_USER_ID = "com.alexpaxom.USER_ID_PARAM"
 
         private const val POSITION_SUBSCRIBED_TAB_NAVIGATION = 0
         private const val POSITION_ALL_STREAMS_TAB_NAVIGATION = 1
@@ -84,6 +86,10 @@ class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
 
 
         @JvmStatic
-        fun newInstance() = ChannelsFragment()
+        fun newInstance(ownerUserId: Int) = ChannelsFragment().apply {
+            arguments = Bundle().apply {
+                putInt(PARAM_OWNER_USER_ID, ownerUserId)
+            }
+        }
     }
 }

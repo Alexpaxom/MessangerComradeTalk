@@ -11,43 +11,46 @@ import io.reactivex.Observable
 import java.sql.Wrapper
 
 class MessagesLoadUseCaseZulipApi(
-    val ownUserId: Int,
     val messagesZulipDataRepository: MessagesZulipDataRepository = MessagesZulipDataRepository(),
 ) {
     private val messagesConverter = MessageConverter()
 
     fun getNextPage(
+        ownUserId: Int,
         messageId: Long,
         countMessages: Int,
         filter: NarrowParams
     ): Observable<CachedWrapper<List<MessageItem>>> {
 
         return messagesZulipDataRepository.getNextPage(messageId, countMessages, filter)
-            .map{ convertTypesMessages(it) }
+            .map{ convertTypesMessages(ownUserId, it) }
     }
 
     fun getPrevPage(
+        ownUserId: Int,
         messageId: Long,
         countMessages: Int, filter:
         NarrowParams
     ): Observable<CachedWrapper<List<MessageItem>>> {
 
         return messagesZulipDataRepository.getPrevPage(messageId, countMessages, filter)
-            .map{ convertTypesMessages(it) }
+            .map{ convertTypesMessages(ownUserId, it) }
     }
 
     fun getHistory(
+        ownUserId: Int,
         messageId: Long,
         countMessages: Int,
         filter: NarrowParams
     ): Observable<CachedWrapper<List<MessageItem>>> {
 
         return messagesZulipDataRepository.getHistory(messageId, countMessages, filter)
-            .map{ convertTypesMessages(it) }
+            .map{ convertTypesMessages(ownUserId, it) }
 
     }
 
     fun convertTypesMessages(
+        ownUserId: Int,
         messages: CachedWrapper<List<Message>>
     ): CachedWrapper<List<MessageItem>> {
         val convertedMessages =

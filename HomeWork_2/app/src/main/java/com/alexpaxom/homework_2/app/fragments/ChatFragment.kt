@@ -31,22 +31,21 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
         { adapterPos, emojiView -> clickOnReaction(adapterPos, emojiView) }
     )
 
-    private val chatHistoryAdapter = ChatHistoryAdapter(chatMessageFactory)
-
-    private var chatPager: ChatPager? = null
-
-    @InjectPresenter
-    lateinit var presenter: ChatPresenter
-
-    @ProvidePresenter
-    fun provideDetailsPresenter(): ChatPresenter? {
-        return ChatPresenter (
+    private val chatParams: Lazy<ChatParams> = lazy {
+        ChatParams(
             topicName = arguments?.getString(ARGUMENT_TOPIC_NAME) ?: error("Bad parameter 'topic name' "),
             streamName = arguments?.getString(ARGUMENT_STREAM_NAME) ?: error("Bad parameter 'stream name' "),
             streamId = arguments?.getInt(ARGUMENT_STREAM_ID) ?: error("Bad parameter 'stream id' "),
             myUserId = arguments?.getInt(ARGUMENT_MY_USER_ID) ?: error("Bad parameter 'user id' ")
         )
     }
+
+    private val chatHistoryAdapter = ChatHistoryAdapter(chatMessageFactory)
+
+    private var chatPager: ChatPager? = null
+
+    @InjectPresenter
+    lateinit var presenter: ChatPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +61,7 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
         // Обрабочики нажатий на элементы списка сообщений
 
         if(savedInstanceState == null)
-            presenter.processEvent(ChatEvent.LoadHistory)
+            presenter.processEvent(ChatEvent.LoadHistory(chatParams.value))
 
         binding.chatingHistory.layoutManager = LinearLayoutManager(context)
         binding.chatingHistory.adapter = chatHistoryAdapter
@@ -80,7 +79,7 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
                 val messageId = resultBundle.getInt(FragmentEmojiSelector.RESULT_ID)
                 emojiUnicode?.let { emojiUnicode ->
                     presenter.processEvent(
-                        ChatEvent.EmojiStateChange(emojiUnicode, messageId, true)
+                        ChatEvent.EmojiStateChange(emojiUnicode, messageId, true, chatParams.value)
                     )
                 }
             })
@@ -91,7 +90,7 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
             binding.messageEnterEdit.text?.let {
                 if (it.isNotEmpty()) {
                     presenter.processEvent(
-                        ChatEvent.SendMessage(it.toString())
+                        ChatEvent.SendMessage(it.toString(), chatParams.value)
                     )
                     binding.messageEnterEdit.text?.clear()
                 }
@@ -130,7 +129,8 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
             ChatEvent.EmojiStateChange(
                 emojiView.displayEmoji,
                 chatHistoryAdapter.dataList[adapterPos].id,
-                emojiView.isSelected
+                emojiView.isSelected,
+                chatParams.value
             )
         )
     }
@@ -196,7 +196,7 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
 
     inner class ChatPager(recyclerView: RecyclerView) : PagingRecyclerUtil(recyclerView) {
         override fun checkLoadData(bottomPos: Int, topPos: Int) {
-            presenter.processEvent(ChatEvent.ChangedScrollPosition(bottomPos, topPos))
+            presenter.processEvent(ChatEvent.ChangedScrollPosition(bottomPos, topPos, chatParams.value))
         }
     }
 }

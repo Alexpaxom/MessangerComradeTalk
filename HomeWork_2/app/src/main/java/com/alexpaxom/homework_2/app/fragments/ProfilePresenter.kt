@@ -15,16 +15,16 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 
 @InjectViewState
-class ProfilePresenter : MvpPresenter<BaseView<ProfileViewState, ProfileEffect>>() {
+class ProfilePresenter(
+    private val searchUsers: UserProfileUseCaseZulipApi = UserProfileUseCaseZulipApi(),
+    private val userStatusInfo: UserStatusUseCaseZulipApi = UserStatusUseCaseZulipApi()
+) : MvpPresenter<BaseView<ProfileViewState, ProfileEffect>>() {
 
     private var currentViewState: ProfileViewState = ProfileViewState()
         set(value) {
             field = value
             viewState.processState(value)
         }
-
-    private val searchUsers = UserProfileUseCaseZulipApi()
-    private val userStatusInfo = UserStatusUseCaseZulipApi()
 
     private val compositeDisposable = CompositeDisposable()
 

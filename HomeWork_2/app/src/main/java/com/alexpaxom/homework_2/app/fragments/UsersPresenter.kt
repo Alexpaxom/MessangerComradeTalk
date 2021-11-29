@@ -1,8 +1,8 @@
 package com.alexpaxom.homework_2.app.fragments
 
 import com.alexpaxom.homework_2.data.models.UserItem
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulipApi
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApi
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulip
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulip
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -26,8 +26,8 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
     private val compositeDisposable = CompositeDisposable()
 
     private var searchUsersSubject: BehaviorSubject<String>? = null
-    private val searchUsers = SearchUsersZulipApi()
-    private val userStatusInfo = UserStatusUseCaseZulipApi()
+    private val searchUsers = SearchUsersZulip()
+    private val userStatusInfo = UserStatusUseCaseZulip()
 
     init {
         initUsersSearchListener()

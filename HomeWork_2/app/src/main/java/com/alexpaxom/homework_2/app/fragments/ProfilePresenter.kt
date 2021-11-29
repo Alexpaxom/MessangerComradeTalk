@@ -1,7 +1,7 @@
 package com.alexpaxom.homework_2.app.fragments
 
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserProfileUseCaseZulipApi
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApi
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserProfileUseCaseZulip
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulip
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -16,8 +16,8 @@ import io.reactivex.rxkotlin.subscribeBy
 
 @InjectViewState
 class ProfilePresenter(
-    private val searchUsers: UserProfileUseCaseZulipApi = UserProfileUseCaseZulipApi(),
-    private val userStatusInfo: UserStatusUseCaseZulipApi = UserStatusUseCaseZulipApi()
+    private val searchUsers: UserProfileUseCaseZulip = UserProfileUseCaseZulip(),
+    private val userStatusInfo: UserStatusUseCaseZulip = UserStatusUseCaseZulip()
 ) : MvpPresenter<BaseView<ProfileViewState, ProfileEffect>>() {
 
     private var currentViewState: ProfileViewState = ProfileViewState()

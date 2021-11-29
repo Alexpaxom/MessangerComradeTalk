@@ -10,7 +10,7 @@ import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.NarrowP
 import io.reactivex.Observable
 import java.sql.Wrapper
 
-class MessagesLoadUseCaseZulipApi(
+class MessagesLoadUseCaseZulip(
     val messagesZulipDataRepository: MessagesZulipDataRepository = MessagesZulipDataRepository(),
 ) {
     private val messagesConverter = MessageConverter()

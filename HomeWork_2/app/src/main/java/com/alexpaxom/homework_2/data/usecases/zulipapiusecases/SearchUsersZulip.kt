@@ -6,7 +6,7 @@ import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.UsersZulipDateRepository
 import io.reactivex.Observable
 
-class SearchUsersZulipApi (
+class SearchUsersZulip (
     val usersRepository: UsersZulipDateRepository = UsersZulipDateRepository(),
 ) {
     private val userConverter = UserConverter()

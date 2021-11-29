@@ -3,8 +3,8 @@ package com.alexpaxom.homework_2.app.fragments
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.ChatUseCase
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessageSendUseCaseZulipApi
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessagesLoadUseCaseZulipApi
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessageSendUseCaseZulip
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessagesLoadUseCaseZulip
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.NarrowParams
 import com.alexpaxom.homework_2.helpers.EmojiHelper
@@ -18,8 +18,8 @@ import retrofit2.HttpException
 import java.util.*
 
 class ChatPresenter(
-    private var messagesLoader: MessagesLoadUseCaseZulipApi = MessagesLoadUseCaseZulipApi(),
-    private val messagesSender: MessageSendUseCaseZulipApi = MessageSendUseCaseZulipApi()
+    private var messagesLoader: MessagesLoadUseCaseZulip = MessagesLoadUseCaseZulip(),
+    private val messagesSender: MessageSendUseCaseZulip = MessageSendUseCaseZulip()
 ) : MvpPresenter<BaseView<ChatViewState, ChatEffect>>() {
 
     private var currentViewState: ChatViewState = ChatViewState()

@@ -5,10 +5,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 
-@Entity(tableName = "Topics")
+
+@Entity(tableName = "Topics", primaryKeys = ["name", "channel_id"])
 data class Topic (
 
-    @PrimaryKey
     @field:Json(name = "name")
     val name: String,
 

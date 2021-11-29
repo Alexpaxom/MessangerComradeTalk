@@ -22,7 +22,6 @@ import moxy.presenter.ProvidePresenter
 class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>(),
     BaseView<ChannelsViewState, ChannelsListEffect> {
 
-
     private val channelsListHoldersFactory = ChannelsListHoldersFactory(
         onExpandableChannelItemClickListener = {onChannelClick(it)},
         onExpandableTopicItemClickListener = {onTopicClick(it)})
@@ -35,9 +34,11 @@ class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>(),
 
     @ProvidePresenter
     fun provideDetailsPresenter(): ChannelsListPresenter? {
-        return ChannelsListPresenter (
-            subscribedFilterFlag = arguments?.getBoolean(ChannelsListFragment.SUBSCRIBED_FILTER_FLAG) ?: false
-        )
+        val subscribedFilterFlag = arguments?.getBoolean(SUBSCRIBED_FILTER_FLAG) ?: false
+        return if(subscribedFilterFlag)
+                    ChannelsListSubscribedPresenter()
+                else
+                    ChannelsListAllPresenter()
     }
 
     override fun createBinding(): CnannelsListFragmentBinding =

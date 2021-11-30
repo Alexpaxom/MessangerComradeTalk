@@ -5,20 +5,21 @@ import com.alexpaxom.homework_2.domain.entity.UserPresence
 import com.alexpaxom.homework_2.domain.entity.UserResult
 import com.alexpaxom.homework_2.domain.entity.UsersResult
 import io.reactivex.Single
+import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface UsersZulipApiRequests {
     @GET("/api/v1/users")
-    fun getUsers(): Single<UsersResult>
+    fun getUsers(): Call<UsersResult>
 
     @GET("/api/v1/users/{user_id}")
     fun getUserById(
         @Path("user_id") userId: Int
-    ): Single<UserResult>
+    ): Call<UserResult>
 
     @GET("/api/v1/users/me")
-    fun getOwnUser(): Single<User>
+    fun getOwnUser(): Call<User>
 
     @GET("/api/v1/users/{user_id}/presence")
     fun getUserPresence(

@@ -1,8 +1,9 @@
 package com.alexpaxom.homework_2.app.fragments
 
+import android.util.Log
 import com.alexpaxom.homework_2.data.models.ChannelItem
 import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchExpandedChannelGroupZulipImpl
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchExpandedChannelGroupZulip
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -24,8 +25,10 @@ class ChannelsListPresenter(
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val searchChannelsSubject: BehaviorSubject<String> = BehaviorSubject.create()
-    private val searchExpandedChannelGroup = SearchExpandedChannelGroupZulipImpl()
+    private var searchChannelsSubject: BehaviorSubject<String>? = null
+    private val searchExpandedChannelGroup = SearchExpandedChannelGroupZulip()
+
+    private val expandedChannelsIds = HashSet<Int>()
 
     init {
         initChannelsGroupSearchListener()
@@ -41,21 +44,21 @@ class ChannelsListPresenter(
     }
 
     private fun changeExpandGroupState(channel: ChannelItem) {
-        val newChannels = arrayListOf<ExpandedChanelGroup>()
-        newChannels.addAll(currentViewState.channels)
-        newChannels.indexOfLast { it.channel.id == channel.id }.let {
-            newChannels[it] = newChannels[it].copy(
-                channel = channel
-            )
-        }
+        // Сохраняем состояние раскрытости списка в локальном сете
+        if(expandedChannelsIds.contains(channel.id) && !channel.isExpanded)
+            expandedChannelsIds.remove(channel.id)
+        else
+            expandedChannelsIds.add(channel.id)
+
 
         currentViewState = currentViewState.copy(
-            channels = newChannels
+            channels = refreshExpandedState(currentViewState.channels)
         )
     }
 
     private fun initChannelsGroupSearchListener() {
-        searchChannelsSubject
+        searchChannelsSubject = BehaviorSubject.create()
+        searchChannelsSubject!!
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .distinctUntilChanged()
@@ -65,34 +68,54 @@ class ChannelsListPresenter(
             }
             .observeOn(Schedulers.io())
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-            .switchMapSingle {
+            .switchMap {
                 if(subscribedFilterFlag)
-                    searchExpandedChannelGroup.searchInSubscribedChannelGroups(it).subscribeOn(
-                        Schedulers.io())
+                    searchExpandedChannelGroup.searchInSubscribedChannelGroups(it)
+                        .subscribeOn(Schedulers.io())
                 else
-                    searchExpandedChannelGroup.searchInAllChannelGroups(it).subscribeOn(Schedulers.io())
+                    searchExpandedChannelGroup.searchInAllChannelGroups(it)
+                        .subscribeOn(Schedulers.io())
             }
-            .observeOn(AndroidSchedulers.mainThread())
+            .doOnError { initChannelsGroupSearchListener() }
+            .observeOn(AndroidSchedulers.mainThread(), true)
             .subscribeBy(
-                onNext = {
-                    currentViewState = ChannelsViewState(channels = it)
-                },
-                onError = {  error ->
-                    val errorMsg = if(error is HttpException)
-                        error.response()?.errorBody()?.string() ?: "Http Error!"
-                    else
-                        error.localizedMessage ?: "Error!"
+                onNext = { channelsGroups ->
 
-                    viewState.processEffect(
-                        ChannelsListEffect.ShowError(errorMsg)
+                    currentViewState = ChannelsViewState(
+                        channels = refreshExpandedState(channelsGroups.data)
                     )
-                }
+                },
+                onError = { processError(it) }
             )
             .addTo(compositeDisposable)
     }
 
+    private fun refreshExpandedState(
+        channelsGroup: List<ExpandedChanelGroup>
+    ) : List<ExpandedChanelGroup> {
+
+        return channelsGroup.map { channelGroup ->
+                channelGroup.copy(
+                    channel = channelGroup.channel.copy(
+                        isExpanded = expandedChannelsIds.contains(channelGroup.channel.id)
+                    )
+                )
+        }
+    }
+
     private fun searchChannels(searchString: String) {
-        searchChannelsSubject.onNext(searchString)
+        searchChannelsSubject?.onNext(searchString)
+    }
+
+    private fun processError(error: Throwable) {
+        val errorMsg = if(error is HttpException)
+            error.response()?.errorBody()?.string() ?: "Http Error!"
+        else
+            error.localizedMessage ?: "Error!"
+
+        viewState.processEffect(
+            ChannelsListEffect.ShowError(errorMsg)
+        )
     }
 
     override fun onDestroy() {

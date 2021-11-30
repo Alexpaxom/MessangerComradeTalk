@@ -2,14 +2,17 @@ package com.alexpaxom.homework_2.app.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.MainNavigationViewpageAdapter
 import com.alexpaxom.homework_2.app.fragments.ChannelsFragment
 import com.alexpaxom.homework_2.app.fragments.ProfileFragment
 import com.alexpaxom.homework_2.app.fragments.UsersFragment
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserProfileUseCaseZulipApi
 import com.alexpaxom.homework_2.databinding.ActivityMainBinding
-import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.UsersZulipDateRepositoryImpl
+import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
+import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.UsersZulipDateRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -33,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val usersRepository = UsersZulipDateRepositoryImpl()
+    private val profileHandler = UserProfileUseCaseZulipApi()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -42,14 +45,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         if(savedInstanceState == null || savedInstanceState.getInt(SAVE_BUNDLE_MY_USER_ID_KEY) == 0) {
-            usersRepository.getUserById()
+            profileHandler.getUserByID()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread(), true)
                 .subscribeBy(
-                    onSuccess = {
-                        init(it.id)
+                    onNext = {
+                        ownUserId = it.data.id
                     },
-                    onError = { error(it.localizedMessage) }
+                    onError = {
+                        // Если произошла ошибка но мы смогли получить данные из кэша
+                        if(ownUserId != 0)
+                            init(ownUserId)
+                        showError(it.localizedMessage)
+                    },
+                    onComplete = { init(ownUserId) }
                 )
                 .addTo(compositeDisposable)
         }
@@ -112,6 +121,10 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         compositeDisposable.dispose()
         super.onDestroy()
+    }
+
+    private fun showError(errorMsg: String) {
+        Toast.makeText(applicationContext, errorMsg, Toast.LENGTH_SHORT).show()
     }
 
 

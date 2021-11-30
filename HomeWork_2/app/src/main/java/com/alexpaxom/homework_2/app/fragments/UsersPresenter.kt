@@ -1,8 +1,9 @@
 package com.alexpaxom.homework_2.app.fragments
 
 import com.alexpaxom.homework_2.data.models.UserItem
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulipApiImpl
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApiImpl
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulipApi
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulipApi
+import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -24,9 +25,9 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val searchUsersSubject: BehaviorSubject<String> = BehaviorSubject.create()
-    private val searchUsers = SearchUsersZulipApiImpl()
-    private val userStatusInfo = UserStatusUseCaseZulipApiImpl()
+    private var searchUsersSubject: BehaviorSubject<String>? = null
+    private val searchUsers = SearchUsersZulipApi()
+    private val userStatusInfo = UserStatusUseCaseZulipApi()
 
     init {
         initUsersSearchListener()
@@ -41,7 +42,10 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
     }
 
     private fun initUsersSearchListener() {
-        searchUsersSubject
+
+        searchUsersSubject = BehaviorSubject.create()
+
+        searchUsersSubject!!
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .distinctUntilChanged()
@@ -53,33 +57,34 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
                 )
             }
             .observeOn(Schedulers.io())
-            .switchMapSingle { searchUsers.search(it)
+            .switchMap { searchUsers.search(it)
                 .subscribeOn(Schedulers.io())
-                .flatMap { users -> loadUsersStates(users) }
+                .concatMapSingleDelayError { usersWrap ->
+                    when(usersWrap) {
+                        is CachedWrapper.CachedData ->
+                            Single.just(usersWrap)
+
+                        is CachedWrapper.OriginalData ->
+                            loadUsersStates(usersWrap.data )
+                                .map{ CachedWrapper.OriginalData(it) }
+                    }
+                }
             }
-            .observeOn(AndroidSchedulers.mainThread())
+            .doOnError { initUsersSearchListener() }
+            .observeOn(AndroidSchedulers.mainThread(), true)
             .subscribeBy(
-                onNext = {
+                onNext = {usersWrap->
                     currentViewState = UsersViewState(
-                        users = it
+                        users = usersWrap.data.sortedBy{ it.name}
                     )
                 },
-                onError = { error ->
-                    val errorMsg = if(error is HttpException)
-                        error.response()?.errorBody()?.string() ?: "Http Error!"
-                    else
-                        error.localizedMessage ?: "Error!"
-
-                    viewState.processEffect(
-                        UsersEffect.ShowError(errorMsg)
-                    )
-                }
+                onError = { processError(it) }
             )
             .addTo(compositeDisposable)
     }
 
     private fun searchUsers(searchString: String) {
-        searchUsersSubject.onNext(searchString)
+        searchUsersSubject?.onNext(searchString)
     }
 
     private fun loadUsersStates(users: List<UserItem>): Single<List<UserItem>> {
@@ -97,6 +102,17 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
                     usersMap[status.userId]!!.copy(status = status)
                 }
             }
+    }
+
+    private fun processError(error: Throwable) {
+        val errorMsg = if(error is HttpException)
+            error.response()?.errorBody()?.string() ?: "Http Error!"
+        else
+            error.localizedMessage ?: "Error!"
+
+        viewState.processEffect(
+            UsersEffect.ShowError(errorMsg)
+        )
     }
 
     override fun onDestroy() {

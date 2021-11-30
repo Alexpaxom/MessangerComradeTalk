@@ -4,6 +4,7 @@ import com.alexpaxom.homework_2.domain.entity.MessagesResult
 import com.alexpaxom.homework_2.domain.entity.ReactionResult
 import com.alexpaxom.homework_2.domain.entity.SendResult
 import io.reactivex.Single
+import retrofit2.Call
 import retrofit2.http.*
 
 interface MessagesZulipApiRequests {
@@ -13,7 +14,7 @@ interface MessagesZulipApiRequests {
         @Query("num_before") numBefore:Int,
         @Query("num_after") numAfter:Int,
         @Query("narrow") filter:String?,
-    ): Single<MessagesResult>
+    ): Call<MessagesResult>
 
     @POST("/api/v1/messages")
     fun sendMessageToStream(

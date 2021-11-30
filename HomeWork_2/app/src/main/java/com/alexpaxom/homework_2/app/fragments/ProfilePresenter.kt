@@ -2,6 +2,7 @@ package com.alexpaxom.homework_2.app.fragments
 
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserProfileUseCaseZulip
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulip
+import com.alexpaxom.homework_2.di.screen.ScreenComponent
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -13,12 +14,17 @@ import java.util.*
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
+import javax.inject.Inject
 
 @InjectViewState
 class ProfilePresenter(
-    private val searchUsers: UserProfileUseCaseZulip = UserProfileUseCaseZulip(),
-    private val userStatusInfo: UserStatusUseCaseZulip = UserStatusUseCaseZulip()
+    screenComponent: ScreenComponent
 ) : MvpPresenter<BaseView<ProfileViewState, ProfileEffect>>() {
+
+    @Inject
+    lateinit var searchUsers: UserProfileUseCaseZulip
+    @Inject
+    lateinit var userStatusInfo: UserStatusUseCaseZulip
 
     private var currentViewState: ProfileViewState = ProfileViewState()
         set(value) {
@@ -27,6 +33,10 @@ class ProfilePresenter(
         }
 
     private val compositeDisposable = CompositeDisposable()
+
+    init {
+        screenComponent.inject(this)
+    }
 
     fun processEvent(event: ProfileEvent) {
         when(event) {

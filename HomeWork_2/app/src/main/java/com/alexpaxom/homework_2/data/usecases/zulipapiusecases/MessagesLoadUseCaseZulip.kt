@@ -3,15 +3,18 @@ package com.alexpaxom.homework_2.data.usecases.zulipapiusecases
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.modelconverters.MessageConverter
 import com.alexpaxom.homework_2.data.models.MessageItem
+import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.entity.Message
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.MessagesZulipDataRepository
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.NarrowParams
 import io.reactivex.Observable
 import java.sql.Wrapper
+import javax.inject.Inject
 
-class MessagesLoadUseCaseZulip(
-    val messagesZulipDataRepository: MessagesZulipDataRepository = MessagesZulipDataRepository(),
+@ScreenScope
+class MessagesLoadUseCaseZulip @Inject constructor(
+    private val messagesZulipDataRepository: MessagesZulipDataRepository
 ) {
     private val messagesConverter = MessageConverter()
 

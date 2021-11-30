@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.App
 import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListAdapter
 import com.alexpaxom.homework_2.app.adapters.cannelslist.ChannelsListHoldersFactory
 import com.alexpaxom.homework_2.data.models.ChannelItem
@@ -33,12 +34,17 @@ class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>(),
     lateinit var presenter: ChannelsListPresenter
 
     @ProvidePresenter
-    fun provideDetailsPresenter(): ChannelsListPresenter? {
+    fun providePresenter(): ChannelsListPresenter? {
         val subscribedFilterFlag = arguments?.getBoolean(SUBSCRIBED_FILTER_FLAG) ?: false
-        return if(subscribedFilterFlag)
-                    ChannelsListSubscribedPresenter()
+        (activity?.application as App).appComponent
+            .getScreenComponent()
+            .create()
+            .let { screenComponent ->
+                return if(subscribedFilterFlag)
+                    ChannelsListSubscribedPresenter(screenComponent)
                 else
-                    ChannelsListAllPresenter()
+                    ChannelsListAllPresenter(screenComponent)
+        }
     }
 
     override fun createBinding(): CnannelsListFragmentBinding =

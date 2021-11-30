@@ -8,12 +8,14 @@ import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.App
 import com.alexpaxom.homework_2.databinding.FragmentProfileBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import moxy.MvpAppCompatDialogFragment
 import moxy.presenter.InjectPresenter
+import moxy.presenter.ProvidePresenter
 
 class ProfileFragment: MvpAppCompatDialogFragment(), BaseView<ProfileViewState, ProfileEffect> {
 
@@ -22,6 +24,13 @@ class ProfileFragment: MvpAppCompatDialogFragment(), BaseView<ProfileViewState, 
 
     @InjectPresenter
     lateinit var presenter: ProfilePresenter
+
+    @ProvidePresenter
+    fun providePresenter(): ProfilePresenter? {
+        return ProfilePresenter(
+            (activity?.application as App).appComponent.getScreenComponent().create()
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

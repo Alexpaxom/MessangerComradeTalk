@@ -2,12 +2,15 @@ package com.alexpaxom.homework_2.data.usecases.zulipapiusecases
 
 import com.alexpaxom.homework_2.data.modelconverters.UserConverter
 import com.alexpaxom.homework_2.data.models.UserItem
+import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.UsersZulipDateRepository
 import io.reactivex.Observable
+import javax.inject.Inject
 
-class UserProfileUseCaseZulip (
-    private val usersRepository: UsersZulipDateRepository = UsersZulipDateRepository()
+@ScreenScope
+class UserProfileUseCaseZulip @Inject constructor(
+    private val usersRepository: UsersZulipDateRepository
 ) {
     private val userConverter = UserConverter()
 

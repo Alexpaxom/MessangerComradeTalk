@@ -1,12 +1,15 @@
 package com.alexpaxom.homework_2.data.usecases.zulipapiusecases
 
+import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.entity.ReactionResult
 import com.alexpaxom.homework_2.domain.entity.SendResult
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.MessagesZulipDataRepository
 import io.reactivex.Single
+import javax.inject.Inject
 
-class MessageSendUseCaseZulip (
-    val messagesZulipDataRepository: MessagesZulipDataRepository = MessagesZulipDataRepository()
+@ScreenScope
+class MessageSendUseCaseZulip @Inject constructor(
+    private val messagesZulipDataRepository: MessagesZulipDataRepository
 ) {
     fun sendMessageToStream(
         streamId: Int,

@@ -12,10 +12,12 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.App
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListAdapter
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListFactoryHolders
 import com.alexpaxom.homework_2.databinding.FragmentUsersBinding
 import moxy.presenter.InjectPresenter
+import moxy.presenter.ProvidePresenter
 
 class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), BaseView<UsersViewState, UsersEffect> {
 
@@ -24,6 +26,13 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), BaseView<User
 
     @InjectPresenter
     lateinit var presenter: UsersPresenter
+
+    @ProvidePresenter
+    fun providePresenter(): UsersPresenter? {
+        return UsersPresenter(
+            (activity?.application as App).appComponent.getScreenComponent().create()
+        )
+    }
 
     override fun createBinding(): FragmentUsersBinding =
         FragmentUsersBinding.inflate(layoutInflater)

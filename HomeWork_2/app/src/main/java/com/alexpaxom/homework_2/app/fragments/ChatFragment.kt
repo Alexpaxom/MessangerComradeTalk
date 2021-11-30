@@ -10,6 +10,7 @@ import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.App
 import com.alexpaxom.homework_2.app.adapters.BaseElements.PagingRecyclerUtil
 import com.alexpaxom.homework_2.app.adapters.chathistory.ChatHistoryAdapter
 import com.alexpaxom.homework_2.app.adapters.chathistory.ChatMessageFactory
@@ -46,6 +47,13 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
 
     @InjectPresenter
     lateinit var presenter: ChatPresenter
+
+    @ProvidePresenter
+    fun providePresenter(): ChatPresenter? {
+        return ChatPresenter(
+            (activity?.application as App).appComponent.getScreenComponent().create()
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

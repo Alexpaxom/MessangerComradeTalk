@@ -5,11 +5,13 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.App
 import com.alexpaxom.homework_2.app.adapters.MainNavigationViewpageAdapter
 import com.alexpaxom.homework_2.app.fragments.*
 import com.alexpaxom.homework_2.databinding.ActivityMainBinding
 import moxy.MvpAppCompatActivity
 import moxy.presenter.InjectPresenter
+import moxy.presenter.ProvidePresenter
 
 
 class MainActivity : MvpAppCompatActivity(), BaseView<MainActivityState, MainActivityEffect> {
@@ -18,6 +20,13 @@ class MainActivity : MvpAppCompatActivity(), BaseView<MainActivityState, MainAct
 
     @InjectPresenter
     lateinit var presenter: MainActivityPresenter
+
+    @ProvidePresenter
+    fun providePresenter(): MainActivityPresenter? {
+        return MainActivityPresenter(
+            (application as App).appComponent.getScreenComponent().create()
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivityMainBinding.inflate(layoutInflater)

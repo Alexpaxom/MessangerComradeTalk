@@ -1,6 +1,6 @@
 package com.alexpaxom.homework_2.domain.repositories.zulipapirepositories
 
-import com.alexpaxom.homework_2.domain.cache.GetDatabaseObject
+import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.daos.UsersDAO
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.entity.User
@@ -8,13 +8,12 @@ import com.alexpaxom.homework_2.domain.entity.UserPresence
 import com.alexpaxom.homework_2.domain.remote.UsersZulipApiRequests
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.*
-import kotlin.concurrent.schedule
+import javax.inject.Inject
 
-class UsersZulipDateRepository(
-    private val usersZulipApiRequests: UsersZulipApiRequests =
-        GetRetrofitObject.retrofit.create(UsersZulipApiRequests::class.java),
-    private val usersDAO: UsersDAO = GetDatabaseObject.usersDao
+@ScreenScope
+class UsersZulipDateRepository @Inject constructor(
+    private val usersZulipApiRequests: UsersZulipApiRequests,
+    private val usersDAO: UsersDAO
 ) {
 
     fun getUsers(

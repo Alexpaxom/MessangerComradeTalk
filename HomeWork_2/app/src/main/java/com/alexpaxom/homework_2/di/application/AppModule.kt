@@ -3,6 +3,7 @@ package com.alexpaxom.homework_2.di.application
 import android.content.Context
 import androidx.room.Room
 import com.alexpaxom.homework_2.app.App
+import com.alexpaxom.homework_2.di.screen.ScreenComponent
 import com.alexpaxom.homework_2.domain.cache.CacheDatabase
 import dagger.Binds
 import dagger.Module
@@ -17,7 +18,10 @@ private const val CHAT_URL = "https://tinkoff-android-fall21.zulipchat.com/"
 private const val LOGIN = "email"
 private const val PASSWORD = "api-kay"
 
-@Module(includes = [AppModule.BindingModule::class])
+@Module(
+    includes = [AppModule.BindingModule::class],
+    subcomponents = [ScreenComponent::class]
+)
 class AppModule {
 
     @Provides

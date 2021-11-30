@@ -8,8 +8,17 @@ import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 
 abstract class ViewBindingFragment<B: ViewBinding> : Fragment() {
-    protected abstract var _binding: Lazy<B>?
-    protected val binding get() = _binding!!.value
+    private var _binding: B? = null
+    protected val binding get() = getOrCreateBinding()
+
+    protected abstract fun createBinding(): B
+
+    private fun getOrCreateBinding(): B {
+        if(_binding == null)
+            _binding = createBinding()
+
+        return _binding!!
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -19,9 +28,8 @@ abstract class ViewBindingFragment<B: ViewBinding> : Fragment() {
         return binding.root
     }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         _binding = null
     }
 }

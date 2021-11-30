@@ -4,12 +4,9 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class User(
+data class ChannelItem(
     override val typeId: Int = 0,
-    val id: Int,
+    override val id: Int,
     val name: String,
-    val email: String,
-    val avatarUrl: String,
-    val status: String = "",
-    val online: Boolean = false
-): Parcelable, ListItem
+    val isExpanded: Boolean = false,
+): Parcelable, ExpandedChannelItem

@@ -1,4 +1,4 @@
-package com.alexpaxom.homework_2.data.repositories
+package com.alexpaxom.homework_2.domain.repositories
 
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.*
@@ -6,7 +6,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
 
-class TestMessagesRepository {
+@Deprecated("Will deleted when be realized repository for any type")
+class TestRepositoryImpl {
 
     private val names = listOf(
         "Иванов Сергей>https://ichef.bbci.co.uk/news/640/cpsprodpb/14A82/production/_116301648_gettyimages-1071204136.jpg",
@@ -39,12 +40,12 @@ class TestMessagesRepository {
         "\uD83D\uDE11",
     )
 
-    fun getUserById(userId: Int): User {
+    fun getUserById(userId: Int): UserItem {
         for(user in names) {
 
             if(user.hashCode() == userId) {
                 val userParam = user.split(">")
-                return User(
+                return UserItem(
                     typeId = R.layout.user_info_item,
                     id = user.hashCode(),
                     name = userParam[0],
@@ -60,12 +61,12 @@ class TestMessagesRepository {
         error("cant find user with id $userId")
     }
 
-    fun getUsers(): List<User> {
-        val retUsersList = arrayListOf<User>()
+    fun getUsers(): List<UserItem> {
+        val retUsersList = arrayListOf<UserItem>()
         for(user in names) {
             val userParam = user.split(">")
             retUsersList.add(
-                User(
+                UserItem(
                     typeId = R.layout.user_info_item,
                     id = user.hashCode(),
                     name = userParam[0],
@@ -80,15 +81,15 @@ class TestMessagesRepository {
         return retUsersList
     }
 
-    fun getMessages(count: Int): ArrayList<Message> {
-        val ret = arrayListOf<Message>()
+    fun getMessages(count: Int): ArrayList<MessageItem> {
+        val ret = arrayListOf<MessageItem>()
         val date = Date()
         date.time -= 1000*60*60*12*count
 
         repeat(count) {
             val user = names.random().split(">")
             ret.add (
-                Message(
+                MessageItem(
                     typeId = R.layout.message_item,
                     id = it,
                     userName = user[0],
@@ -117,10 +118,9 @@ class TestMessagesRepository {
 
         repeat(countChannels) {
             val countTopics = random.nextInt(maxCountTopics)
-            val channelId = nextChannelId
             channelsList.add(
                 ExpandedChanelGroup(
-                    channel = Channel(
+                    channel = ChannelItem(
                         typeId = R.layout.channel_info_item,
                         id = nextChannelId,
                         name = "Channel $it"
@@ -134,11 +134,11 @@ class TestMessagesRepository {
         return channelsList
     }
 
-    fun getTopics(count: Int, channelId: Int = 0): List<Topic> {
-        val topicsResult = arrayListOf<Topic>()
+    fun getTopics(count: Int, channelId: Int = 0): List<TopicItem> {
+        val topicsResult = arrayListOf<TopicItem>()
         repeat(count) {
             topicsResult.add(
-                Topic(
+                TopicItem(
                     typeId = R.layout.topic_info_item,
                     id = channelId + it,
                     channelId = channelId,

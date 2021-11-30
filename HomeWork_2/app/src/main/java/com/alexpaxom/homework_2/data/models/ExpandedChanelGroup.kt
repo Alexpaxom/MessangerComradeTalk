@@ -6,8 +6,8 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class ExpandedChanelGroup(
     override val typeId: Int = 0,
-    val channel: Channel,
-    val topics: List<Topic> = listOf(),
+    val channel: ChannelItem,
+    val topics: List<TopicItem> = listOf(),
 ): Parcelable, ListItem {
     fun toExpandableItemList(needExpanded:Boolean) : List<ExpandedChannelItem> {
         return if(needExpanded)

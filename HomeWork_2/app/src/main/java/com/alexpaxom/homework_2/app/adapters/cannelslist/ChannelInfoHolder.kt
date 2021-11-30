@@ -2,23 +2,32 @@ package com.alexpaxom.homework_2.app.adapters.cannelslist
 
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseViewHolder
-import com.alexpaxom.homework_2.data.models.Channel
+import com.alexpaxom.homework_2.data.models.ChannelItem
 import com.alexpaxom.homework_2.databinding.ChannelInfoItemBinding
 
 class ChannelInfoHolder(
     private val channelInfoItemBinding: ChannelInfoItemBinding,
     private val onMessageClickListener: (topicPos: Int) -> Unit
-): BaseViewHolder<Channel>(channelInfoItemBinding) {
+): BaseViewHolder<ChannelItem>(channelInfoItemBinding) {
 
     init {
         channelInfoItemBinding.channelInfoExpandList.setOnClickListener {
             (bindingAdapter as ChannelsListAdapter).apply {
-                dataList.indexOfLast { it.channel.id == innerList[this@ChannelInfoHolder.bindingAdapterPosition].id }
-                    ?.let{ groupPosition->
-                    dataList[groupPosition].channel.isExpanded = !dataList[groupPosition].channel.isExpanded
-                    updateItem(groupPosition, dataList[groupPosition])
+                val groupItemPosition =
+                dataList.indexOfLast {
+                    it.channel.id == innerList[this@ChannelInfoHolder.bindingAdapterPosition].id
                 }
-                notifyItemChanged(this@ChannelInfoHolder.bindingAdapterPosition)
+
+                if(groupItemPosition != -1) {
+                    dataList[groupItemPosition].let { groupItem ->
+                        val groupItemInvertIsExpanded =  groupItem.copy(
+                            channel = groupItem.channel.copy(
+                                isExpanded = !groupItem.channel.isExpanded
+                            )
+                        )
+                        updateItem(groupItemPosition, groupItemInvertIsExpanded)
+                    }
+                }
             }
         }
 
@@ -28,7 +37,7 @@ class ChannelInfoHolder(
 
     }
 
-    override fun bind(model: Channel) {
+    override fun bind(model: ChannelItem) {
         channelInfoItemBinding.channelInfoName.text = model.name
         if(model.isExpanded)
             channelInfoItemBinding.channelInfoExpandList.setImageResource(R.drawable.ic_close_list)

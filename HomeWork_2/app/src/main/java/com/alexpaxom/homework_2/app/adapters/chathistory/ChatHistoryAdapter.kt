@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseDiffUtilAdapter
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseHolderFactory
-import com.alexpaxom.homework_2.data.models.Message
+import com.alexpaxom.homework_2.data.models.MessageItem
 import com.alexpaxom.homework_2.data.models.Reaction
 import com.alexpaxom.homework_2.helpers.DateFormatter
 import java.util.*
@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 
 class ChatHistoryAdapter(
     holdersFactory: BaseHolderFactory
-): BaseDiffUtilAdapter<Message>(holdersFactory) {
+): BaseDiffUtilAdapter<MessageItem>(holdersFactory) {
     private var addMessageClickListener: ((messagePos: Int) -> Unit)? = null
 
     init {
@@ -23,7 +23,7 @@ class ChatHistoryAdapter(
     fun addReactionByMessageID(messageId: Int, reaction: Reaction) {
         diffUtil.currentList.indexOfLast { it.id == messageId }.let { messageId ->
             if(messageId != -1) {
-                    updateItem(messageId, Message(
+                    updateItem(messageId, MessageItem(
                         diffUtil.currentList[messageId],
                         diffUtil.currentList[messageId].reactionsGroup.addReaction(reaction)
                     )
@@ -36,7 +36,7 @@ class ChatHistoryAdapter(
         diffUtil.currentList.indexOfLast { it.id == messageId }.let { messageId ->
             if(messageId != -1) {
                 updateItem(messageId,
-                    Message(
+                    MessageItem(
                         diffUtil.currentList[messageId],
                         diffUtil.currentList[messageId].reactionsGroup.removeReaction(reaction)
                     )
@@ -46,12 +46,12 @@ class ChatHistoryAdapter(
     }
 
 
-    class MessagesDiffUtil: DiffUtil.ItemCallback<Message>() {
-        override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
+    class MessagesDiffUtil: DiffUtil.ItemCallback<MessageItem>() {
+        override fun areItemsTheSame(oldItem: MessageItem, newItem: MessageItem): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
+        override fun areContentsTheSame(oldItem: MessageItem, newItem: MessageItem): Boolean {
             return oldItem == newItem
         }
 
@@ -84,7 +84,7 @@ class ChatHistoryAdapter(
         addMessageClickListener = listener
     }
 
-    fun createDiffUtil(): AsyncListDiffer<Message> {
+    fun createDiffUtil(): AsyncListDiffer<MessageItem> {
         val differ = AsyncListDiffer(this, MessagesDiffUtil())
         differ.addListListener { previousList, currentList ->
             if(previousList.size != 0 && currentList.size != 0 ) {

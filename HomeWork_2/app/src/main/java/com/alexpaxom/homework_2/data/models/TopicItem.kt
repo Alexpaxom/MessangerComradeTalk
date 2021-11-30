@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Topic(
+data class TopicItem(
     override val typeId: Int = 0,
     override val id: Int,
     val channelId: Int,

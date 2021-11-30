@@ -14,15 +14,4 @@ data class MessageItem(
     val datetime: Date,
     val avatarUrl: String?,
     val reactionsGroup: ReactionsGroup = ReactionsGroup()
-): Parcelable, ListItem {
-    constructor(old: MessageItem, newReactionsGroup: ReactionsGroup) : this(
-        old.typeId,
-        old.id,
-        old.userId,
-        old.userName,
-        old.text,
-        old.datetime,
-        old.avatarUrl,
-        newReactionsGroup,
-    )
-}
+): Parcelable, ListItem

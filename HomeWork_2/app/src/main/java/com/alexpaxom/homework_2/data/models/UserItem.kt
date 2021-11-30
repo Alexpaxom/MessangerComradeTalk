@@ -10,6 +10,5 @@ data class UserItem(
     val name: String,
     val email: String,
     val avatarUrl: String,
-    val status: String = "",
-    val online: Boolean = false
+    val status: UserStatus = UserStatus(id, "")
 ): Parcelable, ListItem

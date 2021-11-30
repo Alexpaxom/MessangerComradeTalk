@@ -2,9 +2,12 @@ package com.alexpaxom.homework_2.domain.repositories.testrepositories
 
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.MessageItem
-import com.alexpaxom.homework_2.data.models.Reaction
+import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.data.models.ReactionsGroup
+import com.alexpaxom.homework_2.domain.entity.ReactionResult
+import com.alexpaxom.homework_2.domain.entity.SendResult
 import com.alexpaxom.homework_2.domain.repositories.MessagesRepository
+import com.alexpaxom.homework_2.helpers.EmojiHelper
 import io.reactivex.Single
 import java.util.*
 import kotlin.random.Random
@@ -34,7 +37,12 @@ class MessagesTestDataRepository: MessagesRepository {
         "\uD83D\uDE11",
     )
 
-    override fun getMessages(): Single<List<MessageItem>> {
+    override fun getMessages(
+        messageId: Long,
+        numBefore: Int,
+        numAfter: Int,
+        filter: String?
+    ): Single<List<MessageItem>> {
         val ret = arrayListOf<MessageItem>()
         val date = Date()
         date.time -= 1000*60*60*12*countMessages
@@ -59,19 +67,42 @@ class MessagesTestDataRepository: MessagesRepository {
         return Single.just(ret)
     }
 
-    private fun reactionsList(maxCount: Int): ArrayList<Reaction>{
+    override fun sendMessageToStream(
+        streamId: Int,
+        topic: String,
+        message: String
+    ): Single<SendResult> {
+        TODO("Not yet implemented")
+    }
+
+    override fun sendMessageToUsers(usersIds: List<Int>, message: String): Single<SendResult> {
+        TODO("Not yet implemented")
+    }
+
+    override fun addReaction(messageId: Int, emojiName: String): Single<ReactionResult> {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeReaction(messageId: Int, emojiName: String): Single<ReactionResult> {
+        TODO("Not yet implemented")
+    }
+
+    private fun reactionsList(maxCount: Int): ArrayList<ReactionItem>{
         val random = Random(100)
+
+        val emojiHelper = EmojiHelper()
 
         val countReactions = random.nextInt(maxCount)
 
-        val reactionList: ArrayList<Reaction> = arrayListOf()
+        val reactionList: ArrayList<ReactionItem> = arrayListOf()
 
         for (i in 0..countReactions) {
-
+            val reactionUnicode = emojiHelper.emojiMap.keys.random()
             reactionList.add(
-                Reaction(
+                ReactionItem(
                     userId = i,
-                    emojiUnicode = reactions.random()
+                    emojiUnicode = reactionUnicode,
+                    emojiName = emojiHelper.getNameByUnicode(reactionUnicode)
                 )
             )
 

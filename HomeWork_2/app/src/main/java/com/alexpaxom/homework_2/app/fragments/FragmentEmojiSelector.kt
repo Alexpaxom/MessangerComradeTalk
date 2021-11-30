@@ -11,8 +11,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.emojiselector.EmojiHoldersFactory
 import com.alexpaxom.homework_2.app.adapters.emojiselector.EmojiSelectorAdapter
-import com.alexpaxom.homework_2.data.models.Reaction
+import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.databinding.EmojiSelectorBottomDialogBinding
+import com.alexpaxom.homework_2.helpers.EmojiHelper
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class FragmentEmojiSelector : BottomSheetDialogFragment() {
@@ -29,20 +30,15 @@ class FragmentEmojiSelector : BottomSheetDialogFragment() {
         savedInstanceState: Bundle? ): View {
         _binding = EmojiSelectorBottomDialogBinding.inflate(inflater, container, false)
 
-        emojiSelectorAdapter.dataList = listOf(
-            "\uD83D\uDE00",
-            "\uD83D\uDE05",
-            "\uD83E\uDD23",
-            "\uD83D\uDE07",
-            "\uD83D\uDE1B",
-            "\uD83E\uDD2A",
-            "\uD83D\uDE11",
-            "\uD83E\uDD70",
-            "\uD83D\uDE0D",
-            "\uD83E\uDD29",
-            "\uD83D\uDE37",
-            "\uD83E\uDD22",
-        ).map { Reaction(R.layout.emoji_for_select_view, 0, it) }
+        emojiSelectorAdapter.dataList = EmojiHelper().emojiMap
+            .map {
+                ReactionItem (
+                    typeId = R.layout.emoji_for_select_view,
+                    userId= 0,
+                    emojiUnicode = it.key,
+                    emojiName = it.value
+                )
+            }
 
 
         binding.selectorEmojiList.adapter = emojiSelectorAdapter
@@ -66,9 +62,6 @@ class FragmentEmojiSelector : BottomSheetDialogFragment() {
 
         return binding.root
     }
-
-
-
 
     private fun returnResult(adapterPos: Int) {
         val resultId = arguments?.getInt(RESULT_ID)

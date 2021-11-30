@@ -2,6 +2,7 @@ package com.alexpaxom.homework_2.domain.repositories.testrepositories
 
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.UserItem
+import com.alexpaxom.homework_2.data.models.UserStatus
 import com.alexpaxom.homework_2.domain.repositories.UsersRepository
 import io.reactivex.Single
 
@@ -18,8 +19,7 @@ class UsersTestDataRepositoryImpl: UsersRepository {
                     name = userParam[0],
                     email = "test@test.com",
                     avatarUrl = userParam[1],
-                    status = "On meeting",
-                    online = true
+                    status = UserStatus(user.hashCode(), "")
                 )
             )
         }
@@ -27,7 +27,7 @@ class UsersTestDataRepositoryImpl: UsersRepository {
         return Single.just(retUsersList)
     }
 
-    override fun getUserById(userId: Int): Single<UserItem> {
+    override fun getUserById(userId: Int?): Single<UserItem> {
         var retUser: UserItem? = null
 
         for(user in NAMES) {
@@ -39,8 +39,7 @@ class UsersTestDataRepositoryImpl: UsersRepository {
                     name = userParam[0],
                     email = "test@test.com",
                     avatarUrl = userParam[1],
-                    status = "On meeting",
-                    online = true
+                    status = UserStatus(user.hashCode(), "")
                 )
             }
         }
@@ -49,6 +48,10 @@ class UsersTestDataRepositoryImpl: UsersRepository {
             return Single.just(retUser)
 
         error("cant find user with id $userId")
+    }
+
+    override fun getUserPresence(userId: Int): Single<UserStatus> {
+        TODO("Not yet implemented")
     }
 
     companion object {

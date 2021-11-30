@@ -13,9 +13,9 @@ class SearchExpandedChannelGroupTestImpl(
     val channelsRepository: ChannelsRepository = ChannelsTestDataRepositoryImpl(),
     val topicsRepository: TopicsRepository = TopicsTestDataRepositoryImpl()
 ): SearchExpandedChannelGroup {
-    override fun searchInChannelGroups(searchString: String): Single<List<ExpandedChanelGroup>> {
+    override fun searchInSubscribedChannelGroups(searchString: String): Single<List<ExpandedChanelGroup>> {
 
-        val result = channelsRepository.getChannels().flatMap { channels ->
+        val result = channelsRepository.getSubscribedChannels().flatMap { channels ->
             val expandedChanelGroupList = channels.map { channel ->
                 topicsRepository.getChannelTopics(channel.id).map{ topics ->
                     ExpandedChanelGroup (
@@ -29,6 +29,10 @@ class SearchExpandedChannelGroupTestImpl(
         }
         (topicsRepository as? TopicsTestDataRepositoryImpl)?.apply { resetRandomSeed() }
         return result
+    }
+
+    override fun searchInAllChannelGroups(searchString: String): Single<List<ExpandedChanelGroup>> {
+        TODO("Not yet implemented")
     }
 
     private fun Single<List<ExpandedChanelGroup>>.filterSearch(searchString: String): Single<List<ExpandedChanelGroup>> {

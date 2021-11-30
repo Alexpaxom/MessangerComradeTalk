@@ -4,5 +4,6 @@ import com.alexpaxom.homework_2.data.models.ChannelItem
 import io.reactivex.Single
 
 interface ChannelsRepository {
-    fun getChannels(): Single<List<ChannelItem>>
+    fun getSubscribedChannels(): Single<List<ChannelItem>>
+    fun getAllChannels(): Single<List<ChannelItem>>
 }

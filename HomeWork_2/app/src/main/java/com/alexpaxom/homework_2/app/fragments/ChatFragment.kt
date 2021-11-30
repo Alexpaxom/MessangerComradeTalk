@@ -7,28 +7,25 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
-import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.chathistory.ChatHistoryAdapter
 import com.alexpaxom.homework_2.app.adapters.chathistory.ChatMessageFactory
 import com.alexpaxom.homework_2.app.adapters.decorators.ChatDateDecorator
 import com.alexpaxom.homework_2.customview.EmojiReactionCounter
 import com.alexpaxom.homework_2.data.models.MessageItem
-import com.alexpaxom.homework_2.data.models.Reaction
-import com.alexpaxom.homework_2.data.models.ReactionsGroup
-import com.alexpaxom.homework_2.data.usecases.testusecases.MessagesLoadUseCaseTestImpl
-import com.alexpaxom.homework_2.domain.repositories.TestRepositoryImpl
+import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.databinding.FragmentChatBinding
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import com.alexpaxom.homework_2.helpers.EmojiHelper
+import moxy.MvpAppCompatDialogFragment
+import moxy.presenter.InjectPresenter
+import retrofit2.HttpException
 import java.util.*
 
+import moxy.presenter.ProvidePresenter
 
-class ChatFragment : DialogFragment(), ChatStateMachine {
+class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatEffect> {
 
     private var _binding: FragmentChatBinding? = null
     private val binding get() = _binding!!
@@ -38,12 +35,23 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
         { adapterPos, emojiView -> clickOnReaction(adapterPos, emojiView) }
     )
 
-    override var currentState: ChatState = ChatState.InitialState
-
     private val chatHistoryAdapter = ChatHistoryAdapter(chatMessageFactory)
 
-    private val compositeDisposable = CompositeDisposable()
+    @InjectPresenter
+    lateinit var presenter: ChatPresenter
 
+    @ProvidePresenter
+    fun provideDetailsPresenter(): ChatPresenter? {
+        return ChatPresenter (
+            topicName = arguments?.getString(ARGUMENT_TOPIC_NAME) ?: error("Bad parameter 'topic name' "),
+            streamName = arguments?.getString(ARGUMENT_STREAM_NAME) ?: error("Bad parameter 'stream name' "),
+            streamId = arguments?.getInt(ARGUMENT_STREAM_ID) ?: error("Bad parameter 'stream id' "),
+            myUserId = arguments?.getInt(ARGUMENT_MY_USER_ID) ?: error("Bad parameter 'user id' ")
+        )
+    }
+
+    private var needScroll: Boolean = false
+    private var scrollMessageId: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,17 +59,10 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     ): View {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
 
-
         // Обрабочики нажатий на элементы списка сообщений
 
-        if(savedInstanceState == null) {
-            loadMessages()
-        }
-        else {
-            goToState(ChatState.ResultState(
-                savedInstanceState.getParcelableArrayList<MessageItem>(SAVED_BUNDLE_MESSAGES)
-                ?: listOf()))
-        }
+        if(savedInstanceState == null)
+            presenter.processEvent(ChatEvent.LoadHistory)
 
         binding.chatingHistory.layoutManager = LinearLayoutManager(context)
         binding.chatingHistory.adapter = chatHistoryAdapter
@@ -77,38 +78,19 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
                 val emojiUnicode = resultBundle.getString(FragmentEmojiSelector.EMOJI_UNICODE)
                 val messageId = resultBundle.getInt(FragmentEmojiSelector.RESULT_ID)
                 emojiUnicode?.let { emojiUnicode ->
-                    chatHistoryAdapter.addReactionByMessageID(
-                        messageId,
-                        Reaction(
-                            R.layout.emoji_for_select_view,
-                            MY_USER_ID,
-                            emojiUnicode
-                        )
+                    presenter.processEvent(
+                        ChatEvent.EmojiStateChange(emojiUnicode, messageId, true)
                     )
                 }
             })
-
-        // Колбек после добавления нового сообщения в список
-        chatHistoryAdapter.setClickListenerOnAddMessage {
-            binding.chatingHistory.scrollToPosition(it)
-        }
 
 
         // Обработка нажатия на кнопку отправки сообщения
         binding.messageSendBtn.setOnClickListener() {
             binding.messageEnterEdit.text?.let {
                 if (it.isNotEmpty()) {
-                    chatHistoryAdapter.addItem(
-                        MessageItem(
-                        typeId = R.layout.my_message_item,
-                        id = MESSAGE_ID++,
-                        userId = MY_USER_ID,
-                        userName = "My message",
-                        text = binding.messageEnterEdit.text.toString(),
-                        datetime = Date(),
-                        avatarUrl = null,
-                        reactionsGroup = ReactionsGroup(listOf(), MY_USER_ID)
-                    )
+                    presenter.processEvent(
+                        ChatEvent.SendMessage(it.toString())
                     )
                     binding.messageEnterEdit.text?.clear()
                 }
@@ -128,25 +110,11 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
             }
         }
 
+        chatHistoryAdapter.setAfterUpdateDataCallBack {
+            presenter.processEvent(ChatEvent.MessagesInserted)
+        }
+
         return binding.root
-    }
-
-    fun loadMessages() {
-        MessagesLoadUseCaseTestImpl().getMessages()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { goToState(ChatState.LoadingState) }
-            .subscribeBy(
-                onSuccess = { goToState(ChatState.ResultState(it)) },
-                onError = { goToState(ChatState.ErrorState(it)) }
-            )
-            .addTo(compositeDisposable)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        val list: ArrayList<MessageItem> = ArrayList(chatHistoryAdapter.dataList)
-        outState.putParcelableArrayList(SAVED_BUNDLE_MESSAGES, list)
-        super.onSaveInstanceState(outState)
     }
 
     private fun selectNewReaction(adapterPos: Int) {
@@ -157,42 +125,13 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
     }
 
     private fun clickOnReaction(adapterPos: Int, emojiView: EmojiReactionCounter) {
-        if(emojiView.isSelected) {
-            chatHistoryAdapter.addReactionByMessageID(
+        presenter.processEvent(
+            ChatEvent.EmojiStateChange(
+                emojiView.displayEmoji,
                 chatHistoryAdapter.dataList[adapterPos].id,
-                Reaction(
-                    R.layout.emoji_for_select_view,
-                    MY_USER_ID,
-                    emojiView.displayEmoji
-                )
+                emojiView.isSelected
             )
-        }
-        else {
-            chatHistoryAdapter.removeReactionByMessageID(
-                chatHistoryAdapter.dataList[adapterPos].id,
-                Reaction(
-                    R.layout.emoji_for_select_view,
-                    MY_USER_ID,
-                    emojiView.displayEmoji
-                )
-            )
-        }
-    }
-
-    override fun toResult(resultState: ChatState.ResultState) {
-        binding.messagesLoadingProgress.isVisible = false
-
-        chatHistoryAdapter.dataList = resultState.messages
-        binding.chatingHistory.scrollToPosition(chatHistoryAdapter.dataList.size-1)
-    }
-
-    override fun toLoading(loadingState: ChatState.LoadingState) {
-        binding.messagesLoadingProgress.isVisible = true
-    }
-
-    override fun toError(errorState: ChatState.ErrorState) {
-        binding.messagesLoadingProgress.isVisible = false
-        Toast.makeText(context, errorState.error.localizedMessage, Toast.LENGTH_LONG).show()
+        )
     }
 
     override fun getTheme(): Int {
@@ -204,19 +143,57 @@ class ChatFragment : DialogFragment(), ChatStateMachine {
         _binding = null
     }
 
-    override fun onDestroy() {
-        compositeDisposable.dispose()
-        super.onDestroy()
+    override fun processState(state: ChatViewState) {
+        chatHistoryAdapter.dataList = state.messages
+        binding.messagesLoadingProgress.isVisible = state.isEmptyLoading
+    }
+
+    override fun processEffect(effect: ChatEffect) {
+        when(effect) {
+            is ChatEffect.ScrollToPosition -> scrollToMessage(effect.massageId, effect.isSmoothScroll)
+            is ChatEffect.ShowError -> showError(effect.error)
+        }
+    }
+
+    private fun showError(errorMsg: String) {
+        binding.messagesLoadingProgress.isVisible = false
+        Toast.makeText( context, errorMsg, Toast.LENGTH_LONG).show()
+    }
+
+    private fun scrollToMessage(messageId: Int, isSmoothScroll: Boolean) {
+        val pos = chatHistoryAdapter.dataList.indexOfLast { it.id == messageId }
+        if(pos != -1) {
+            if (isSmoothScroll)
+                binding.chatingHistory.smoothScrollToPosition(pos)
+            else
+                binding.chatingHistory.scrollToPosition(pos)
+        }
+        else
+            error("Try scroll to not exist position message pos: $pos")
     }
 
     companion object {
 
-        private const val SAVED_BUNDLE_MESSAGES = "com.alexpaxom.SAVED_BUNDLE_MESSAGES"
-        private const val MY_USER_ID = 99999
-        private var MESSAGE_ID = 1000 // временное поле нужно для того что бы у сообщений было уникльное id
-        const val FRAGMENT_ID = "com.alexpaxom.CHAT_FRAGMENT_ID"
-        @JvmStatic
-        fun newInstance() = ChatFragment()
-    }
+        private const val ARGUMENT_TOPIC_NAME = "com.alexpaxom.ARGUMENT_TOPIC_NAME"
+        private const val ARGUMENT_STREAM_NAME = "com.alexpaxom.ARGUMENT_STREAM_NAME"
+        private const val ARGUMENT_STREAM_ID = "com.alexpaxom.ARGUMENT_STREAM_ID"
+        private const val ARGUMENT_MY_USER_ID = "com.alexpaxom.ARGUMENT_MY_USER_ID"
 
+        const val FRAGMENT_ID = "com.alexpaxom.CHAT_FRAGMENT_ID"
+
+        @JvmStatic
+        fun newInstance(
+            topicName: String = "",
+            streamName: String,
+            streamId: Int,
+            myUserId: Int
+        ) = ChatFragment().apply {
+            arguments = Bundle().apply {
+                putString(ARGUMENT_TOPIC_NAME, topicName)
+                putString(ARGUMENT_STREAM_NAME, streamName)
+                putInt(ARGUMENT_STREAM_ID, streamId)
+                putInt(ARGUMENT_MY_USER_ID, myUserId)
+            }
+        }
+    }
 }

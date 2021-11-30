@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -13,26 +14,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListAdapter
 import com.alexpaxom.homework_2.app.adapters.userslist.UsersListFactoryHolders
-import com.alexpaxom.homework_2.data.models.UserItem
-import com.alexpaxom.homework_2.data.usecases.testusecases.SearchUsersTestImpl
 import com.alexpaxom.homework_2.databinding.FragmentUsersBinding
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
-import java.util.concurrent.TimeUnit
+import moxy.presenter.InjectPresenter
 
-class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMachine {
-
-    override var currentState: UsersState = UsersState.InitialState
+class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), BaseView<UsersViewState, UsersEffect> {
 
     private val usersListFactoryHolders = UsersListFactoryHolders{ onUserClickListener(it) }
     private val usersListAdapter = UsersListAdapter(usersListFactoryHolders)
-    private val compositeDisposable = CompositeDisposable()
 
-    private val searchUsersSubject: BehaviorSubject<String> = BehaviorSubject.create()
+    @InjectPresenter
+    lateinit var presenter: UsersPresenter
 
     override fun createBinding(): FragmentUsersBinding =
         FragmentUsersBinding.inflate(layoutInflater)
@@ -49,7 +40,14 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
             context,
             RecyclerView.VERTICAL
         )
-        channelsDividerItemDecoration.setDrawable(resources.getDrawable(R.drawable.users_list_decoration_divider))
+
+        ResourcesCompat.getDrawable(
+            resources,
+            R.drawable.users_list_decoration_divider, activity?.theme
+        )?.let {
+                channelsDividerItemDecoration.setDrawable(it)
+        }
+
 
         binding.usersList.addItemDecoration(channelsDividerItemDecoration)
 
@@ -60,48 +58,18 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
         super.onViewCreated(view, savedInstanceState)
 
         binding.searchUsers.searchEdit.doAfterTextChanged {
-            searchUsers(it.toString())
+            presenter.processEvent(
+                UsersEvent.SearchUsers(it.toString())
+            )
         }
 
         binding.searchUsers.searchBtn.setOnClickListener {
-            searchUsers(binding.searchUsers.searchEdit.text.toString())
-        }
-
-        if(savedInstanceState==null) {
-            searchUsersSubject
-                .subscribeOn(Schedulers.io())
-                .distinctUntilChanged()
-                .doOnNext { goToState(UsersState.LoadingState) }
-                .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-                .switchMap { SearchUsersTestImpl().search(it).toObservable() }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = { goToState(UsersState.ResultState(it)) },
-                    onError = { goToState(UsersState.ErrorState(it)) }
+            presenter.processEvent(
+                UsersEvent.SearchUsers(
+                    binding.searchUsers.searchEdit.text.toString()
                 )
-                .addTo(compositeDisposable)
-
-            // загружаем первую порцию данных
-            searchUsers(INITIAL_SEARCH_QUERY)
+            )
         }
-        else
-            usersListAdapter.dataList = savedInstanceState.getParcelableArrayList<UserItem>(
-                SAVED_BUNDLE_USERS
-            )?.toList() ?: listOf()
-    }
-
-    private fun searchUsers(searchString: String) {
-        searchUsersSubject.onNext(searchString)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        val savedListUsers = ArrayList(usersListAdapter.dataList)
-
-        outState.putParcelableArrayList(
-            SAVED_BUNDLE_USERS,
-            savedListUsers
-        )
-        super.onSaveInstanceState(outState)
     }
 
     private fun onUserClickListener(adapterPos: Int) {
@@ -109,28 +77,19 @@ class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), UsersStateMac
         profileFragment.show(childFragmentManager, ProfileFragment.FRAGMENT_ID)
     }
 
-    override fun toResult(resultState: UsersState.ResultState) {
-        binding.usersProgress.isVisible = false
-        usersListAdapter.dataList = resultState.items
+    override fun processState(state: UsersViewState) {
+
+        usersListAdapter.dataList = state.users
+        binding.usersProgress.isVisible = state.isEmptyLoad
     }
 
-    override fun toLoading(loadingState: UsersState.LoadingState) {
-        binding.usersProgress.isVisible = true
-    }
-
-    override fun toError(errorState: UsersState.ErrorState) {
-        binding.usersProgress.isVisible = false
-        Toast.makeText(context, errorState.error.localizedMessage, Toast.LENGTH_LONG).show()
-    }
-
-    override fun onDestroy() {
-        compositeDisposable.dispose()
-        super.onDestroy()
+    override fun processEffect(effect: UsersEffect) {
+        when(effect) {
+            is UsersEffect.ShowError -> Toast.makeText( context, effect.error, Toast.LENGTH_LONG).show()
+        }
     }
 
     companion object {
-        private const val SAVED_BUNDLE_USERS = "com.alexpaxom.SAVED_BUNDLE_USERS"
-        private const val INITIAL_SEARCH_QUERY = ""
         const val FRAGMENT_ID = "com.alexpaxom.USERS_FRAGMENT_ID"
 
 

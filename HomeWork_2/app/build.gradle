@@ -42,6 +42,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
     implementation 'com.google.ar.sceneform:filament-android:1.17.1'
+    implementation "androidx.recyclerview:recyclerview:1.2.0-alpha04"
 
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.12.0'
@@ -50,9 +51,23 @@ dependencies {
 
     //RxJava 2
     implementation "io.reactivex.rxjava2:rxjava:2.2.21"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
+    implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
 
+    //okHttp
+    def okhttp_version = '4.8.0'
+    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+    implementation("com.squareup.okhttp3:logging-interceptor:$okhttp_version")
+    //Retrofit
+    def retrofit_version = '2.9.0'
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
 
-    implementation "androidx.recyclerview:recyclerview:1.2.0-alpha04"
+    //Moxy
+    def moxyVersion = '2.2.2'
+    implementation "com.github.moxy-community:moxy:$moxyVersion"
+    implementation "com.github.moxy-community:moxy-androidx:$moxyVersion"
+    kapt "com.github.moxy-community:moxy-compiler:$moxyVersion"
+
 }

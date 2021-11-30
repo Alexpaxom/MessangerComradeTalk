@@ -8,8 +8,13 @@ import com.alexpaxom.homework_2.app.adapters.MainNavigationViewpageAdapter
 import com.alexpaxom.homework_2.app.fragments.ChannelsFragment
 import com.alexpaxom.homework_2.app.fragments.ProfileFragment
 import com.alexpaxom.homework_2.app.fragments.UsersFragment
-import com.alexpaxom.homework_2.domain.repositories.TestRepositoryImpl
 import com.alexpaxom.homework_2.databinding.ActivityMainBinding
+import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.UsersZulipDateRepositoryImpl
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 
 
 class MainActivity : AppCompatActivity() {
@@ -24,14 +29,38 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    var ownUserId = 0
+
+    private val compositeDisposable = CompositeDisposable()
+
+    private val usersRepository = UsersZulipDateRepositoryImpl()
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         super.onCreate(savedInstanceState)
 
+        if(savedInstanceState == null || savedInstanceState.getInt(SAVE_BUNDLE_MY_USER_ID_KEY) == 0) {
+            usersRepository.getUserById()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = {
+                        init(it.id)
+                    },
+                    onError = { error(it.localizedMessage) }
+                )
+                .addTo(compositeDisposable)
+        }
+        else
+            init(savedInstanceState.getInt(SAVE_BUNDLE_MY_USER_ID_KEY))
+    }
+
+    private fun init(ownUserId: Int) {
+        this.ownUserId = ownUserId
         binding.mainNavigatinViewPager.adapter = mainNavigationViewpageAdapter.value
-        binding.mainNavigatinViewPager.isUserInputEnabled = false;
+        binding.mainNavigatinViewPager.isUserInputEnabled = false
 
         // Обработчик нажатий основного нижнего меню
         binding.mainBottomNavMenu.setOnItemSelectedListener {
@@ -55,8 +84,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun getMainNavigationFragments(): Map<Int, Fragment> {
 
-        val userId = TestRepositoryImpl().getUsers().first().id
-
         // При первом заходе создаем новые фрагменты в последующем получаем их из FragmentManager
         val channelFragment =
             supportFragmentManager.findFragmentByTag("$VIEW_PAGER_TAG$POSITION_CHANNELS_BOTTOM_NAVIGATION")
@@ -68,7 +95,7 @@ class MainActivity : AppCompatActivity() {
 
         val profileFragment =
             supportFragmentManager.findFragmentByTag("$VIEW_PAGER_TAG$POSITION_PROFILE_BOTTOM_NAVIGATION")
-                ?: ProfileFragment.newInstance(userId, true)
+                ?: ProfileFragment.newInstance(ownUserId, true)
 
         return mapOf(
             POSITION_CHANNELS_BOTTOM_NAVIGATION to channelFragment,
@@ -77,11 +104,22 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(SAVE_BUNDLE_MY_USER_ID_KEY, ownUserId)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onDestroy() {
+        compositeDisposable.dispose()
+        super.onDestroy()
+    }
+
 
     companion object {
         private const val POSITION_CHANNELS_BOTTOM_NAVIGATION = 0
         private const val POSITION_PEOPLE_BOTTOM_NAVIGATION = 1
         private const val POSITION_PROFILE_BOTTOM_NAVIGATION = 2
+        private const val SAVE_BUNDLE_MY_USER_ID_KEY = "com.alexpaxom.SAVE_BUNDLE_MY_USER_ID_KEY"
         private const val VIEW_PAGER_TAG = "f"
     }
 }

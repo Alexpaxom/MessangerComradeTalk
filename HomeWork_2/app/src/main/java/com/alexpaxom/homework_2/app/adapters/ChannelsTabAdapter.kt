@@ -7,16 +7,25 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.alexpaxom.homework_2.app.fragments.ChannelsListFragment
 
 class ChannelsTabAdapter(
-    fragment: Fragment,
-    private val fragmentsList: Map<Int, Fragment> = mapOf()
-): FragmentStateAdapter(fragment) {
-    override fun getItemCount(): Int = fragmentsList.size
+    private val fragmentManager: FragmentManager,
+    lifecycle: Lifecycle,
+    private val fragmentsIdsList: List<Int> = listOf(),
+    private val createFragmentById: (fragmentId: Int) -> Fragment
+): FragmentStateAdapter(fragmentManager, lifecycle) {
+
+    override fun getItemCount(): Int = fragmentsIdsList.size
 
     override fun createFragment(position: Int): Fragment {
-        return fragmentsList[position] ?: error("Not found fragment for this position")
+        return createFragmentById(fragmentsIdsList[position])
     }
 
-    fun fragmentAt(position: Int): Fragment? {
-        return fragmentsList[position]
+    fun fragmentAt(pos: Int): Fragment? {
+        return fragmentManager.findFragmentByTag(
+            "$VIEW_PAGER_TAG$pos"
+        )
+    }
+
+    companion object {
+        private const val VIEW_PAGER_TAG = "f"
     }
 }

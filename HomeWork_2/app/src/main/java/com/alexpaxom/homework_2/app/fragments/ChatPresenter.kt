@@ -137,7 +137,11 @@ class ChatPresenter(
             .addTo(compositeDisposable)
     }
 
-    private fun loadNextPageMessages(lastMessageId: Int, chatParams: ChatParams) {
+    private fun loadNextPageMessages(
+        lastMessageId: Int,
+        chatParams: ChatParams,
+        scrollToEnd: Boolean = false
+    ) {
         messagesLoader.getNextPage(
             messageId = lastMessageId.toLong(),
             countMessages = MAX_COUNT_LOAD_MESSAGES,
@@ -152,7 +156,17 @@ class ChatPresenter(
                 )
             }
             .subscribeBy(
+
                 onNext = { messagesWrap ->
+                    if(scrollToEnd && messagesWrap.data.size > 0) {
+                        afterInsertEffectsList.add(
+                            ChatEffect.ScrollToPosition(
+                                messagesWrap.data.last().id,
+                                true
+                            )
+                        )
+                    }
+
                     currentViewState = currentViewState.copy(
                         messages = chatHandler.addMessagesToPosition(
                             position = currentViewState.messages.size,
@@ -168,7 +182,7 @@ class ChatPresenter(
     }
 
     private fun createFilterForMessages(chatParams: ChatParams): NarrowParams
-    = NarrowParams(chatParams.streamId, chatParams.topicName)
+            = NarrowParams(chatParams.streamId, chatParams.topicName)
 
 
     private fun sendMessage(message: String, chatParams: ChatParams) {
@@ -186,13 +200,10 @@ class ChatPresenter(
             }
             .subscribeBy(
                 onSuccess = {
-                    afterInsertEffectsList.add(
-                        ChatEffect.ScrollToPosition(it.id, true)
-                    )
-
                     loadNextPageMessages(
                         lastMessageId = currentViewState.messages.last().id,
-                        chatParams
+                        chatParams,
+                        true
                     )
                 },
                 onError = { processError(it) }

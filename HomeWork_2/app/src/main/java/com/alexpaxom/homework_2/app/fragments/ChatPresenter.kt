@@ -74,6 +74,9 @@ class ChatPresenter(
     private fun loadChatHistory(
         chatParams: ChatParams
     ) {
+
+        var isScrolled = false
+
         messagesLoader.getHistory(
             messageId = NEWEST_MESSAGE,
             countMessages = DEFAULT_COUNT_LOAD_MESSAGES,
@@ -90,10 +93,12 @@ class ChatPresenter(
             }
             .subscribeBy(
                 onNext = { messagesWrap ->
-                    if(messagesWrap is CachedWrapper.CachedData && messagesWrap.data.isNotEmpty())
+                    if(!isScrolled && messagesWrap.data.isNotEmpty()) {
+                        isScrolled = true
                         afterInsertEffectsList.add(
                             ChatEffect.ScrollToPosition(messagesWrap.data.last().id)
                         )
+                    }
 
                     currentViewState = ChatViewState(
                         messages = chatHandler.addMessagesToPosition(

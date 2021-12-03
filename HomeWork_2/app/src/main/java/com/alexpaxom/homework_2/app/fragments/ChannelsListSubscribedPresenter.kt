@@ -22,7 +22,7 @@ class ChannelsListSubscribedPresenter @Inject constructor(
     init {
         initChannelsGroupSearchListener()
         // загружаем первые данные о пользователях
-        super.searchChannels(ChannelsListFragment.INITIAL_SEARCH_QUERY)
+        super.searchChannels(INITIAL_SEARCH_QUERY)
     }
 
     override fun initChannelsGroupSearchListener() {
@@ -59,6 +59,10 @@ class ChannelsListSubscribedPresenter @Inject constructor(
     override fun onDestroy() {
         compositeDisposable.dispose()
         super.onDestroy()
+    }
+
+    companion object {
+        private const val INITIAL_SEARCH_QUERY = ""
     }
 
 }

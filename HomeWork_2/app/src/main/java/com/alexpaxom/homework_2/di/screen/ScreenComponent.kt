@@ -1,7 +1,6 @@
 package com.alexpaxom.homework_2.di.screen
 
 import com.alexpaxom.homework_2.app.activities.MainActivity
-import com.alexpaxom.homework_2.app.activities.MainActivityPresenter
 import com.alexpaxom.homework_2.app.fragments.*
 import dagger.Subcomponent
 
@@ -11,7 +10,8 @@ import dagger.Subcomponent
 interface ScreenComponent {
 
     fun inject(mainActivity: MainActivity)
-    fun inject(channelsListFragment: ChannelsListFragment)
+    fun inject(channelsListSubscribedFragment: ChannelsListSubscribedFragment)
+    fun inject(channelsListAllFragment: ChannelsListAllFragment)
     fun inject(chatFragment: ChatFragment)
     fun inject(profileFragment: ProfileFragment)
     fun inject(usersFragment: UsersFragment)

@@ -82,6 +82,7 @@ class UsersPresenter @Inject constructor(
             .subscribeBy(
                 onNext = {usersWrap->
                     currentViewState = UsersViewState(
+                        isEmptyLoad = usersWrap is CachedWrapper.CachedData,
                         users = usersWrap.data.sortedBy{ it.name}
                     )
                 },

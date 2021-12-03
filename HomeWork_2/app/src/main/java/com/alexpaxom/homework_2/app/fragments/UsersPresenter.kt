@@ -3,7 +3,7 @@ package com.alexpaxom.homework_2.app.fragments
 import com.alexpaxom.homework_2.data.models.UserItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulip
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulip
-import com.alexpaxom.homework_2.di.screen.ScreenComponent
+import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -13,19 +13,18 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import moxy.InjectViewState
 import moxy.MvpPresenter
 import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class UsersPresenter(
-    screenComponent: ScreenComponent
+@ScreenScope
+@InjectViewState
+class UsersPresenter @Inject constructor(
+    private val searchUsers: SearchUsersZulip,
+    private val userStatusInfo:UserStatusUseCaseZulip,
 ): MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
-
-    @Inject
-    lateinit var searchUsers: SearchUsersZulip
-    @Inject
-    lateinit var userStatusInfo:UserStatusUseCaseZulip
 
     private var currentViewState: UsersViewState = UsersViewState()
         set(value) {
@@ -38,7 +37,6 @@ class UsersPresenter(
     private var searchUsersSubject: BehaviorSubject<String>? = null
 
     init {
-        screenComponent.inject(this)
         initUsersSearchListener()
         // загружаем первую порцию данных
         searchUsers(INITIAL_SEARCH_QUERY)

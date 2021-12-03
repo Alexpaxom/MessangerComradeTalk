@@ -18,24 +18,33 @@ import com.alexpaxom.homework_2.app.adapters.userslist.UsersListFactoryHolders
 import com.alexpaxom.homework_2.databinding.FragmentUsersBinding
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
+import javax.inject.Inject
+import javax.inject.Provider
 
 class UsersFragment : ViewBindingFragment<FragmentUsersBinding>(), BaseView<UsersViewState, UsersEffect> {
 
     private val usersListFactoryHolders = UsersListFactoryHolders{ onUserClickListener(it) }
     private val usersListAdapter = UsersListAdapter(usersListFactoryHolders)
 
+    @Inject
+    lateinit var daggerPresenter: Provider<UsersPresenter>
+
     @InjectPresenter
     lateinit var presenter: UsersPresenter
 
     @ProvidePresenter
-    fun providePresenter(): UsersPresenter? {
-        return UsersPresenter(
-            (activity?.application as App).appComponent.getScreenComponent().create()
-        )
-    }
+    fun providePresenter(): UsersPresenter = daggerPresenter.get()
 
     override fun createBinding(): FragmentUsersBinding =
         FragmentUsersBinding.inflate(layoutInflater)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        (activity?.application as App).appComponent
+            .getScreenComponent()
+            .create()
+            .inject(this)
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

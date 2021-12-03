@@ -19,6 +19,8 @@ import com.alexpaxom.homework_2.data.models.TopicItem
 import com.alexpaxom.homework_2.databinding.CnannelsListFragmentBinding
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
+import javax.inject.Inject
+import javax.inject.Provider
 
 class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>(),
     BaseView<ChannelsViewState, ChannelsListEffect> {
@@ -30,25 +32,33 @@ class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBinding>(),
 
     private val channelsListAdapter = ChannelsListAdapter(channelsListHoldersFactory)
 
+    @Inject
+    lateinit var daggerChannelsListSubscribedPresenter: Provider<ChannelsListSubscribedPresenter>
+    @Inject
+    lateinit var daggerChannelsListAllPresenter: Provider<ChannelsListAllPresenter>
+
     @InjectPresenter
     lateinit var presenter: ChannelsListPresenter
 
     @ProvidePresenter
     fun providePresenter(): ChannelsListPresenter? {
         val subscribedFilterFlag = arguments?.getBoolean(SUBSCRIBED_FILTER_FLAG) ?: false
-        (activity?.application as App).appComponent
-            .getScreenComponent()
-            .create()
-            .let { screenComponent ->
-                return if(subscribedFilterFlag)
-                    ChannelsListSubscribedPresenter(screenComponent)
-                else
-                    ChannelsListAllPresenter(screenComponent)
-        }
+        return if(subscribedFilterFlag)
+            daggerChannelsListSubscribedPresenter.get()
+        else
+            daggerChannelsListAllPresenter.get()
     }
 
     override fun createBinding(): CnannelsListFragmentBinding =
         CnannelsListFragmentBinding.inflate(layoutInflater)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        (requireActivity().application as App).appComponent
+            .getScreenComponent()
+            .create()
+            .inject(this)
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

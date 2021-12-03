@@ -16,23 +16,29 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import moxy.MvpAppCompatDialogFragment
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
+import javax.inject.Inject
+import javax.inject.Provider
 
 class ProfileFragment: MvpAppCompatDialogFragment(), BaseView<ProfileViewState, ProfileEffect> {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
+    @Inject
+    lateinit var daggerPresenter: Provider<ProfilePresenter>
+
     @InjectPresenter
     lateinit var presenter: ProfilePresenter
 
     @ProvidePresenter
-    fun providePresenter(): ProfilePresenter? {
-        return ProfilePresenter(
-            (activity?.application as App).appComponent.getScreenComponent().create()
-        )
-    }
+    fun providePresenter(): ProfilePresenter = daggerPresenter.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        (requireActivity().application as App).appComponent
+            .getScreenComponent()
+            .create()
+            .inject(this)
+
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_FRAME, R.style.Theme_DialogFragment)
         arguments?.getBoolean(ARGUMENT_OWNER_PARAMETER)?.let { ownerFlag ->

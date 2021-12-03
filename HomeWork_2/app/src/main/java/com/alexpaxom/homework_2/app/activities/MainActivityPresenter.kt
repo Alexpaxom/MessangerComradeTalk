@@ -3,21 +3,21 @@ package com.alexpaxom.homework_2.app.activities
 import com.alexpaxom.homework_2.app.fragments.BaseView
 import com.alexpaxom.homework_2.data.models.UserItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserProfileUseCaseZulip
-import com.alexpaxom.homework_2.di.screen.ScreenComponent
+import com.alexpaxom.homework_2.di.screen.ScreenScope
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import moxy.InjectViewState
 import moxy.MvpPresenter
 import javax.inject.Inject
 
-class MainActivityPresenter(
-    screenComponent: ScreenComponent
+@ScreenScope
+@InjectViewState
+class MainActivityPresenter @Inject constructor(
+    private val profileHandler: UserProfileUseCaseZulip
 ): MvpPresenter<BaseView<MainActivityState, MainActivityEffect>>() {
-
-    @Inject
-    lateinit var profileHandler: UserProfileUseCaseZulip
 
     var ownUser: UserItem? = null
 
@@ -30,7 +30,6 @@ class MainActivityPresenter(
     private val compositeDisposable = CompositeDisposable()
 
     init {
-        screenComponent.inject(this)
         loadOwnUserInfo()
     }
 

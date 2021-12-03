@@ -21,6 +21,8 @@ import moxy.MvpAppCompatDialogFragment
 import moxy.presenter.InjectPresenter
 
 import moxy.presenter.ProvidePresenter
+import javax.inject.Inject
+import javax.inject.Provider
 
 class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatEffect> {
 
@@ -45,17 +47,21 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
 
     private var chatPager: ChatPager? = null
 
+    @Inject
+    lateinit var daggerPresenter: Provider<ChatPresenter>
+
     @InjectPresenter
     lateinit var presenter: ChatPresenter
 
     @ProvidePresenter
-    fun providePresenter(): ChatPresenter? {
-        return ChatPresenter(
-            (activity?.application as App).appComponent.getScreenComponent().create()
-        )
-    }
+    fun providePresenter(): ChatPresenter = daggerPresenter.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        (requireActivity().application as App).appComponent
+            .getScreenComponent()
+            .create()
+            .inject(this)
+
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_FRAME, R.style.Theme_DialogFragment)
     }

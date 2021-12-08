@@ -28,13 +28,16 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
 
         outRect.top = spaceBetweenElements
 
-        if(adapter.isDecorate(parent.getChildAdapterPosition(view))) {
-            drawableLayer.textDate.let {
-                it.text = adapter.getDecorateParam(parent.getChildAdapterPosition(view))
-                measureView()
-                outRect.top += it.marginTop + it.marginBottom + it.height
+        parent.getChildAdapterPosition(view).let { adapterPos ->
+            if(adapterPos != RecyclerView.NO_POSITION && adapter.isDecorate(adapterPos)) {
+                drawableLayer.textDate.let {
+                    it.text = adapter.getDecorateParam(adapterPos)
+                    measureView()
+                    outRect.top += it.marginTop + it.marginBottom + it.height
+                }
             }
         }
+
     }
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
@@ -46,16 +49,20 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
         val x = left + (right-left)/2f
 
         parent.children.forEach { child ->
-            if (adapter.isDecorate(parent.getChildAdapterPosition(child))) {
-                drawableLayer.textDate.text = adapter.getDecorateParam(parent.getChildAdapterPosition(child))
-                val y = child.top.toFloat()-drawableLayer.textDate.height - drawableLayer.textDate.marginBottom
 
-                // измеряем и отрисовываем TextView
-                measureView()
-                c.save()
-                c.translate(x-drawableLayer.textDate.width/2, y)
-                drawableLayer.root.draw(c)
-                c.restore()
+            parent.getChildAdapterPosition(child).let { adapterPos ->
+                if (adapterPos != RecyclerView.NO_POSITION && adapter.isDecorate(adapterPos)) {
+                    drawableLayer.textDate.text = adapter.getDecorateParam(adapterPos)
+                    val y =
+                        child.top.toFloat() - drawableLayer.textDate.height - drawableLayer.textDate.marginBottom
+
+                    // измеряем и отрисовываем TextView
+                    measureView()
+                    c.save()
+                    c.translate(x - drawableLayer.textDate.width / 2, y)
+                    drawableLayer.root.draw(c)
+                    c.restore()
+                }
             }
         }
     }

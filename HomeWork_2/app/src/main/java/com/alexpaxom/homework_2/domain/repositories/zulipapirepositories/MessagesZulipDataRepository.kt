@@ -1,6 +1,6 @@
 package com.alexpaxom.homework_2.domain.repositories.zulipapirepositories
 
-import com.alexpaxom.homework_2.domain.cache.GetDatabaseObject
+import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.daos.MessagesDAO
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.entity.Message
@@ -9,13 +9,12 @@ import com.alexpaxom.homework_2.domain.entity.SendResult
 import com.alexpaxom.homework_2.domain.remote.MessagesZulipApiRequests
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.*
-import kotlin.concurrent.schedule
+import javax.inject.Inject
 
-class MessagesZulipDataRepository(
-    private val messagesZulipApiRequests: MessagesZulipApiRequests =
-        GetRetrofitObject.retrofit.create(MessagesZulipApiRequests::class.java),
-    private val messagesDao: MessagesDAO = GetDatabaseObject.messagesDao
+@ScreenScope
+class MessagesZulipDataRepository @Inject constructor(
+    private val messagesZulipApiRequests: MessagesZulipApiRequests,
+    private val messagesDao: MessagesDAO
 ) {
 
     private fun getMessages(

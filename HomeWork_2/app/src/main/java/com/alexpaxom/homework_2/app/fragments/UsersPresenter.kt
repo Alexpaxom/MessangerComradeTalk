@@ -3,6 +3,7 @@ package com.alexpaxom.homework_2.app.fragments
 import com.alexpaxom.homework_2.data.models.UserItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchUsersZulip
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserStatusUseCaseZulip
+import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -12,11 +13,19 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import moxy.InjectViewState
 import moxy.MvpPresenter
 import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
+@ScreenScope
+@InjectViewState
+class UsersPresenter @Inject constructor(
+    private val searchUsers: SearchUsersZulip,
+    private val userStatusInfo:UserStatusUseCaseZulip,
+): MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
+
     private var currentViewState: UsersViewState = UsersViewState()
         set(value) {
             field = value
@@ -26,8 +35,6 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
     private val compositeDisposable = CompositeDisposable()
 
     private var searchUsersSubject: BehaviorSubject<String>? = null
-    private val searchUsers = SearchUsersZulip()
-    private val userStatusInfo = UserStatusUseCaseZulip()
 
     init {
         initUsersSearchListener()
@@ -75,6 +82,7 @@ class UsersPresenter: MvpPresenter<BaseView<UsersViewState, UsersEffect>>() {
             .subscribeBy(
                 onNext = {usersWrap->
                     currentViewState = UsersViewState(
+                        isEmptyLoad = usersWrap is CachedWrapper.CachedData,
                         users = usersWrap.data.sortedBy{ it.name}
                     )
                 },

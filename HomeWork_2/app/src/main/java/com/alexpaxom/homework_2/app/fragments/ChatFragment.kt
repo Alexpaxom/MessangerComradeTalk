@@ -10,6 +10,7 @@ import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.App
 import com.alexpaxom.homework_2.app.adapters.BaseElements.PagingRecyclerUtil
 import com.alexpaxom.homework_2.app.adapters.chathistory.ChatHistoryAdapter
 import com.alexpaxom.homework_2.app.adapters.chathistory.ChatMessageFactory
@@ -20,6 +21,8 @@ import moxy.MvpAppCompatDialogFragment
 import moxy.presenter.InjectPresenter
 
 import moxy.presenter.ProvidePresenter
+import javax.inject.Inject
+import javax.inject.Provider
 
 class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatEffect> {
 
@@ -44,10 +47,21 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
 
     private var chatPager: ChatPager? = null
 
+    @Inject
+    lateinit var daggerPresenter: Provider<ChatPresenter>
+
     @InjectPresenter
     lateinit var presenter: ChatPresenter
 
+    @ProvidePresenter
+    fun providePresenter(): ChatPresenter = daggerPresenter.get()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        (requireActivity().application as App).appComponent
+            .getScreenComponent()
+            .create()
+            .inject(this)
+
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_FRAME, R.style.Theme_DialogFragment)
     }

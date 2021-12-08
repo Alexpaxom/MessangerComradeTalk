@@ -2,11 +2,14 @@ package com.alexpaxom.homework_2.data.usecases.zulipapiusecases
 
 import com.alexpaxom.homework_2.data.modelconverters.StatusConverter
 import com.alexpaxom.homework_2.data.models.UserStatus
+import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.UsersZulipDateRepository
 import io.reactivex.Single
+import javax.inject.Inject
 
-class UserStatusUseCaseZulip(
-    private val usersRepository: UsersZulipDateRepository = UsersZulipDateRepository()
+@ScreenScope
+class UserStatusUseCaseZulip @Inject constructor(
+    private val usersRepository: UsersZulipDateRepository
 ) {
 
     private val statusConverter = StatusConverter()

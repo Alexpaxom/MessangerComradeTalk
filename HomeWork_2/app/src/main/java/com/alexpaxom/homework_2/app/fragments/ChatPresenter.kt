@@ -5,6 +5,7 @@ import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.ChatUseCase
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessageSendUseCaseZulip
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessagesLoadUseCaseZulip
+import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.NarrowParams
 import com.alexpaxom.homework_2.helpers.EmojiHelper
@@ -13,13 +14,17 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import moxy.InjectViewState
 import moxy.MvpPresenter
 import retrofit2.HttpException
 import java.util.*
+import javax.inject.Inject
 
-class ChatPresenter(
-    private var messagesLoader: MessagesLoadUseCaseZulip = MessagesLoadUseCaseZulip(),
-    private val messagesSender: MessageSendUseCaseZulip = MessageSendUseCaseZulip()
+@ScreenScope
+@InjectViewState
+class ChatPresenter @Inject constructor(
+    private val messagesLoader: MessagesLoadUseCaseZulip,
+    private val messagesSender: MessageSendUseCaseZulip,
 ) : MvpPresenter<BaseView<ChatViewState, ChatEffect>>() {
 
     private var currentViewState: ChatViewState = ChatViewState()
@@ -64,6 +69,9 @@ class ChatPresenter(
     private fun loadChatHistory(
         chatParams: ChatParams
     ) {
+
+        var isScrolled = false
+
         messagesLoader.getHistory(
             messageId = NEWEST_MESSAGE,
             countMessages = DEFAULT_COUNT_LOAD_MESSAGES,
@@ -80,10 +88,12 @@ class ChatPresenter(
             }
             .subscribeBy(
                 onNext = { messagesWrap ->
-                    if(messagesWrap is CachedWrapper.CachedData && messagesWrap.data.isNotEmpty())
+                    if(!isScrolled && messagesWrap.data.isNotEmpty()) {
+                        isScrolled = true
                         afterInsertEffectsList.add(
                             ChatEffect.ScrollToPosition(messagesWrap.data.last().id)
                         )
+                    }
 
                     currentViewState = ChatViewState(
                         messages = chatHandler.addMessagesToPosition(

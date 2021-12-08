@@ -1,15 +1,14 @@
 package com.alexpaxom.homework_2.app
 
 import android.app.Application
+import com.alexpaxom.homework_2.di.application.AppComponent
+import com.alexpaxom.homework_2.di.application.DaggerAppComponent
 
 class App: Application() {
+    lateinit var appComponent: AppComponent
+
     override fun onCreate() {
         super.onCreate()
-        instance = this
-    }
-
-    companion object {
-        lateinit var instance: App
-            private set
+        appComponent = DaggerAppComponent.factory().create(this)
     }
 }

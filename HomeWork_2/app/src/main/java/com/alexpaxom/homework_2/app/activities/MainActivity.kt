@@ -3,23 +3,37 @@ package com.alexpaxom.homework_2.app.activities
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import com.alexpaxom.homework_2.R
+import com.alexpaxom.homework_2.app.App
 import com.alexpaxom.homework_2.app.adapters.MainNavigationViewpageAdapter
 import com.alexpaxom.homework_2.app.fragments.*
 import com.alexpaxom.homework_2.databinding.ActivityMainBinding
 import moxy.MvpAppCompatActivity
 import moxy.presenter.InjectPresenter
+import moxy.presenter.ProvidePresenter
+import javax.inject.Inject
+import javax.inject.Provider
 
 
 class MainActivity : MvpAppCompatActivity(), BaseView<MainActivityState, MainActivityEffect> {
 
     lateinit var binding: ActivityMainBinding
 
+    @Inject
+    lateinit var daggerPresenter: Provider<MainActivityPresenter>
+
     @InjectPresenter
     lateinit var presenter: MainActivityPresenter
 
+    @ProvidePresenter
+    fun providePresenter(): MainActivityPresenter = daggerPresenter.get()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        (application as App).appComponent
+            .getScreenComponent()
+            .create()
+            .inject(this)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         super.onCreate(savedInstanceState)

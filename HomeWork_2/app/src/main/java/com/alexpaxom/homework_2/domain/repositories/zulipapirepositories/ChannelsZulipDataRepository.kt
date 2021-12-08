@@ -1,16 +1,17 @@
 package com.alexpaxom.homework_2.domain.repositories.zulipapirepositories
 
-import com.alexpaxom.homework_2.domain.cache.GetDatabaseObject
+import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.daos.ChannelsDAO
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.entity.Channel
 import com.alexpaxom.homework_2.domain.remote.ChannelsZulipApiRequests
 import io.reactivex.Observable
+import javax.inject.Inject
 
-class ChannelsZulipDataRepository(
-    private val channelsZulipApiRequests: ChannelsZulipApiRequests =
-        GetRetrofitObject.retrofit.create(ChannelsZulipApiRequests::class.java),
-    private val channelsDAO: ChannelsDAO = GetDatabaseObject.channelsDao
+@ScreenScope
+class ChannelsZulipDataRepository @Inject constructor(
+    private val channelsZulipApiRequests: ChannelsZulipApiRequests,
+    private val channelsDAO: ChannelsDAO
 ) {
 
     fun getSubscribedChannels(

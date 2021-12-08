@@ -36,9 +36,9 @@ class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
                 createFragmentById = { fragmentId ->
                     when(fragmentId) {
                         R.string.channels_tab_subscribed ->
-                            ChannelsListFragment.newInstance(true, ownUserId)
+                            ChannelsListSubscribedFragment.newInstance(ownUserId)
                         else ->
-                            ChannelsListFragment.newInstance(false, ownUserId)
+                            ChannelsListAllFragment.newInstance(ownUserId)
                     }
                 }
             )

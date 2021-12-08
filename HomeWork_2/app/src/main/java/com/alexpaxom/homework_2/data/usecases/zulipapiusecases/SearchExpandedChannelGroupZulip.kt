@@ -3,6 +3,7 @@ package com.alexpaxom.homework_2.data.usecases.zulipapiusecases
 import com.alexpaxom.homework_2.data.modelconverters.ChannelConverter
 import com.alexpaxom.homework_2.data.modelconverters.TopicConverter
 import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
+import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.entity.Channel
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.ChannelsZulipDataRepository
@@ -10,10 +11,12 @@ import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.TopicsZ
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class SearchExpandedChannelGroupZulip(
-    val channelsRepository: ChannelsZulipDataRepository = ChannelsZulipDataRepository(),
-    val topicsRepository: TopicsZulipDataRepository = TopicsZulipDataRepository()
+@ScreenScope
+class SearchExpandedChannelGroupZulip @Inject constructor(
+    private val channelsRepository: ChannelsZulipDataRepository,
+    private val topicsRepository: TopicsZulipDataRepository
 ) {
 
     private val topicConverter = TopicConverter()

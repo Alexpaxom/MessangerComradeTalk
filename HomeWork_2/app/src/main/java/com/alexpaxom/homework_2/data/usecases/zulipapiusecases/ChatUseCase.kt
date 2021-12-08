@@ -2,8 +2,11 @@ package com.alexpaxom.homework_2.data.usecases.zulipapiusecases
 
 import com.alexpaxom.homework_2.data.models.MessageItem
 import com.alexpaxom.homework_2.data.models.ReactionItem
+import com.alexpaxom.homework_2.di.screen.ScreenScope
+import javax.inject.Inject
 
-class ChatUseCase {
+@ScreenScope
+class ChatUseCase @Inject constructor(){
 
     fun addReactionByMessageID(
         messageId: Int,

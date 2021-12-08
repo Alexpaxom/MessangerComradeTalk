@@ -15,7 +15,7 @@ open class ChannelsListPresenter: MvpPresenter<BaseView<ChannelsViewState, Chann
 
     protected open var searchChannelsSubject: BehaviorSubject<String>? = null
 
-    val expandedChannelsIds = HashSet<Int>()
+    protected val expandedChannelsIds = HashSet<Int>()
 
     open fun processEvent(event: ChannelsListEvent) {
         when(event) {

@@ -29,13 +29,18 @@ class ChannelsZulipDataRepository @Inject constructor(
 
             try {
                 // Запрашиваем данные с сервера и возвращаем следом за кэшем
-                val channels = channelsZulipApiRequests.getSubscribedStreams().execute().body()?.subscriptions ?: listOf()
+                val channels = channelsZulipApiRequests.getSubscribedStreams()
+                    .execute()
+                    .body()
+                    ?.subscriptions
+                    ?.map{ it.copy(inSubscribes = true)} ?: listOf()
+
                 emitter.onNext(CachedWrapper.OriginalData(channels))
 
                 // обновляем кэш
                 if(refreshCache)
                     channelsDAO.deleteAllSubscribed()
-                channelsDAO.insertAll(channels.map{ it.copy(inSubscribes = true)} )
+                channelsDAO.insertAll(channels )
             }
             catch (e: Exception) {
                 emitter.tryOnError(e)
@@ -57,14 +62,28 @@ class ChannelsZulipDataRepository @Inject constructor(
             }
 
             try {
+
+                // Получаем id стримов на которые уже подписаны
+                val subscribedIds = channelsZulipApiRequests.getSubscribedStreams()
+                    .execute()
+                    .body()
+                    ?.subscriptions?.map {it.streamId}?.toSet() ?: setOf()
+
                 // Запрашиваем данные с сервера и возвращаем следом за кэшем
-                val channels = channelsZulipApiRequests.getAllStreams().execute().body()?.streams ?: listOf()
+                // Попутно отмечаем те стримы на которые уже подписаны
+                val channels = channelsZulipApiRequests.getAllStreams()
+                    .execute()
+                    .body()
+                    ?.streams
+                    ?.map{ it.copy(inSubscribes = it.streamId in subscribedIds) } ?: listOf()
+
+
                 emitter.onNext(CachedWrapper.OriginalData(channels))
 
                 // обновляем кэш
                 if(refreshCache)
                     channelsDAO.deleteAllChannels()
-                channelsDAO.insertAll(channels.map{ it.copy(inSubscribes = false)})
+                channelsDAO.insertAll(channels)
 
                 emitter.onComplete()
             }

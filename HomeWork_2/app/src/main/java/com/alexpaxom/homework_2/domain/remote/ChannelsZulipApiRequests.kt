@@ -6,6 +6,7 @@ import com.alexpaxom.homework_2.domain.entity.TopicsResult
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ChannelsZulipApiRequests {
     @GET("/api/v1/users/me/subscriptions")

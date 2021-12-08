@@ -11,7 +11,7 @@ import com.alexpaxom.homework_2.domain.entity.Message
 import com.alexpaxom.homework_2.domain.entity.Topic
 import com.alexpaxom.homework_2.domain.entity.User
 
-@Database(entities = [Message::class, User::class, Topic::class, Channel::class], version = 5)
+@Database(entities = [Message::class, User::class, Topic::class, Channel::class], version = 6)
 abstract class CacheDatabase: RoomDatabase() {
     abstract fun messagesDao(): MessagesDAO
     abstract fun usersDao(): UsersDAO

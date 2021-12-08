@@ -12,7 +12,7 @@ interface ChannelsDAO {
     @Query("SELECT * FROM Channels WHERE in_subscribed = 1")
     fun getAllSubscribed(): List<Channel>
 
-    @Query("SELECT * FROM Channels WHERE in_subscribed = 0")
+    @Query("SELECT * FROM Channels")
     fun getAll(): List<Channel>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -21,6 +21,6 @@ interface ChannelsDAO {
     @Query("DELETE FROM Channels WHERE in_subscribed = 1")
     fun deleteAllSubscribed()
 
-    @Query("DELETE FROM Channels WHERE in_subscribed = 0")
+    @Query("DELETE FROM Channels")
     fun deleteAllChannels()
 }

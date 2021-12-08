@@ -3,8 +3,8 @@ package com.alexpaxom.homework_2.app.fragments
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.ChatUseCase
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessageSendUseCaseZulipApi
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessagesLoadUseCaseZulipApi
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessageSendUseCaseZulip
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.MessagesLoadUseCaseZulip
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.NarrowParams
 import com.alexpaxom.homework_2.helpers.EmojiHelper
@@ -18,10 +18,8 @@ import retrofit2.HttpException
 import java.util.*
 
 class ChatPresenter(
-    var topicName: String,
-    var streamName: String,
-    var streamId: Int,
-    var myUserId: Int
+    private var messagesLoader: MessagesLoadUseCaseZulip = MessagesLoadUseCaseZulip(),
+    private val messagesSender: MessageSendUseCaseZulip = MessageSendUseCaseZulip()
 ) : MvpPresenter<BaseView<ChatViewState, ChatEffect>>() {
 
     private var currentViewState: ChatViewState = ChatViewState()
@@ -31,9 +29,6 @@ class ChatPresenter(
         }
 
     private val afterInsertEffectsList: ArrayList<ChatEffect> = arrayListOf()
-
-    private var messagesLoader: Lazy<MessagesLoadUseCaseZulipApi> = lazy { MessagesLoadUseCaseZulipApi(myUserId) }
-    private val messagesSender: MessageSendUseCaseZulipApi = MessageSendUseCaseZulipApi()
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -45,20 +40,20 @@ class ChatPresenter(
 
     fun processEvent(event: ChatEvent) {
         when(event) {
-            ChatEvent.LoadHistory ->
+            is ChatEvent.LoadHistory ->
                 if(!currentViewState.isEmptyLoading)
-                    loadChatHistory()
+                    loadChatHistory(event.chatParams)
 
             is ChatEvent.ChangedScrollPosition ->
                 if(!currentViewState.isEmptyLoading)
-                    checkLoadNewPage(event.bottomPos, event.topPos)
+                    checkLoadNewPage(event.bottomPos, event.topPos, event.chatParams)
 
-            is ChatEvent.SendMessage -> sendMessage(event.message)
+            is ChatEvent.SendMessage -> sendMessage(event.message, event.chatParams)
             is ChatEvent.EmojiStateChange -> {
                 if(event.isAdd)
-                    addReaction(event.emojiUnicode, event.messageId)
+                    addReaction(event.emojiUnicode, event.messageId, event.chatParams)
                 else
-                    removeReaction(event.emojiUnicode, event.messageId)
+                    removeReaction(event.emojiUnicode, event.messageId, event.chatParams)
             }
             ChatEvent.MessagesInserted -> afterInsertEffectsList.forEach {
                 viewState.processEffect(afterInsertEffectsList.removeAt(0))
@@ -66,11 +61,14 @@ class ChatPresenter(
         }
     }
 
-    private fun loadChatHistory() {
-        messagesLoader.value.getHistory(
+    private fun loadChatHistory(
+        chatParams: ChatParams
+    ) {
+        messagesLoader.getHistory(
             messageId = NEWEST_MESSAGE,
             countMessages = DEFAULT_COUNT_LOAD_MESSAGES,
-            filter = createFilterForMessages(),
+            filter = createFilterForMessages(chatParams),
+            ownUserId = chatParams.myUserId
         )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread(), true)
@@ -101,11 +99,15 @@ class ChatPresenter(
             .addTo(compositeDisposable)
     }
 
-    private fun loadPreviousPageMessages(lastMessageId: Int) {
-        messagesLoader.value.getPrevPage(
+    private fun loadPreviousPageMessages(
+        lastMessageId: Int,
+        chatParams: ChatParams
+    ) {
+        messagesLoader.getPrevPage(
             messageId = lastMessageId.toLong(),
             countMessages = DEFAULT_COUNT_LOAD_MESSAGES_PER_PAGE,
-            filter = createFilterForMessages()
+            filter = createFilterForMessages(chatParams),
+            ownUserId = chatParams.myUserId
         )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -135,11 +137,16 @@ class ChatPresenter(
             .addTo(compositeDisposable)
     }
 
-    private fun loadNextPageMessages(lastMessageId: Int) {
-        messagesLoader.value.getNextPage(
+    private fun loadNextPageMessages(
+        lastMessageId: Int,
+        chatParams: ChatParams,
+        scrollToEnd: Boolean = false
+    ) {
+        messagesLoader.getNextPage(
             messageId = lastMessageId.toLong(),
             countMessages = MAX_COUNT_LOAD_MESSAGES,
-            filter = createFilterForMessages()
+            filter = createFilterForMessages(chatParams),
+            ownUserId = chatParams.myUserId
         )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -149,7 +156,17 @@ class ChatPresenter(
                 )
             }
             .subscribeBy(
+
                 onNext = { messagesWrap ->
+                    if(scrollToEnd && messagesWrap.data.size > 0) {
+                        afterInsertEffectsList.add(
+                            ChatEffect.ScrollToPosition(
+                                messagesWrap.data.last().id,
+                                true
+                            )
+                        )
+                    }
+
                     currentViewState = currentViewState.copy(
                         messages = chatHandler.addMessagesToPosition(
                             position = currentViewState.messages.size,
@@ -164,11 +181,16 @@ class ChatPresenter(
             .addTo(compositeDisposable)
     }
 
-    private fun createFilterForMessages(): NarrowParams = NarrowParams(streamId, topicName)
+    private fun createFilterForMessages(chatParams: ChatParams): NarrowParams
+            = NarrowParams(chatParams.streamId, chatParams.topicName)
 
 
-    private fun sendMessage(message: String) {
-        messagesSender.sendMessageToStream(streamId, topicName, message)
+    private fun sendMessage(message: String, chatParams: ChatParams) {
+        messagesSender.sendMessageToStream(
+            chatParams.streamId,
+            chatParams.topicName,
+            message
+        )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
@@ -178,12 +200,10 @@ class ChatPresenter(
             }
             .subscribeBy(
                 onSuccess = {
-                    afterInsertEffectsList.add(
-                        ChatEffect.ScrollToPosition(it.id, true)
-                    )
-
                     loadNextPageMessages(
                         lastMessageId = currentViewState.messages.last().id,
+                        chatParams,
+                        true
                     )
                 },
                 onError = { processError(it) }
@@ -191,10 +211,10 @@ class ChatPresenter(
             .addTo(compositeDisposable)
     }
 
-    private fun removeReaction(emojiUnicode: String, messageId: Int) {
+    private fun removeReaction(emojiUnicode: String, messageId: Int, chatParams: ChatParams) {
         val reaction = ReactionItem(
             typeId = R.layout.emoji_for_select_view,
-            userId = myUserId,
+            userId = chatParams.myUserId,
             emojiUnicode = emojiUnicode,
             emojiName = emojiHelper.getNameByUnicode(emojiUnicode)
         )
@@ -217,10 +237,10 @@ class ChatPresenter(
             .addTo(compositeDisposable)
     }
 
-    private fun addReaction(emojiUnicode: String, messageId: Int) {
+    private fun addReaction(emojiUnicode: String, messageId: Int, chatParams: ChatParams) {
         val reaction = ReactionItem(
             typeId = R.layout.emoji_for_select_view,
-            userId = myUserId,
+            userId = chatParams.myUserId,
             emojiUnicode = emojiUnicode,
             emojiName = emojiHelper.getNameByUnicode(emojiUnicode)
         )
@@ -247,11 +267,15 @@ class ChatPresenter(
             .addTo(compositeDisposable)
     }
 
-    private fun checkLoadNewPage(bottomPos: Int, topPos: Int) {
+    private fun checkLoadNewPage(
+        bottomPos: Int,
+        topPos: Int,
+        chatParams: ChatParams
+    ) {
         if(topPos < LOADING_THRESHOLD_START && hasOldMessages)
-            loadPreviousPageMessages(currentViewState.messages.first().id)
+            loadPreviousPageMessages(currentViewState.messages.first().id, chatParams)
         else if(bottomPos > currentViewState.messages.size-LOADING_THRESHOLD_START)
-            loadNextPageMessages(currentViewState.messages.last().id)
+            loadNextPageMessages(currentViewState.messages.last().id, chatParams)
     }
 
     private fun processError(error: Throwable) {

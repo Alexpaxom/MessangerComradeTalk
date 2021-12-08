@@ -5,7 +5,7 @@ import com.alexpaxom.homework_2.domain.entity.SendResult
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.MessagesZulipDataRepository
 import io.reactivex.Single
 
-class MessageSendUseCaseZulipApi (
+class MessageSendUseCaseZulip (
     val messagesZulipDataRepository: MessagesZulipDataRepository = MessagesZulipDataRepository()
 ) {
     fun sendMessageToStream(

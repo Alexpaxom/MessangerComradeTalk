@@ -5,7 +5,7 @@ import com.alexpaxom.homework_2.data.models.UserStatus
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.UsersZulipDateRepository
 import io.reactivex.Single
 
-class UserStatusUseCaseZulipApi(
+class UserStatusUseCaseZulip(
     private val usersRepository: UsersZulipDateRepository = UsersZulipDateRepository()
 ) {
 

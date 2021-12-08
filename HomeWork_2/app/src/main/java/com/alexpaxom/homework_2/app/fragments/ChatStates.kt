@@ -7,11 +7,26 @@ data class ChatViewState(
     val isEmptyLoading: Boolean = false
 )
 
+
+
 sealed interface ChatEvent {
-    object LoadHistory: ChatEvent
-    class ChangedScrollPosition(val bottomPos: Int, val topPos: Int): ChatEvent
-    class SendMessage(val message: String): ChatEvent
-    class EmojiStateChange(val emojiUnicode: String, val messageId: Int, val isAdd: Boolean): ChatEvent
+    class LoadHistory(val chatParams: ChatParams): ChatEvent
+
+    class ChangedScrollPosition(
+        val bottomPos: Int,
+        val topPos: Int,
+        val chatParams: ChatParams): ChatEvent
+
+    class SendMessage(val message: String, val chatParams: ChatParams): ChatEvent
+
+    class EmojiStateChange(
+        val emojiUnicode: String,
+        val messageId: Int,
+        val isAdd: Boolean,
+        val chatParams: ChatParams): ChatEvent
+
+
+
     object MessagesInserted: ChatEvent
 }
 

@@ -1,9 +1,7 @@
 package com.alexpaxom.homework_2.data.usecases.zulipapiusecases
 
-import android.util.Log
 import com.alexpaxom.homework_2.data.modelconverters.ChannelConverter
 import com.alexpaxom.homework_2.data.modelconverters.TopicConverter
-import com.alexpaxom.homework_2.data.models.ChannelItem
 import com.alexpaxom.homework_2.data.models.ExpandedChanelGroup
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.entity.Channel

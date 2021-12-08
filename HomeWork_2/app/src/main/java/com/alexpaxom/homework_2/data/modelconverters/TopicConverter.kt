@@ -8,7 +8,8 @@ class TopicConverter {
     fun convert(topic: Topic): TopicItem {
         return TopicItem (
             typeId = R.layout.topic_info_item,
-            id = topic.name.hashCode(),
+            // TODO not unique
+            id = (topic.name+topic.channelId).hashCode(),
             channelId = topic.channelId,
             name = topic.name,
             countMessages = 0

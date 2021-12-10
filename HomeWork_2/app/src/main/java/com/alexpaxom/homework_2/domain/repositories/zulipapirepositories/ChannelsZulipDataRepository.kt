@@ -4,8 +4,10 @@ import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.daos.ChannelsDAO
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.entity.Channel
+import com.alexpaxom.homework_2.domain.entity.SubscribeResult
 import com.alexpaxom.homework_2.domain.remote.ChannelsZulipApiRequests
 import io.reactivex.Observable
+import io.reactivex.Single
 import javax.inject.Inject
 
 @ScreenScope
@@ -91,5 +93,22 @@ class ChannelsZulipDataRepository @Inject constructor(
                 emitter.tryOnError(e)
             }
         }
+    }
+
+    fun subscribeToChannel(
+        channelName: String
+    ): Single<SubscribeResult> {
+        return channelsZulipApiRequests.subscribeOrCreateStream(
+            ChannelParamsFormatter.format(channelName, "")
+        )
+    }
+
+    fun createChannel(
+        channelName: String,
+        channelDescription: String = ""
+    ): Single<SubscribeResult> {
+        return channelsZulipApiRequests.subscribeOrCreateStream(
+            ChannelParamsFormatter.format(channelName, channelDescription)
+        )
     }
 }

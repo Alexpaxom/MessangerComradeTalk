@@ -1,7 +1,8 @@
 package com.alexpaxom.homework_2.app.fragments
 
-import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.SearchExpandedChannelGroupZulip
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.LoadChannelUseCaseZulip
 import com.alexpaxom.homework_2.di.screen.ScreenScope
+import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -14,7 +15,7 @@ import javax.inject.Inject
 @ScreenScope
 @InjectViewState
 class ChannelsListAllPresenter @Inject constructor(
-    private val searchExpandedChannelGroup:SearchExpandedChannelGroupZulip
+    private val loadChannelUseCase:LoadChannelUseCaseZulip
 ): ChannelsListPresenter() {
 
     private val compositeDisposable = CompositeDisposable()
@@ -39,7 +40,7 @@ class ChannelsListAllPresenter @Inject constructor(
             .observeOn(Schedulers.io())
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
             .switchMap {
-                searchExpandedChannelGroup.searchInAllChannelGroups(it)
+                loadChannelUseCase.searchInAllChannelGroups(it)
                     .subscribeOn(Schedulers.io())
             }
             .doOnError { initChannelsGroupSearchListener() }
@@ -48,6 +49,7 @@ class ChannelsListAllPresenter @Inject constructor(
                 onNext = { channelsGroups ->
 
                     currentViewState = ChannelsViewState(
+                        isEmptyLoad = channelsGroups is CachedWrapper.CachedData,
                         channels = refreshExpandedState(channelsGroups.data)
                     )
                 },

@@ -15,6 +15,7 @@ interface ScreenComponent {
     fun inject(chatFragment: ChatFragment)
     fun inject(profileFragment: ProfileFragment)
     fun inject(usersFragment: UsersFragment)
+    fun inject(channelEditFragment: ChannelEditFragment)
 
     @Subcomponent.Factory
     interface Factory {

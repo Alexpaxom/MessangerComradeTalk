@@ -10,4 +10,6 @@
     <string name="channels_tab_all_streams">All Streams</string>
     <string name="empty_string"></string>
     <string name="search_help_text">Search</string>
+    <string name="channel_name_hint">Channel name</string>
+    <string name="channel_description_hint">Channel description</string>
 </resources>

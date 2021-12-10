@@ -14,7 +14,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 @ScreenScope
-class SearchExpandedChannelGroupZulip @Inject constructor(
+class LoadChannelUseCaseZulip @Inject constructor(
     private val channelsRepository: ChannelsZulipDataRepository,
     private val topicsRepository: TopicsZulipDataRepository
 ) {
@@ -81,7 +81,7 @@ class SearchExpandedChannelGroupZulip @Inject constructor(
                 item.copy (
                     topics = item.topics.filter { it.name.contains(searchString, ignoreCase = true) }
                 )
-            }
+            }.sortedBy { it.channel.name }
         }
     }
 }

@@ -21,6 +21,12 @@ class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
         savedInstanceState: Bundle?
     ): View {
 
+        initAdapter()
+
+        return binding.root
+    }
+
+    private fun initAdapter() {
         val ownUserId = arguments?.getInt(PARAM_OWNER_USER_ID) ?: error("User id is required!")
 
         val fragmentsIdsList = listOf(
@@ -43,13 +49,13 @@ class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
                 }
             )
 
-
         TabLayoutMediator(binding.topNavMenu, binding.cannelsViewPager) { tab, position ->
             tab.text = resources.getString(fragmentsIdsList[position])
         }.attach()
+    }
 
-
-        return binding.root
+    private fun refresh() {
+        initAdapter()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,6 +68,15 @@ class ChannelsFragment: ViewBindingFragment<FragmentChannelsBinding>() {
         binding.searchChannels.searchBtn.setOnClickListener {
             searchInCurrentFragment(binding.searchChannels.searchEdit.text.toString())
         }
+
+        binding.createChannelBtn.setOnClickListener {
+            ChannelEditFragment().show(childFragmentManager, ChannelEditFragment.FRAGMENT_ID)
+        }
+
+        childFragmentManager
+            .setFragmentResultListener(ChannelEditFragment.FRAGMENT_ID, this) {
+                    _, _ -> refresh()
+            }
     }
 
     private fun searchInCurrentFragment(searchString: String) {

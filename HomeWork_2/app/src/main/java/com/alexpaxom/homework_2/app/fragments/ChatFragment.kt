@@ -193,8 +193,8 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
     companion object {
         private const val DEFAULT_TOPIC_NAME = "(no topic)"
         private const val ARGUMENT_TOPIC_NAME = "com.alexpaxom.ARGUMENT_TOPIC_NAME"
-        private const val ARGUMENT_CHANNEL_NAME = "com.alexpaxom.ARGUMENT_STREAM_NAME"
-        private const val ARGUMENT_CHANNEL_ID = "com.alexpaxom.ARGUMENT_STREAM_ID"
+        private const val ARGUMENT_CHANNEL_NAME = "com.alexpaxom.ARGUMENT_CHANNEL_NAME"
+        private const val ARGUMENT_CHANNEL_ID = "com.alexpaxom.ARGUMENT_CHANNEL_ID"
         private const val ARGUMENT_MY_USER_ID = "com.alexpaxom.ARGUMENT_MY_USER_ID"
 
         const val FRAGMENT_ID = "com.alexpaxom.CHAT_FRAGMENT_ID"

@@ -32,8 +32,8 @@ class ChannelsListAllFragment: ChannelsListFragment() {
 
         val chatFragment = ChatFragment.newInstance(
             topicName = topicItem.name,
-            streamName = topicChannel.name,
-            streamId = topicChannel.id,
+            channelName = topicChannel.name,
+            channelId = topicChannel.id,
             myUserId = arguments?.getInt(PARAM_OWNER_USER_ID) ?: error("Required userId for chat!")
 
         )

@@ -192,12 +192,12 @@ class ChatPresenter @Inject constructor(
     }
 
     private fun createFilterForMessages(chatParams: ChatParams): NarrowParams
-            = NarrowParams(chatParams.streamId, chatParams.topicName)
+            = NarrowParams(chatParams.channelId, chatParams.topicName)
 
 
     private fun sendMessage(message: String, chatParams: ChatParams) {
         messagesSender.sendMessageToStream(
-            chatParams.streamId,
+            chatParams.channelId,
             chatParams.topicName,
             message
         )

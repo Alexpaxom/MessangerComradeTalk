@@ -36,9 +36,9 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
 
     private val chatParams: Lazy<ChatParams> = lazy {
         ChatParams(
-            topicName = arguments?.getString(ARGUMENT_TOPIC_NAME) ?: error("Bad parameter 'topic name' "),
-            streamName = arguments?.getString(ARGUMENT_STREAM_NAME) ?: error("Bad parameter 'stream name' "),
-            streamId = arguments?.getInt(ARGUMENT_STREAM_ID) ?: error("Bad parameter 'stream id' "),
+            topicName = arguments?.getString(ARGUMENT_TOPIC_NAME) ?: DEFAULT_TOPIC_NAME,
+            channelName = arguments?.getString(ARGUMENT_CHANNEL_NAME) ?: error("Bad parameter 'channel name' "),
+            channelId = arguments?.getInt(ARGUMENT_CHANNEL_ID) ?: error("Bad parameter 'channel id' "),
             myUserId = arguments?.getInt(ARGUMENT_MY_USER_ID) ?: error("Bad parameter 'user id' ")
         )
     }
@@ -73,6 +73,13 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
         _binding = FragmentChatBinding.inflate(inflater, container, false)
 
         // Обрабочики нажатий на элементы списка сообщений
+        binding.channelName.text = "#${chatParams.value.channelName}"
+
+        binding.topicName.text = chatParams.value.topicName
+        binding.sendTopicName.text = chatParams.value.topicName
+
+        binding.topicName.isVisible = chatParams.value.topicName != DEFAULT_TOPIC_NAME
+        binding.sendTopicName.isVisible = chatParams.value.topicName == DEFAULT_TOPIC_NAME
 
         if(savedInstanceState == null)
             presenter.processEvent(ChatEvent.LoadHistory(chatParams.value))
@@ -184,10 +191,10 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
     }
 
     companion object {
-
+        private const val DEFAULT_TOPIC_NAME = "(no topic)"
         private const val ARGUMENT_TOPIC_NAME = "com.alexpaxom.ARGUMENT_TOPIC_NAME"
-        private const val ARGUMENT_STREAM_NAME = "com.alexpaxom.ARGUMENT_STREAM_NAME"
-        private const val ARGUMENT_STREAM_ID = "com.alexpaxom.ARGUMENT_STREAM_ID"
+        private const val ARGUMENT_CHANNEL_NAME = "com.alexpaxom.ARGUMENT_STREAM_NAME"
+        private const val ARGUMENT_CHANNEL_ID = "com.alexpaxom.ARGUMENT_STREAM_ID"
         private const val ARGUMENT_MY_USER_ID = "com.alexpaxom.ARGUMENT_MY_USER_ID"
 
         const val FRAGMENT_ID = "com.alexpaxom.CHAT_FRAGMENT_ID"
@@ -195,14 +202,14 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
         @JvmStatic
         fun newInstance(
             topicName: String = "",
-            streamName: String,
-            streamId: Int,
+            channelName: String,
+            channelId: Int,
             myUserId: Int
         ) = ChatFragment().apply {
             arguments = Bundle().apply {
                 putString(ARGUMENT_TOPIC_NAME, topicName)
-                putString(ARGUMENT_STREAM_NAME, streamName)
-                putInt(ARGUMENT_STREAM_ID, streamId)
+                putString(ARGUMENT_CHANNEL_NAME, channelName)
+                putInt(ARGUMENT_CHANNEL_ID, channelId)
                 putInt(ARGUMENT_MY_USER_ID, myUserId)
             }
         }

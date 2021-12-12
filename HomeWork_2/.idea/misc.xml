@@ -17,6 +17,8 @@
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/channels_list_decoration_divider.xml" value="0.1078125" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/cursor_color.xml" value="0.21302083333333333" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/ic_add_24.xml" value="0.21302083333333333" />
+        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/ic_arrow_back_24.xml" value="0.2" />
+        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/ic_arrow_back_40.xml" value="0.2" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.21302083333333333" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/ic_channels_list.xml" value="0.21302083333333333" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/ic_close_list.xml" value="0.21302083333333333" />
@@ -27,7 +29,7 @@
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/ic_status_circle.xml" value="0.16944444444444445" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/text_color_bottom_nav_main_menu.xml" value="0.21302083333333333" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/userss_list_decoration_divider.xml" value="0.21302083333333333" />
-        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/activity_main.xml" value="0.14" />
+        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/chanel_info_item.xml" value="0.33" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/channel_info_item.xml" value="0.33" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/cnannels_list_fragment.xml" value="0.196875" />
@@ -40,7 +42,7 @@
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/fragment_channel_create.xml" value="0.33" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/fragment_channel_edit.xml" value="0.196875" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/fragment_channels.xml" value="0.12" />
-        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/fragment_chat.xml" value="0.22" />
+        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/fragment_chat.xml" value="0.2" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/fragment_profile.xml" value="0.22" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/fragment_search.xml" value="0.18" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/fragment_users.xml" value="0.2" />
@@ -49,8 +51,8 @@
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/layout_test.xml" value="0.17" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/massage_item.xml" value="0.20885416666666667" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/message_item.xml" value="0.33" />
-        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/message_template_layout.xml" value="0.2" />
-        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/my_message_item.xml" value="0.9" />
+        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/message_template_layout.xml" value="0.14" />
+        <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/my_message_item.xml" value="0.25" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/tipic_info_item.xml" value="0.22" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/topic_info_item.xml" value="0.196875" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/layout/user_info_item.xml" value="0.33" />

@@ -12,4 +12,12 @@
     <string name="search_help_text">Search</string>
     <string name="channel_name_hint">Channel name</string>
     <string name="channel_description_hint">Channel description</string>
+    <string name="menu_delete_message_string">Delete message</string>
+    <string name="menu_set_message_reaction_string">Set reaction</string>
+    <string name="menu_edit_message_string">Edit message</string>
+    <string name="menu_change_message_topic_string">Change topic</string>
+    <string name="menu_copy_massage_text_string">Copy text</string>
+    <string name="bottom_menu_item_channels_string">Channels</string>
+    <string name="bottom_menu_item_people_string">People</string>
+    <string name="bottom_menu_item_profile_string">Profile</string>
 </resources>

@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.core.widget.doOnTextChanged
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alexpaxom.homework_2.R
@@ -30,7 +30,7 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
     private val binding get() = _binding!!
 
     private val chatMessageFactory = ChatMessageFactory(
-        { selectNewReaction(it) },
+        { openMenu(it) },
         { adapterPos, emojiView -> clickOnReaction(adapterPos, emojiView) }
     )
 
@@ -93,6 +93,11 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
         binding.chatingHistory.addItemDecoration(decorator)
 
 
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         // Обработка результата выбора эмоджи через диалог
         childFragmentManager.setFragmentResultListener(FragmentEmojiSelector.EMOJI_SELECT_RESULT_DIALOG_ID, this,
             { _, resultBundle ->
@@ -119,9 +124,8 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
         }
 
         // Обработка состояний при вводе данных в поле сообщения
-
-        binding.messageEnterEdit.doOnTextChanged { text, start, before, count ->
-            binding.messageEnterEdit.text?.let {
+        binding.messageEnterEdit.doAfterTextChanged { text ->
+            text?.let {
                 binding.messageSendBtn.setImageResource(
                     if(it.isNotEmpty())
                         android.R.drawable.ic_menu_send
@@ -135,7 +139,7 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
             presenter.processEvent(ChatEvent.MessagesInserted)
         }
 
-        return binding.root
+        super.onViewCreated(view, savedInstanceState)
     }
 
     private fun selectNewReaction(adapterPos: Int) {
@@ -143,6 +147,14 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
             chatHistoryAdapter.dataList[adapterPos].id
         )
         fragmentEmojiSelector.show(childFragmentManager, FragmentEmojiSelector.EMOJI_SELECT_RESULT_DIALOG_ID)
+    }
+
+    private fun openMenu(adapterPos: Int) {
+        val bottomMessageMenuFragment = BottomMenuFragment.newInstance(
+            R.menu.message_bottom_context_menu,
+            chatHistoryAdapter.dataList[adapterPos],
+        )
+        bottomMessageMenuFragment.show(childFragmentManager, BottomMenuFragment.FRAGMENT_ID)
     }
 
     private fun clickOnReaction(adapterPos: Int, emojiView: EmojiReactionCounter) {

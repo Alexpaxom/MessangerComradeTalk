@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/delete_message_item"
+        android:title="@string/menu_delete_message_string" />
+
+    <item
+        android:id="@+id/set_message_reaction_item"
+        android:title="@string/menu_set_message_reaction_string" />
+
+    <item
+        android:id="@+id/edit_message_item"
+        android:title="@string/menu_edit_message_string" />
+
+    <item
+        android:id="@+id/change_message_topic_item"
+        android:title="@string/menu_change_message_topic_string" />
+
+    <item
+        android:id="@+id/copy_massage_text_item"
+        android:title="@string/menu_copy_massage_text_string" />
+</menu>

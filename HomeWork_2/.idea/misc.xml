@@ -3,6 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/AdminPC/Desktop/programs/HomeWork_2/app/src/main/res/layout/fragment_channel_edit.xml" value="0.2477355072463768" />
+        <entry key="..\:/Users/AdminPC/Desktop/programs/HomeWork_2/app/src/main/res/layout/fragment_chat.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/AdminPC/Desktop/programs/HomeWork_2/app/src/main/res/layout/fragment_search.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/AdminPC/Desktop/programs/HomeWork_2/app/src/main/res/layout/fragment_select_topic.xml" value="0.264" />
+        <entry key="..\:/Users/AdminPC/Desktop/programs/HomeWork_2/app/src/main/res/layout/fragment_users.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/AdminPC/Desktop/programs/HomeWork_2/app/src/main/res/layout/topic_info_item.xml" value="0.25416666666666665" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.21302083333333333" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/bg_chat_delimiter_date.xml" value="0.1078125" />
         <entry key="..\:/_/programing/kotlin/tfs-android-fall-2021-homework/HomeWork_2/app/src/main/res/drawable/bg_chat_message.xml" value="0.21302083333333333" />

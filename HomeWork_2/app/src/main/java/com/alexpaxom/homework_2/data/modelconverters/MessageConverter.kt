@@ -29,6 +29,7 @@ class MessageConverter {
                 userId = message.senderId,
                 userName = message.senderFullName,
                 text = text.toString().trim(),
+                topicName = message.topicName ?: "",
                 datetime = Date(message.timestamp*CONVERT_FROM_UTC_SECONDS),
                 avatarUrl = message.avatarUrl,
                 reactionsGroup = ReactionsGroup(reactionsList)

@@ -9,6 +9,7 @@ import com.alexpaxom.homework_2.domain.entity.Message
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.MessagesZulipDataRepository
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.NarrowParams
 import io.reactivex.Observable
+import io.reactivex.Single
 import java.sql.Wrapper
 import javax.inject.Inject
 
@@ -26,7 +27,7 @@ class MessagesLoadUseCaseZulip @Inject constructor(
     ): Observable<CachedWrapper<List<MessageItem>>> {
 
         return messagesZulipDataRepository.getNextPage(messageId, countMessages, filter)
-            .map{ convertTypesMessages(ownUserId, it) }
+            .map { convertTypesMessages(ownUserId, it) }
     }
 
     fun getPrevPage(
@@ -37,7 +38,7 @@ class MessagesLoadUseCaseZulip @Inject constructor(
     ): Observable<CachedWrapper<List<MessageItem>>> {
 
         return messagesZulipDataRepository.getPrevPage(messageId, countMessages, filter)
-            .map{ convertTypesMessages(ownUserId, it) }
+            .map { convertTypesMessages(ownUserId, it) }
     }
 
     fun getHistory(
@@ -48,29 +49,40 @@ class MessagesLoadUseCaseZulip @Inject constructor(
     ): Observable<CachedWrapper<List<MessageItem>>> {
 
         return messagesZulipDataRepository.getHistory(messageId, countMessages, filter)
-            .map{ convertTypesMessages(ownUserId, it) }
+            .map { convertTypesMessages(ownUserId, it) }
 
     }
 
-    fun convertTypesMessages(
+    fun getMessage(
+        ownUserId: Int,
+        messageId: Long,
+        filter: NarrowParams
+    ): Observable<List<MessageItem>> {
+        return messagesZulipDataRepository.getHistory(messageId, 0, filter, useCache = false)
+            .map {
+                convertTypesMessages(ownUserId, it).data
+            }
+    }
+
+    private fun convertTypesMessages(
         ownUserId: Int,
         messages: CachedWrapper<List<Message>>
     ): CachedWrapper<List<MessageItem>> {
         val convertedMessages =
             messages.data
-                    .map { messagesConverter.convert(it) }
-                    .map {message ->
-                        val typedMessage = if(message.userId == ownUserId)
-                            message.copy( typeId = R.layout.my_message_item )
-                        else
-                            message
+                .map { messagesConverter.convert(it) }
+                .map { message ->
+                    val typedMessage = if (message.userId == ownUserId)
+                        message.copy(typeId = R.layout.my_message_item)
+                    else
+                        message
 
-                        typedMessage.reactionsGroup.userIdOwner = ownUserId
+                    typedMessage.reactionsGroup.userIdOwner = ownUserId
 
-                        return@map typedMessage
-                    }
+                    return@map typedMessage
+                }
 
-        return when(messages) {
+        return when (messages) {
             is CachedWrapper.CachedData -> CachedWrapper.CachedData(convertedMessages)
             is CachedWrapper.OriginalData -> CachedWrapper.OriginalData(convertedMessages)
         }

@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseDiffUtilAdapter
 import com.alexpaxom.homework_2.app.adapters.BaseElements.BaseHolderFactory
 import com.alexpaxom.homework_2.data.models.MessageItem
+import com.alexpaxom.homework_2.data.models.TopicItem
 import com.alexpaxom.homework_2.helpers.DateFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -17,7 +18,7 @@ class ChatHistoryAdapter(
         diffUtil = AsyncListDiffer(this, MessagesDiffUtil())
     }
 
-    fun isDecorate(itemPosition: Int): Boolean {
+    fun isDrawDateDecorator(itemPosition: Int): Boolean {
         if(itemPosition == 0)
             return true
 
@@ -30,10 +31,28 @@ class ChatHistoryAdapter(
         return diffDays > 1 || prevDate.get(Calendar.DAY_OF_MONTH) !=  date.get(Calendar.DAY_OF_MONTH)
     }
 
-    fun getDecorateParam(itemPosition: Int): String {
+    fun getDateDecorateParam(itemPosition: Int): String {
         return DateFormatter.formatDate (
             dataList[itemPosition].datetime, DateFormatter.DATA_DELIMITER_FORMAT
         )
+    }
+
+    fun isDrawNextTopicDecorator(itemPosition: Int): Boolean {
+        if(itemPosition == 0)
+            return true
+
+        return dataList[itemPosition-1].topicName != dataList[itemPosition].topicName
+    }
+
+    fun isDrawPrevTopicDecorator(itemPosition: Int): Boolean {
+        if(itemPosition == dataList.size-1)
+            return true
+
+        return dataList[itemPosition].topicName != dataList[itemPosition+1].topicName
+    }
+
+    fun getTopicDecorateParam(itemPosition: Int): String {
+        return dataList[itemPosition].topicName
     }
 
     class MessagesDiffUtil: DiffUtil.ItemCallback<MessageItem>() {

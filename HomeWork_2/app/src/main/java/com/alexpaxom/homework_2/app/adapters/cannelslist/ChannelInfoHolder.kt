@@ -8,11 +8,12 @@ import com.alexpaxom.homework_2.databinding.ChannelInfoItemBinding
 class ChannelInfoHolder(
     private val channelInfoItemBinding: ChannelInfoItemBinding,
     private val channelClickListener: (channel: ChannelItem) -> Unit,
+    private val onExpandChannelListener: ((channel: ChannelItem) -> Unit)? = null,
 ): BaseViewHolder<ChannelItem>(channelInfoItemBinding) {
 
     init {
         // обрабатываем нажатие на канал (показываем/скрываем топики)
-        channelInfoItemBinding.channelInfoLayout.setOnClickListener {
+        channelInfoItemBinding.channelInfoExpandList.setOnClickListener {
             (bindingAdapter as ChannelsListAdapter).apply {
                 val groupItemPosition =
                 dataList.indexOfLast {
@@ -27,8 +28,24 @@ class ChannelInfoHolder(
                             )
                         )
                         updateItem(groupItemPosition, groupItemInvertIsExpanded)
+                        // Внешний раскрытия элемента списка
+                        onExpandChannelListener?.invoke(groupItemInvertIsExpanded.channel)
+                    }
+                }
+            }
+        }
+
+        channelInfoItemBinding.channelInfoLayout.setOnClickListener() {
+            (bindingAdapter as ChannelsListAdapter).apply {
+                val groupItemPosition =
+                    dataList.indexOfLast {
+                        it.channel.id == innerList[this@ChannelInfoHolder.bindingAdapterPosition].id
+                    }
+
+                if(groupItemPosition != -1) {
+                    dataList[groupItemPosition].let { groupItem ->
                         // Внешний обработчик нажатия
-                        channelClickListener(groupItemInvertIsExpanded.channel)
+                        channelClickListener(groupItem.channel)
                     }
                 }
             }

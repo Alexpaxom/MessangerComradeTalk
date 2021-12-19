@@ -2,6 +2,7 @@ package com.alexpaxom.homework_2.app.fragments
 
 import android.os.Bundle
 import com.alexpaxom.homework_2.app.App
+import com.alexpaxom.homework_2.data.models.ChannelItem
 import com.alexpaxom.homework_2.data.models.TopicItem
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
@@ -26,6 +27,18 @@ class ChannelsListSubscribedFragment: ChannelsListFragment() {
             .inject(this)
 
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onChannelClick(channel: ChannelItem) {
+        val chatFragment = ChatFragment.newInstance(
+            topicName = null,
+            channelName = channel.name,
+            channelId = channel.id,
+            myUserId = arguments?.getInt(PARAM_OWNER_USER_ID) ?: error("Required userId for chat!")
+
+        )
+
+        chatFragment.show(parentFragmentManager, ChatFragment.FRAGMENT_ID)
     }
 
     override fun onTopicClick(topicItem: TopicItem) {

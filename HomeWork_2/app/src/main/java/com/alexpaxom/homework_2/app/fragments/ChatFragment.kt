@@ -321,7 +321,7 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
 
         @JvmStatic
         fun newInstance(
-            topicName: String = "",
+            topicName: String? = null,
             channelName: String,
             channelId: Int,
             myUserId: Int

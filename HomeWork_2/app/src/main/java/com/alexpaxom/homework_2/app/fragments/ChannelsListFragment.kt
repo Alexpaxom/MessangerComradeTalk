@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.CallSuper
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -22,7 +23,10 @@ abstract class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBi
 
     private val channelsListHoldersFactory = ChannelsListHoldersFactory(
         onExpandableChannelItemClickListener = {onChannelClick(it)},
-        onExpandableTopicItemClickListener = {onTopicClick(it)})
+        onExpandableTopicItemClickListener = {onTopicClick(it)},
+        onExpandChannelListener = { onExpandChannel(it) }
+    )
+
 
     private val channelsListAdapter = ChannelsListAdapter(channelsListHoldersFactory)
 
@@ -66,7 +70,7 @@ abstract class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBi
         presenter.processEvent(ChannelsListEvent.SearchInChannelGroup(searchString))
     }
 
-    private fun onChannelClick(channel: ChannelItem) {
+    private fun onExpandChannel(channel: ChannelItem) {
         presenter.processEvent(ChannelsListEvent.ExpandedStateChange(channel))
     }
 
@@ -82,5 +86,6 @@ abstract class ChannelsListFragment : ViewBindingFragment<CnannelsListFragmentBi
     }
 
     protected abstract fun onTopicClick(topicItem: TopicItem)
+    protected abstract fun onChannelClick(channel: ChannelItem)
 
 }

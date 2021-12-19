@@ -12,7 +12,8 @@ import com.alexpaxom.homework_2.databinding.TopicInfoItemBinding
 
 class ChannelsListHoldersFactory(
     private val onExpandableChannelItemClickListener: (channel: ChannelItem) -> Unit,
-    private val onExpandableTopicItemClickListener: (topic: TopicItem) -> Unit
+    private val onExpandableTopicItemClickListener: (topic: TopicItem) -> Unit,
+    private val onExpandChannelListener: ((channel: ChannelItem) -> Unit)? = null,
 ): BaseHolderFactory() {
     override fun createViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> {
         return when(viewType) {
@@ -30,7 +31,8 @@ class ChannelsListHoldersFactory(
                     viewGroup,
                     false
                 ),
-                onExpandableChannelItemClickListener
+                onExpandableChannelItemClickListener,
+                onExpandChannelListener
             )
             else -> error("Bad type channel list holder")
         }

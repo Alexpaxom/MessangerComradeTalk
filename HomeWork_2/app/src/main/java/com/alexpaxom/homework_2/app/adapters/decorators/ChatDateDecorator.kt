@@ -5,18 +5,19 @@ import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.children
-import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.adapters.chathistory.ChatHistoryAdapter
+import com.alexpaxom.homework_2.customview.getHeightWithMargins
 import com.alexpaxom.homework_2.databinding.DateDelimeterBinding
+import com.alexpaxom.homework_2.databinding.TopicDelimeterBinding
 
 class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoration(){
-    val drawableLayer = DateDelimeterBinding.inflate(LayoutInflater.from(recyclerView.context), recyclerView, false)
-    val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-    val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-    val spaceBetweenElements = recyclerView.context.resources.getDimensionPixelSize(R.dimen.chat_delimiter_messages)
+    private val dateDelimiterLayout = DateDelimeterBinding.inflate(LayoutInflater.from(recyclerView.context), recyclerView, false)
+    private val topicDelimiterLayout = TopicDelimeterBinding.inflate(LayoutInflater.from(recyclerView.context), recyclerView, false)
+    val topicDelimiterMargin = recyclerView.context.resources.getDimensionPixelSize(R.dimen.chat_topic_delimiter_margin)
 
     override fun getItemOffsets(
         outRect: Rect,
@@ -26,16 +27,29 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
     ) {
         val adapter = parent.adapter as ChatHistoryAdapter
 
-        outRect.top = spaceBetweenElements
 
         parent.getChildAdapterPosition(view).let { adapterPos ->
-            if(adapterPos != RecyclerView.NO_POSITION && adapter.isDecorate(adapterPos)) {
-                drawableLayer.textDate.let {
-                    it.text = adapter.getDecorateParam(adapterPos)
-                    measureView()
-                    outRect.top += it.marginTop + it.marginBottom + it.height
+            if(adapterPos != RecyclerView.NO_POSITION) {
+
+                if(adapter.isDrawDateDecorator(adapterPos)) {
+                    dateDelimiterLayout.textDate.text = adapter.getDateDecorateParam(adapterPos)
+                    measureView(dateDelimiterLayout, parent)
+                    outRect.top += dateDelimiterLayout.textDate.getHeightWithMargins()
+                }
+
+                if(adapter.isDrawNextTopicDecorator(adapterPos)) {
+                    topicDelimiterLayout.topicName.text = adapter.getTopicDecorateParam(adapterPos)
+                    measureView(topicDelimiterLayout, parent)
+                    outRect.top += topicDelimiterLayout.topicDelimiter.getHeightWithMargins()+topicDelimiterMargin
+                }
+
+                if(adapter.isDrawPrevTopicDecorator(adapterPos)) {
+                    topicDelimiterLayout.topicName.text = adapter.getTopicDecorateParam(adapterPos)
+                    measureView(topicDelimiterLayout, parent)
+                    outRect.bottom += topicDelimiterLayout.topicDelimiter.getHeightWithMargins()+topicDelimiterMargin
                 }
             }
+
         }
 
     }
@@ -44,6 +58,7 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
         super.onDrawOver(c, parent, state)
         val adapter = parent.adapter as ChatHistoryAdapter
 
+        // находим центр ресайклера
         val left = parent.paddingLeft
         val right = parent.width - parent.paddingLeft
         val x = left + (right-left)/2f
@@ -51,25 +66,72 @@ class ChatDateDecorator(recyclerView: RecyclerView) : RecyclerView.ItemDecoratio
         parent.children.forEach { child ->
 
             parent.getChildAdapterPosition(child).let { adapterPos ->
-                if (adapterPos != RecyclerView.NO_POSITION && adapter.isDecorate(adapterPos)) {
-                    drawableLayer.textDate.text = adapter.getDecorateParam(adapterPos)
-                    val y =
-                        child.top.toFloat() - drawableLayer.textDate.height - drawableLayer.textDate.marginBottom
+                if (adapterPos != RecyclerView.NO_POSITION) {
+                    var y = child.top.toFloat()
 
-                    // измеряем и отрисовываем TextView
-                    measureView()
-                    c.save()
-                    c.translate(x - drawableLayer.textDate.width / 2, y)
-                    drawableLayer.root.draw(c)
-                    c.restore()
+                    // отрисовываем разделитель следующего топика
+                    if(adapter.isDrawNextTopicDecorator(adapterPos))
+                    {
+                        topicDelimiterLayout.topicName.text = adapter.getTopicDecorateParam(adapterPos)
+
+                        measureView(topicDelimiterLayout, parent)
+                        y -= topicDelimiterLayout.topicDelimiter.getHeightWithMargins()
+
+                        drawDelimiterAtPosition(
+                            view = topicDelimiterLayout.root,
+                            canvas = c,
+                            x = left.toFloat(),
+                            y = y,
+                        )
+                    }
+
+                    // отрисовываем разделитель даты
+                    if(adapter.isDrawDateDecorator(adapterPos))
+                    {
+                        dateDelimiterLayout.textDate.text = adapter.getDateDecorateParam(adapterPos)
+
+                        measureView(dateDelimiterLayout, parent)
+                        y -= dateDelimiterLayout.textDate.getHeightWithMargins()+topicDelimiterMargin
+
+                        drawDelimiterAtPosition(
+                            view = dateDelimiterLayout.root,
+                            canvas = c,
+                            x = x - dateDelimiterLayout.textDate.width / 2,
+                            y = y,
+                        )
+                    }
+
+                    // отрисовываем разделитель предидущего топика
+                    if(adapter.isDrawPrevTopicDecorator(adapterPos)) {
+                        topicDelimiterLayout.topicName.text = adapter.getTopicDecorateParam(adapterPos)
+
+                        measureView(topicDelimiterLayout, parent)
+                        y = child.bottom.toFloat() + topicDelimiterLayout.topicDelimiter.marginTop
+                        drawDelimiterAtPosition(
+                            view = topicDelimiterLayout.root,
+                            canvas = c,
+                            x = left.toFloat(),
+                            y = y,
+                        )
+                    }
+
                 }
             }
         }
     }
 
+    private fun drawDelimiterAtPosition(view: View, canvas: Canvas, x: Float, y:Float) {
+        canvas.save()
+        canvas.translate(x, y)
+        view.draw(canvas)
+        canvas.restore()
+    }
 
-    private fun measureView() {
-        drawableLayer.root.measure(widthSpec, heightSpec)
-        drawableLayer.root.layout(0, 0, 0, 0)
+    private fun measureView(drawable: ViewBinding, parent: View) {
+        drawable.root.measure(
+            View.MeasureSpec.makeMeasureSpec(parent.width, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+        drawable.root.layout(0, 0, 0, 0)
     }
 }

@@ -1,26 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/message_layout"
+    android:paddingHorizontal="1dp"
+    android:background="@color/green_topic_color"
+    android:id="@+id/my_message_layout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:flow_horizontalAlign="center">
+    android:layout_height="wrap_content">
 
-
-    <com.alexpaxom.homework_2.customview.MassageViewGroup
-        android:id="@+id/message_item"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/message_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="85"
-        app:massageTextBackground="@drawable/bg_chat_message">
-
-    </com.alexpaxom.homework_2.customview.MassageViewGroup>
-
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="15" />
+        android:paddingHorizontal="13dp"
+        android:paddingVertical="10dp"
+        android:background="@color/main_background"
+        app:flow_horizontalAlign="center">
 
 
-</LinearLayout>
+        <com.alexpaxom.homework_2.customview.MassageViewGroup
+            android:id="@+id/message_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="85"
+            app:massageTextBackground="@drawable/bg_chat_message">
+
+        </com.alexpaxom.homework_2.customview.MassageViewGroup>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="15" />
+
+    </LinearLayout>
+
+</FrameLayout>

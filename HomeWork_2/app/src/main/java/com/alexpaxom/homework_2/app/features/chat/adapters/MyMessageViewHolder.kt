@@ -12,7 +12,7 @@ class MyMessageViewHolder(
 
     init {
         myMessageItemBinding.myMessageItem.setOnReactionClickListener {
-            OnReactionClickListener(adapterPosition, this)
+            OnReactionClickListener(absoluteAdapterPosition, this)
         }
     }
 

@@ -24,7 +24,7 @@ class EmojiHoldersFactory(
         }
 
         holder.itemView.setOnClickListener {
-            onClickListener(holder.adapterPosition)
+            onClickListener(holder.absoluteAdapterPosition)
         }
 
         return holder

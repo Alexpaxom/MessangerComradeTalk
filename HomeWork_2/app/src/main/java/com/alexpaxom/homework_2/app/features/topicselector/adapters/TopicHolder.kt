@@ -12,7 +12,7 @@ class TopicHolder(
     init {
         itemView.setOnClickListener {
             (bindingAdapter as? TopicsListAdapter)?.let {
-                onTopicItemClickListener(it.dataList[absoluteAdapterPosition] as TopicItem)
+                onTopicItemClickListener(it.dataList[absoluteAdapterPosition])
             }
         }
     }

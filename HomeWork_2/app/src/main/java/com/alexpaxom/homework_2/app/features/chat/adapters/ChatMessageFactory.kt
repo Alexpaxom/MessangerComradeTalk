@@ -35,7 +35,7 @@ class ChatMessageFactory(
         }
 
         holder.itemView.setOnLongClickListener {
-            longClickCallback(holder.adapterPosition)
+            longClickCallback(holder.absoluteAdapterPosition)
             true
         }
 

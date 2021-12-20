@@ -131,9 +131,8 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
             FragmentEmojiSelector.EMOJI_SELECT_RESULT_DIALOG_ID,
             this,
             { _, resultBundle ->
-                val emojiUnicode = resultBundle.getString(FragmentEmojiSelector.EMOJI_UNICODE)
                 val messageId = resultBundle.getInt(FragmentEmojiSelector.RESULT_ID)
-                emojiUnicode?.let { emojiUnicode ->
+                resultBundle.getString(FragmentEmojiSelector.EMOJI_UNICODE)?.let { emojiUnicode ->
                     presenter.processEvent(
                         ChatEvent.EmojiStateChange(emojiUnicode, messageId, true, chatParams.value)
                     )

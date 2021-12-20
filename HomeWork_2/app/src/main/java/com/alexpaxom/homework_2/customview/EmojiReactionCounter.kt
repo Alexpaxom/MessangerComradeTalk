@@ -7,7 +7,7 @@ import android.util.AttributeSet
 import android.view.View
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.helpers.NumAbbreviationFormatter
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 class EmojiReactionCounter  @JvmOverloads constructor(
     context: Context,

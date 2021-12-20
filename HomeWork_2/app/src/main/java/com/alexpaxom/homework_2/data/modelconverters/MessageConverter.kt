@@ -2,6 +2,7 @@ package com.alexpaxom.homework_2.data.modelconverters
 
 import android.os.Build
 import android.text.Html
+import androidx.core.text.HtmlCompat
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.data.models.MessageItem
 import com.alexpaxom.homework_2.data.models.ReactionsGroup
@@ -16,7 +17,7 @@ class MessageConverter {
         val text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 Html.fromHtml(message.content, Html.FROM_HTML_MODE_COMPACT)
             else
-                Html.fromHtml(message.content)
+                HtmlCompat.fromHtml(message.content, HtmlCompat.FROM_HTML_MODE_LEGACY);
 
         val reactionsList = message.reactions
             .filter{it.reactionType == "unicode_emoji"}

@@ -1,5 +1,7 @@
 package com.alexpaxom.homework_2.app.features.channels.fragments
 
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.EditChannelsUseCaseZulip
+import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.EditTopicsUseCaseZulip
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.LoadChannelUseCaseZulip
 import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
@@ -15,8 +17,14 @@ import javax.inject.Inject
 @ScreenScope
 @InjectViewState
 class ChannelsListAllPresenter @Inject constructor(
-    private val loadChannelUseCase:LoadChannelUseCaseZulip
-): ChannelsListPresenter() {
+    private val loadChannelUseCase:LoadChannelUseCaseZulip,
+    editChannelsUseCaseZulip: EditChannelsUseCaseZulip,
+    editTopicsUseCaseZulip: EditTopicsUseCaseZulip
+): ChannelsListPresenter(
+    loadChannelUseCase,
+    editChannelsUseCaseZulip,
+    editTopicsUseCaseZulip
+) {
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -57,6 +65,8 @@ class ChannelsListAllPresenter @Inject constructor(
             )
             .addTo(compositeDisposable)
     }
+
+
 
     override fun onDestroy() {
         compositeDisposable.dispose()

@@ -17,4 +17,7 @@ interface TopicsDAO {
 
     @Query("DELETE FROM Topics WHERE channel_id = :channelId")
     fun deleteAllTopicsByChannelId(channelId: Int)
+
+    @Query("DELETE FROM Topics WHERE channel_id = :channelId AND name = :topicName")
+    fun deleteTopic(channelId: Int, topicName: String)
 }

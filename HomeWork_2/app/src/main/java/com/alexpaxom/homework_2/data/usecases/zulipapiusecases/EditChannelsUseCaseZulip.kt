@@ -1,6 +1,7 @@
 package com.alexpaxom.homework_2.data.usecases.zulipapiusecases
 
 import com.alexpaxom.homework_2.di.screen.ScreenScope
+import com.alexpaxom.homework_2.domain.entity.StreamDeleteResult
 import com.alexpaxom.homework_2.domain.entity.SubscribeResult
 import com.alexpaxom.homework_2.domain.repositories.zulipapirepositories.ChannelsZulipDataRepository
 import io.reactivex.Single
@@ -15,4 +16,7 @@ class EditChannelsUseCaseZulip @Inject constructor(
 
     fun createChannel(channelName: String, channelDescription: String): Single<SubscribeResult> =
         channelsZulipDataRepository.createChannel(channelName, channelDescription)
+
+    fun archiveChannel(channelId: Int): Single<StreamDeleteResult> =
+        channelsZulipDataRepository.archiveChannel(channelId)
 }

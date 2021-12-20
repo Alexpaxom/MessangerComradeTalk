@@ -4,7 +4,9 @@ import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.daos.ChannelsDAO
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.entity.Channel
+import com.alexpaxom.homework_2.domain.entity.StreamDeleteResult
 import com.alexpaxom.homework_2.domain.entity.SubscribeResult
+import com.alexpaxom.homework_2.domain.entity.TopicDeleteResult
 import com.alexpaxom.homework_2.domain.remote.ChannelsZulipApiRequests
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -110,5 +112,14 @@ class ChannelsZulipDataRepository @Inject constructor(
         return channelsZulipApiRequests.subscribeOrCreateStream(
             ChannelParamsFormatter.format(channelName, channelDescription)
         )
+    }
+
+    fun archiveChannel(
+        channelId: Int
+    ): Single<StreamDeleteResult> {
+        return channelsZulipApiRequests.archiveStream(channelId)
+            .doOnSubscribe {
+                channelsDAO.deleteChannel(channelId)
+            }
     }
 }

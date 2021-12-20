@@ -23,4 +23,7 @@ interface ChannelsDAO {
 
     @Query("DELETE FROM Channels")
     fun deleteAllChannels()
+
+    @Query("DELETE FROM Channels WHERE stream_id = :channelId")
+    fun deleteChannel(channelId: Int)
 }

@@ -19,4 +19,6 @@
     <string name="bottom_menu_item_channels_string">Channels</string>
     <string name="bottom_menu_item_people_string">People</string>
     <string name="bottom_menu_item_profile_string">Profile</string>
+    <string name="archive_channel_menu_string">Archive channel</string>
+    <string name="delete_topic_menu_string">Delete topic</string>
 </resources>

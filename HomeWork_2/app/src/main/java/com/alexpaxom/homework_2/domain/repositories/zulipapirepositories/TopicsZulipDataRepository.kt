@@ -4,8 +4,10 @@ import com.alexpaxom.homework_2.di.screen.ScreenScope
 import com.alexpaxom.homework_2.domain.cache.daos.TopicsDAO
 import com.alexpaxom.homework_2.domain.cache.helpers.CachedWrapper
 import com.alexpaxom.homework_2.domain.entity.Topic
+import com.alexpaxom.homework_2.domain.entity.TopicDeleteResult
 import com.alexpaxom.homework_2.domain.remote.ChannelsZulipApiRequests
 import io.reactivex.Observable
+import io.reactivex.Single
 import javax.inject.Inject
 
 @ScreenScope
@@ -56,6 +58,16 @@ class TopicsZulipDataRepository @Inject constructor(
 
             emitter.onComplete()
         }
+    }
+
+    fun removeTopic(
+        channelId: Int,
+        topicName: String
+    ): Single<TopicDeleteResult> {
+        return topicsZulipApiRequests.removeTopic(channelId, topicName)
+            .doOnSubscribe {
+                topicsDAO.deleteTopic(channelId, topicName)
+            }
     }
 
 }

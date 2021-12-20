@@ -45,7 +45,8 @@ class TopicsZulipDataRepository @Inject constructor(
 
                     // обновляем кэш
                     if(refreshCache)
-                        topicsDAO.insertAll(topics)
+                        topicsDAO.deleteAllTopicsByChannelId(channelId)
+                    topicsDAO.insertAll(topics)
 
                 }
                 catch (e: Exception) {

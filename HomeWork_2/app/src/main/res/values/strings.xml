@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">HomeWork_2</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name">ComradeTalk</string>
     <string name="massage_enter">Message</string>
     <string name="profile_user_online_status">online</string>
     <string name="profile_user_idle_status">idle</string>

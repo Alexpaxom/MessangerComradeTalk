@@ -164,7 +164,6 @@ class MassageViewGroup @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         var totalWidth = 0
-        var totalHeight = 0
 
         messageBackgroundDrawable?.getPadding(messageBackgroundPaddings)
 
@@ -223,7 +222,7 @@ class MassageViewGroup @JvmOverloads constructor(
 
         totalWidth += messageBackgroundPaddings.right + messageBackgroundPaddings.left
 
-        totalHeight = maxOf(
+        val totalHeight: Int = maxOf(
             avatarImageView.getHeightWithMargins(),
 
             nameTextView.getHeightWithMargins()

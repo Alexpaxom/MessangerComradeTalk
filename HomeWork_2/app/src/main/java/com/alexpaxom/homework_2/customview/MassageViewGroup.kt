@@ -14,38 +14,6 @@ import com.alexpaxom.homework_2.data.models.ReactionItem
 import com.alexpaxom.homework_2.data.models.ReactionsGroup
 import com.bumptech.glide.Glide
 
-inline fun View.getWidthWithMargins(): Int = measuredWidth + marginLeft + marginRight
-inline fun View.getHeightWithMargins(): Int = measuredHeight + marginTop + marginBottom
-
-inline fun View.layoutByLeftTopNeighbors(left: View?, top: View?, addOffsetLeft:Int = 0, addOffsetTop: Int = 0) {
-    val leftCoord = addOffsetLeft + (left?.right ?: 0) + (left?.marginRight ?: 0) + marginLeft
-    val topCoord = addOffsetTop + (top?.bottom ?: 0) + (top?.marginBottom ?: 0) + marginTop
-
-    layout(
-        leftCoord,
-        topCoord,
-        leftCoord + measuredWidth,
-        topCoord + measuredHeight,
-    )
-}
-
-inline fun View.layoutByRightTopNeighbors(
-    right: View?, top: View?,
-    addOffsetRight:Int = 0, addOffsetTop: Int = 0,
-    maxWidth: Int = 0) {
-
-    val rightCoord = maxWidth - addOffsetRight - (right?.left ?: 0) - (right?.marginLeft ?: 0) - marginRight
-    val topCoord = addOffsetTop + (top?.bottom ?: 0) + (top?.marginBottom ?: 0) + marginTop
-
-    layout(
-        rightCoord-measuredWidth,
-        topCoord,
-        rightCoord,
-        topCoord + measuredHeight,
-    )
-}
-
-
 class MassageViewGroup @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -69,8 +37,10 @@ class MassageViewGroup @JvmOverloads constructor(
 
     // макет фона сообщения
     private var messageBackgroundDrawable: Drawable? = null
+
     // Дополнитлеьные паддиги вокруг сообщения, созданные фоном
     private val messageBackgroundPaddings = Rect()
+
     // Размеры фона сообщения
     private val messageBackgroundRect = Rect()
 
@@ -78,7 +48,7 @@ class MassageViewGroup @JvmOverloads constructor(
     private val nameTextView: TextView
     private val messageTextView: TextView
     private val reactionsListLayout: FlexBoxLayout
-    private var onReactionClickListener: (EmojiReactionCounter.()->Unit)? = null
+    private var onReactionClickListener: (EmojiReactionCounter.() -> Unit)? = null
     private var reactionsGroup = ReactionsGroup()
 
     init {
@@ -119,7 +89,7 @@ class MassageViewGroup @JvmOverloads constructor(
         }
     }
 
-    fun setAvatarByUrl(url:String) {
+    fun setAvatarByUrl(url: String) {
         Glide
             .with(this)
             .load(url)
@@ -136,12 +106,17 @@ class MassageViewGroup @JvmOverloads constructor(
             addReactionView(
                 codeEmoji = it.first,
                 count = it.second,
-                selected = reactionsGroup.isSelected(it.first))
+                selected = reactionsGroup.isSelected(it.first)
+            )
         }
     }
 
 
-    private fun addReactionView(codeEmoji: String = "\uD83D\uDE36", count:Int = 1, selected: Boolean = false) {
+    private fun addReactionView(
+        codeEmoji: String = "\uD83D\uDE36",
+        count: Int = 1,
+        selected: Boolean = false
+    ) {
         val emoji = View.inflate(context, R.layout.emoji_view, null) as EmojiReactionCounter
 
         emoji.displayEmoji = codeEmoji
@@ -162,9 +137,9 @@ class MassageViewGroup @JvmOverloads constructor(
 
     fun findReactionId(codeEmoji: String): View? {
 
-        for(i in 0 until reactionsListLayout.childCount) {
+        for (i in 0 until reactionsListLayout.childCount) {
             val emoji = reactionsListLayout.getChildAt(i) as EmojiReactionCounter
-            if(emoji.displayEmoji == codeEmoji)
+            if (emoji.displayEmoji == codeEmoji)
                 return emoji
         }
 
@@ -172,18 +147,18 @@ class MassageViewGroup @JvmOverloads constructor(
     }
 
     fun removeReaction(codeEmoji: String) {
-        reactionsListLayout.removeView( findReactionId(codeEmoji) )
+        reactionsListLayout.removeView(findReactionId(codeEmoji))
     }
 
     fun removeReaction(view: View) {
-        reactionsListLayout.removeView( view )
+        reactionsListLayout.removeView(view)
     }
 
     fun removeAllReactions() {
         reactionsListLayout.removeAllViews()
     }
 
-    fun setOnReactionClickListener(onClickListener:(EmojiReactionCounter.()->Unit)?  = null) {
+    fun setOnReactionClickListener(onClickListener: (EmojiReactionCounter.() -> Unit)? = null) {
         onReactionClickListener = onClickListener
     }
 
@@ -194,48 +169,48 @@ class MassageViewGroup @JvmOverloads constructor(
         messageBackgroundDrawable?.getPadding(messageBackgroundPaddings)
 
         // Получаем параметры аватара пользователя
-        if(avatarImageView.isVisible)
-        measureChildWithMargins(
-            avatarImageView,
-            widthMeasureSpec,
-            0,
-            heightMeasureSpec,
-            0
-        )
+        if (avatarImageView.isVisible)
+            measureChildWithMargins(
+                avatarImageView,
+                widthMeasureSpec,
+                0,
+                heightMeasureSpec,
+                0
+            )
 
         // Получаем параметры текствью с именем пользователя
-        if(nameTextView.isVisible)
-        measureChildWithMargins(
-            nameTextView,
-            widthMeasureSpec,
-            avatarImageView.getWidthWithMargins()
-                    +messageBackgroundPaddings.left
-                    +messageBackgroundPaddings.right,
-            heightMeasureSpec,
-            messageBackgroundPaddings.top
-        )
+        if (nameTextView.isVisible)
+            measureChildWithMargins(
+                nameTextView,
+                widthMeasureSpec,
+                avatarImageView.getWidthWithMargins()
+                        + messageBackgroundPaddings.left
+                        + messageBackgroundPaddings.right,
+                heightMeasureSpec,
+                messageBackgroundPaddings.top
+            )
 
         // Получаем параметры текствью с сообщением
-        if(messageTextView.isVisible)
-        measureChildWithMargins(
-            messageTextView,
-            widthMeasureSpec,
-            avatarImageView.getWidthWithMargins()
-                    +messageBackgroundPaddings.left
-                    +messageBackgroundPaddings.right,
-            heightMeasureSpec,
-            nameTextView.top
-        )
+        if (messageTextView.isVisible)
+            measureChildWithMargins(
+                messageTextView,
+                widthMeasureSpec,
+                avatarImageView.getWidthWithMargins()
+                        + messageBackgroundPaddings.left
+                        + messageBackgroundPaddings.right,
+                heightMeasureSpec,
+                nameTextView.top
+            )
 
         // Получаем параметры слоя с реакциями и их колчеством
-        if(reactionsListLayout.isVisible)
-        measureChildWithMargins(
-            reactionsListLayout,
-            widthMeasureSpec,
-            avatarImageView.getWidthWithMargins()+messageBackgroundPaddings.left,
-            heightMeasureSpec,
-            messageTextView.top+messageBackgroundPaddings.top
-        )
+        if (reactionsListLayout.isVisible)
+            measureChildWithMargins(
+                reactionsListLayout,
+                widthMeasureSpec,
+                avatarImageView.getWidthWithMargins() + messageBackgroundPaddings.left,
+                heightMeasureSpec,
+                messageTextView.top + messageBackgroundPaddings.top
+            )
 
         if (avatarImageView.isVisible)
             totalWidth = avatarImageView.getWidthWithMargins()
@@ -266,7 +241,7 @@ class MassageViewGroup @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        if(align == "right")
+        if (align == "right")
             alignLayoutRight()
         else
             alignLayoutLeft()
@@ -280,15 +255,15 @@ class MassageViewGroup @JvmOverloads constructor(
         nameTextView.layoutByRightTopNeighbors(
             right = null,
             top = null,
-            addOffsetRight = paddingRight+messageBackgroundPaddings.right,
-            addOffsetTop = paddingTop+messageBackgroundPaddings.top
+            addOffsetRight = paddingRight + messageBackgroundPaddings.right,
+            addOffsetTop = paddingTop + messageBackgroundPaddings.top
         )
 
         // располагаем сообщение пользователя
         messageTextView.layoutByRightTopNeighbors(
             right = null,
             top = nameTextView,
-            addOffsetRight = paddingRight+messageBackgroundPaddings.right,
+            addOffsetRight = paddingRight + messageBackgroundPaddings.right,
             maxWidth = measuredWidth
         )
 
@@ -305,7 +280,7 @@ class MassageViewGroup @JvmOverloads constructor(
             right = null,
             top = messageTextView,
             addOffsetTop = messageBackgroundPaddings.bottom,
-            addOffsetRight = paddingRight+messageBackgroundPaddings.right,
+            addOffsetRight = paddingRight + messageBackgroundPaddings.right,
             maxWidth = measuredWidth
         )
 
@@ -317,8 +292,8 @@ class MassageViewGroup @JvmOverloads constructor(
     }
 
     private fun alignLayoutLeft() {
-        val avatar = if(avatarImageView.isVisible) avatarImageView else null
-        val leftPaddingWhereNotImage = if(avatarImageView.isVisible) 0 else paddingLeft
+        val avatar = if (avatarImageView.isVisible) avatarImageView else null
+        val leftPaddingWhereNotImage = if (avatarImageView.isVisible) 0 else paddingLeft
 
         // располагаем аватар
         avatarImageView.layoutByLeftTopNeighbors(
@@ -332,15 +307,15 @@ class MassageViewGroup @JvmOverloads constructor(
         nameTextView.layoutByLeftTopNeighbors(
             left = avatar,
             top = null,
-            addOffsetLeft = leftPaddingWhereNotImage+messageBackgroundPaddings.left,
-            addOffsetTop = paddingTop+messageBackgroundPaddings.top
+            addOffsetLeft = leftPaddingWhereNotImage + messageBackgroundPaddings.left,
+            addOffsetTop = paddingTop + messageBackgroundPaddings.top
         )
 
         // располагаем сообщение пользователя
         messageTextView.layoutByLeftTopNeighbors(
             left = avatar,
             top = nameTextView,
-            addOffsetLeft = leftPaddingWhereNotImage+messageBackgroundPaddings.left,
+            addOffsetLeft = leftPaddingWhereNotImage + messageBackgroundPaddings.left,
         )
 
         // располагаем список рекций пользователя

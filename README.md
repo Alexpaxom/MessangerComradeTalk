@@ -19,3 +19,8 @@
 - RxJava 2
 - Dagger 2
 - Retrofit + Moshi
+
+# Авротризация пока не реализованна полноценно. 
+Для того что бы все работало нужно 
+в коде (HomeWork_2/app/src/main/java/com/alexpaxom/homework_2/di/application/AppModule.kt)
+прописать логин (переменная LOGIN) и user_key(PASSWORD) 

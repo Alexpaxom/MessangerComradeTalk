@@ -28,6 +28,5 @@ class TopicInfoHolder(
 
     override fun bind(model: TopicItem) {
         topicInfoItemBinding.topicInfoName.text = model.name
-        topicInfoItemBinding.topicInfoMessageCount.text = model.countMessages.toString()
     }
 }

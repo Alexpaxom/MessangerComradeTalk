@@ -70,12 +70,14 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/send_topic_name"
+        app:layout_constraintBottom_toTopOf="@+id/footer_background_top"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topic_name"
         app:layout_constraintVertical_bias="0.0"
-        tools:listitem="@layout/message_item" />
+        tools:listitem="@layout/message_item" >
+
+    </androidx.recyclerview.widget.RecyclerView>
 
     <FrameLayout
         android:id="@+id/footer_background"
@@ -85,7 +87,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chating_history"/>
+        app:layout_constraintTop_toBottomOf="@+id/chating_history">
+
+    </FrameLayout>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/footer_background_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="send_topic_name,cancel_edit" />
 
     <TextView
         android:id="@+id/send_topic_name"

@@ -55,7 +55,7 @@ class MessagesZulipDataRepository @Inject constructor(
                 emiter.onComplete()
 
             } catch (e: Exception) {
-                emiter.onError(e)
+                if(!emiter.isDisposed) emiter.onError(e)
             }
         }
     }
@@ -116,6 +116,7 @@ class MessagesZulipDataRepository @Inject constructor(
 
     fun removeMessage(messageId: Int): Single<MessageUpdateResult> {
         return messagesZulipApiRequests.removeMessage(messageId)
+            .doOnSubscribe{ messagesDao.deleteMessageById(messageId) }
     }
 
     fun editMessage(
@@ -134,6 +135,8 @@ class MessagesZulipDataRepository @Inject constructor(
     }
 
     fun addReaction(messageId: Int, emojiName: String): Single<ReactionResult> {
+
+
         return messagesZulipApiRequests.addReaction(messageId, emojiName)
     }
 

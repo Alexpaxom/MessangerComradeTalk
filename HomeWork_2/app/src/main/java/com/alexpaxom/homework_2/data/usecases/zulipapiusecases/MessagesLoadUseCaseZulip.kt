@@ -58,7 +58,13 @@ class MessagesLoadUseCaseZulip @Inject constructor(
         messageId: Long,
         filter: NarrowParams
     ): Observable<List<MessageItem>> {
-        return messagesZulipDataRepository.getHistory(messageId, 0, filter, useCache = false)
+        return messagesZulipDataRepository.getHistory(
+            messageId,
+            0,
+            filter,
+            useCache = false,
+            refreshCache = false
+        )
             .map {
                 convertTypesMessages(ownUserId, it).data
             }

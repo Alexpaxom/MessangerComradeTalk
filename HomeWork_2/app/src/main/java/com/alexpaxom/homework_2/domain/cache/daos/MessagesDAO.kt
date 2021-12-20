@@ -16,4 +16,7 @@ interface MessagesDAO {
 
     @Query("DELETE FROM Messages WHERE stream_id = :streamId AND (subject = :topicName OR :topicName IS NULL)")
     fun deleteTopicMessages(streamId: Int, topicName: String?)
+
+    @Query("DELETE FROM Messages WHERE id = :messageId")
+    fun deleteMessageById(messageId: Int)
 }

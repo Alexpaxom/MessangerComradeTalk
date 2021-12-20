@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1.0"
         android:background="@color/main_background"
-        tools:context=".app.fragments.ProfileFragment">
+        tools:context=".app.features.userprofile.fragments.ProfileFragment">
 
         <ImageView
             android:id="@+id/user_avatar"

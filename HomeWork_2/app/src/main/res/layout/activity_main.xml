@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:theme="@style/Theme.HomeWork_2"
     android:background="@color/main_background"
-    tools:context=".app.activities.MainActivity">
+    tools:context=".app.features.mainwindow.activities.MainActivity">
 
 
     <ProgressBar

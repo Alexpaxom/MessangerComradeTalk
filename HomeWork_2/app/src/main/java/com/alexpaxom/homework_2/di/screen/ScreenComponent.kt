@@ -1,7 +1,13 @@
 package com.alexpaxom.homework_2.di.screen
 
-import com.alexpaxom.homework_2.app.activities.MainActivity
-import com.alexpaxom.homework_2.app.fragments.*
+import com.alexpaxom.homework_2.app.features.channels.fragments.ChannelEditFragment
+import com.alexpaxom.homework_2.app.features.channels.fragments.ChannelsListAllFragment
+import com.alexpaxom.homework_2.app.features.channels.fragments.ChannelsListSubscribedFragment
+import com.alexpaxom.homework_2.app.features.chat.fragments.ChatFragment
+import com.alexpaxom.homework_2.app.features.mainwindow.activities.MainActivity
+import com.alexpaxom.homework_2.app.features.userprofile.fragments.ProfileFragment
+import com.alexpaxom.homework_2.app.features.userslist.fragments.UsersFragment
+import com.alexpaxom.homework_2.app.features.topicselector.fragments.*
 import dagger.Subcomponent
 
 

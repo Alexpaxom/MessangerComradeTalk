@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/main_background"
     android:orientation="horizontal"
-    tools:context=".app.fragments.ChatFragment">
+    tools:context=".app.features.chat.fragments.ChatFragment">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/left_guideline"

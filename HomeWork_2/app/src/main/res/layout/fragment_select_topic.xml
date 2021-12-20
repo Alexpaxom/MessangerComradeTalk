@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primary"
-    tools:context=".app.fragments.SelectTopicFragment">
+    tools:context=".app.features.topicselector.fragments.SelectTopicFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/search_topic"

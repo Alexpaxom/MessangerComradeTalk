@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/main_background"
     android:paddingHorizontal="15dp"
-    tools:context=".app.fragments.ChannelEditFragment">
+    tools:context=".app.features.channels.fragments.ChannelEditFragment">
 
     <ImageButton
         android:id="@+id/confirm_edit_channel_btn"

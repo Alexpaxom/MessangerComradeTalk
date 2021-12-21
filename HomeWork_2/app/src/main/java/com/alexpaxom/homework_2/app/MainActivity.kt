@@ -23,6 +23,7 @@ class MainActivity : MvpAppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Обработчик логина пользователя
         supportFragmentManager.setFragmentResultListener(
             LoginFragment.FRAGMENT_ID,
             this

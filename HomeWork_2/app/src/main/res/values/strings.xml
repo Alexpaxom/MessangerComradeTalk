@@ -28,4 +28,5 @@
     <string name="password_hint_string">Password</string>
     <string name="log_in_text_btn">Log In</string>
     <string name="default_chat_url">tinkoff-android-fall21.zulipchat.com</string>
+    <string name="no_internet_connection_hint">No internet connection</string>
 </resources>

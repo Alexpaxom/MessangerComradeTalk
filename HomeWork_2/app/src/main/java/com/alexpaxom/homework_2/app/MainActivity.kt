@@ -1,5 +1,8 @@
 package com.alexpaxom.homework_2.app
 
+import android.content.Context
+import android.net.*
+import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
 import android.os.Bundle
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.features.login.fragments.LoginFragment
@@ -7,6 +10,10 @@ import com.alexpaxom.homework_2.app.features.mainnavigation.fragments.MainNaviga
 import com.alexpaxom.homework_2.databinding.ActivityMainBinding
 import com.alexpaxom.homework_2.domain.entity.LoginResult
 import moxy.MvpAppCompatActivity
+import android.os.Build
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
+import androidx.core.view.isVisible
 
 
 class MainActivity : MvpAppCompatActivity() {
@@ -23,6 +30,9 @@ class MainActivity : MvpAppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Проверка есть ли на момент запуска подключение к интернету
+        binding.noInternetStatus.isVisible = !hasInternetConnection()
+
         // Обработчик логина пользователя
         supportFragmentManager.setFragmentResultListener(
             LoginFragment.FRAGMENT_ID,
@@ -37,6 +47,18 @@ class MainActivity : MvpAppCompatActivity() {
             }
         }
 
+    }
+
+    fun hasInternetConnection(): Boolean {
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE)
+                as ConnectivityManager
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            cm.allNetworks
+                .mapNotNull(cm::getNetworkCapabilities)
+                .any { capabilities -> capabilities.hasCapability(NET_CAPABILITY_INTERNET) }
+        } else {
+            cm.activeNetworkInfo?.isConnected == true
+        }
     }
 
 

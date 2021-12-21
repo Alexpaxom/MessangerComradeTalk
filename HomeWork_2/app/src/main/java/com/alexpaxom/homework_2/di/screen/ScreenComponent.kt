@@ -4,7 +4,9 @@ import com.alexpaxom.homework_2.app.features.channels.fragments.ChannelEditFragm
 import com.alexpaxom.homework_2.app.features.channels.fragments.ChannelsListAllFragment
 import com.alexpaxom.homework_2.app.features.channels.fragments.ChannelsListSubscribedFragment
 import com.alexpaxom.homework_2.app.features.chat.fragments.ChatFragment
-import com.alexpaxom.homework_2.app.features.mainwindow.activities.MainActivity
+import com.alexpaxom.homework_2.app.features.login.fragments.LoginFragment
+import com.alexpaxom.homework_2.app.MainActivity
+import com.alexpaxom.homework_2.app.features.mainnavigation.fragments.MainNavigationFragment
 import com.alexpaxom.homework_2.app.features.userprofile.fragments.ProfileFragment
 import com.alexpaxom.homework_2.app.features.userslist.fragments.UsersFragment
 import com.alexpaxom.homework_2.app.features.topicselector.fragments.*
@@ -23,6 +25,8 @@ interface ScreenComponent {
     fun inject(usersFragment: UsersFragment)
     fun inject(channelEditFragment: ChannelEditFragment)
     fun inject(selectTopicFragment: SelectTopicFragment)
+    fun inject(mainNavigationFragment: MainNavigationFragment)
+    fun inject(loginFragment: LoginFragment)
 
     @Subcomponent.Factory
     interface Factory {

@@ -1,4 +1,4 @@
-package com.alexpaxom.homework_2.app.features.mainwindow.adapters
+package com.alexpaxom.homework_2.app.features.mainnavigation.adapters
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager

@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.alexpaxom.homework_2.app.App
 import com.alexpaxom.homework_2.di.screen.ScreenComponent
 import com.alexpaxom.homework_2.domain.cache.CacheDatabase
+import com.alexpaxom.homework_2.domain.entity.LoginResult
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -13,10 +14,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-
-private const val CHAT_URL = "https://tinkoff-android-fall21.zulipchat.com/"
-private const val LOGIN = "email"
-private const val PASSWORD = "api-kay"
 
 @Module(
     includes = [AppModule.BindingModule::class],
@@ -33,7 +30,8 @@ class AppModule {
 
     @Provides
     fun provideOkHttpClient(
-        httpLoggingInterceptor: HttpLoggingInterceptor
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        loginResult: LoginResult
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(httpLoggingInterceptor)
@@ -42,7 +40,7 @@ class AppModule {
                     if (response.request.header("Authorization") != null)
                         error("Bad login or password")
                     return response.request.newBuilder()
-                        .header("Authorization", Credentials.basic(LOGIN, PASSWORD))
+                        .header("Authorization", Credentials.basic(loginResult.email, loginResult.apiKey))
                         .build()
                 }
 
@@ -51,9 +49,9 @@ class AppModule {
     }
 
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideRetrofit(okHttpClient: OkHttpClient, loginResult: LoginResult): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(CHAT_URL)
+            .baseUrl(loginResult.url)
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())

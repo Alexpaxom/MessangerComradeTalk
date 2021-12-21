@@ -1,62 +1,76 @@
-package com.alexpaxom.homework_2.app.features.mainwindow.activities
+package com.alexpaxom.homework_2.app.features.mainnavigation.fragments
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import com.alexpaxom.homework_2.R
 import com.alexpaxom.homework_2.app.App
-import com.alexpaxom.homework_2.app.features.mainwindow.adapters.MainNavigationViewpageAdapter
 import com.alexpaxom.homework_2.app.features.baseelements.BaseView
+import com.alexpaxom.homework_2.app.features.baseelements.ViewBindingFragment
 import com.alexpaxom.homework_2.app.features.channels.fragments.ChannelsFragment
+import com.alexpaxom.homework_2.app.features.mainnavigation.activities.MainNavigationEffect
+import com.alexpaxom.homework_2.app.features.mainnavigation.activities.MainNavigationState
+import com.alexpaxom.homework_2.app.features.mainnavigation.adapters.MainNavigationViewpageAdapter
 import com.alexpaxom.homework_2.app.features.userprofile.fragments.ProfileFragment
 import com.alexpaxom.homework_2.app.features.userslist.fragments.UsersFragment
-import com.alexpaxom.homework_2.databinding.ActivityMainBinding
-import moxy.MvpAppCompatActivity
+import com.alexpaxom.homework_2.databinding.FragmentMainNavigationBinding
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import javax.inject.Inject
 import javax.inject.Provider
 
 
-class MainActivity : MvpAppCompatActivity(), BaseView<MainActivityState, MainActivityEffect> {
+class MainNavigationFragment : ViewBindingFragment<FragmentMainNavigationBinding>(),
+    BaseView<MainNavigationState, MainNavigationEffect> {
 
-    lateinit var binding: ActivityMainBinding
+    override fun createBinding(): FragmentMainNavigationBinding =
+        FragmentMainNavigationBinding.inflate(layoutInflater)
 
     @Inject
-    lateinit var daggerPresenter: Provider<MainActivityPresenter>
+    lateinit var daggerPresenter: Provider<MainNavigationPresenter>
 
     @InjectPresenter
-    lateinit var presenter: MainActivityPresenter
+    lateinit var presenter: MainNavigationPresenter
 
     @ProvidePresenter
-    fun providePresenter(): MainActivityPresenter = daggerPresenter.get()
+    fun providePresenter(): MainNavigationPresenter = daggerPresenter.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        (application as App).appComponent
+        (requireActivity().application as App).appComponent
             .getScreenComponent()
             .create()
             .inject(this)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
         super.onCreate(savedInstanceState)
     }
 
-    override fun processState(state: MainActivityState) {
-        binding.mainActivityProgress.isVisible = state.isEmptyLoad
-        state.userInfo?.let{ user -> init(user.id) }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        super.onCreateView(inflater, container, savedInstanceState)
+        return binding.root
     }
 
-    override fun processEffect(effect: MainActivityEffect) {
-        when(effect) {
-            is MainActivityEffect.ShowError -> showError(effect.error)
+
+    override fun processState(state: MainNavigationState) {
+        binding.mainActivityProgress.isVisible = state.isEmptyLoad
+        state.userInfo?.let { user -> init(user.id) }
+    }
+
+    override fun processEffect(effect: MainNavigationEffect) {
+        when (effect) {
+            is MainNavigationEffect.ShowError -> showError(effect.error)
         }
     }
 
     private fun init(ownUserId: Int) {
         binding.mainNavigatinViewPager.adapter =
             MainNavigationViewpageAdapter(
-                supportFragmentManager,
+                childFragmentManager,
                 lifecycle,
                 fragmentsIdsList = listOf(
                     R.id.bottom_menu_item_channels,
@@ -64,7 +78,7 @@ class MainActivity : MvpAppCompatActivity(), BaseView<MainActivityState, MainAct
                     R.id.bottom_menu_item_profile
                 ),
                 createFragmentById = {
-                    when(it) {
+                    when (it) {
                         R.id.bottom_menu_item_channels ->
                             ChannelsFragment.newInstance(ownUserId)
                         R.id.bottom_menu_item_people ->
@@ -80,14 +94,20 @@ class MainActivity : MvpAppCompatActivity(), BaseView<MainActivityState, MainAct
         binding.mainBottomNavMenu.setOnItemSelectedListener { menuItem ->
             (binding.mainNavigatinViewPager.adapter as MainNavigationViewpageAdapter)
                 .let { pageAdapter ->
-                binding.mainNavigatinViewPager.currentItem =
-                    pageAdapter.getFragmentPositionById(menuItem.itemId)
-            }
+                    binding.mainNavigatinViewPager.currentItem =
+                        pageAdapter.getFragmentPositionById(menuItem.itemId)
+                }
             true
         }
     }
 
     private fun showError(errorMsg: String) {
-        Toast.makeText(applicationContext, errorMsg, Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun newInstance() = MainNavigationFragment()
     }
 }

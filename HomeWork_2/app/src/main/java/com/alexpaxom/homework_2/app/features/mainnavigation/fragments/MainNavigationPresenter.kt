@@ -1,6 +1,9 @@
-package com.alexpaxom.homework_2.app.features.mainwindow.activities
+package com.alexpaxom.homework_2.app.features.mainnavigation.fragments
 
 import com.alexpaxom.homework_2.app.features.baseelements.BaseView
+import com.alexpaxom.homework_2.app.features.mainnavigation.activities.MainActivityEvent
+import com.alexpaxom.homework_2.app.features.mainnavigation.activities.MainNavigationEffect
+import com.alexpaxom.homework_2.app.features.mainnavigation.activities.MainNavigationState
 import com.alexpaxom.homework_2.data.models.UserItem
 import com.alexpaxom.homework_2.data.usecases.zulipapiusecases.UserProfileUseCaseZulip
 import com.alexpaxom.homework_2.di.screen.ScreenScope
@@ -15,13 +18,13 @@ import javax.inject.Inject
 
 @ScreenScope
 @InjectViewState
-class MainActivityPresenter @Inject constructor(
+class MainNavigationPresenter @Inject constructor(
     private val profileHandler: UserProfileUseCaseZulip
-): MvpPresenter<BaseView<MainActivityState, MainActivityEffect>>() {
+): MvpPresenter<BaseView<MainNavigationState, MainNavigationEffect>>() {
 
     var ownUser: UserItem? = null
 
-    private var currentViewState: MainActivityState = MainActivityState()
+    private var currentViewState: MainNavigationState = MainNavigationState()
         set(value) {
             field = value
             viewState.processState(value)
@@ -44,7 +47,7 @@ class MainActivityPresenter @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread(), true)
             .doOnSubscribe {
-                currentViewState = MainActivityState(isEmptyLoad = true)
+                currentViewState = MainNavigationState(isEmptyLoad = true)
             }
             .subscribeBy(
                 onNext = {
@@ -53,12 +56,16 @@ class MainActivityPresenter @Inject constructor(
                 },
                 onError = {
                     ownUser?.let{
-                        currentViewState = MainActivityState( userInfo = ownUser )
+                        currentViewState = MainNavigationState( userInfo = ownUser )
                     }
-                    viewState.processEffect(MainActivityEffect.ShowError(it.localizedMessage?:"Error when get current user param"))
+                    viewState.processEffect(
+                        MainNavigationEffect.ShowError(
+                            it.localizedMessage ?: "Error when get current user param"
+                        )
+                    )
                 },
                 onComplete = {
-                    currentViewState = MainActivityState( userInfo = ownUser )
+                    currentViewState = MainNavigationState( userInfo = ownUser )
                 }
             )
             .addTo(compositeDisposable)

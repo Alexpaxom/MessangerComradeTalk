@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HomeWork_2">
         <activity
-            android:name="com.alexpaxom.homework_2.app.features.mainwindow.activities.MainActivity"
+            android:name="com.alexpaxom.homework_2.app.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

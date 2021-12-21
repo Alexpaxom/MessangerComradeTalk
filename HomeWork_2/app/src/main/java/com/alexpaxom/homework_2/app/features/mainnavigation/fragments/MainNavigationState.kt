@@ -1,8 +1,8 @@
-package com.alexpaxom.homework_2.app.features.mainwindow.activities
+package com.alexpaxom.homework_2.app.features.mainnavigation.activities
 
 import com.alexpaxom.homework_2.data.models.UserItem
 
-data class MainActivityState (
+data class MainNavigationState (
     val userInfo: UserItem? = null,
     val isEmptyLoad: Boolean = false
 )
@@ -11,6 +11,6 @@ sealed interface MainActivityEvent {
     object GetOwnUserInfo : MainActivityEvent
 }
 
-sealed interface MainActivityEffect {
-    class ShowError(val error: String): MainActivityEffect
+sealed interface MainNavigationEffect {
+    class ShowError(val error: String): MainNavigationEffect
 }

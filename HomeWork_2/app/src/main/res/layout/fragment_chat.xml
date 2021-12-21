@@ -162,7 +162,7 @@
         android:layout_marginTop="5dp"
         android:background="@drawable/bg_round_button"
         android:padding="0dp"
-        android:src="@android:drawable/ic_menu_add"
+        android:src="@android:drawable/ic_menu_send"
         app:layout_constraintBottom_toBottomOf="@+id/message_enter"
         app:layout_constraintEnd_toEndOf="@id/right_guideline"
         app:layout_constraintTop_toTopOf="@+id/message_enter" />

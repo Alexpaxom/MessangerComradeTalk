@@ -170,10 +170,7 @@ class ChatFragment : MvpAppCompatDialogFragment(), BaseView<ChatViewState, ChatE
                     if (presenter.currentViewState.editMessage != null)
                         R.drawable.ic_check_24
                     else {
-                        if (it.isNotEmpty())
-                            android.R.drawable.ic_menu_send
-                        else
-                            android.R.drawable.ic_menu_add
+                        android.R.drawable.ic_menu_send
                     }
                 )
             }

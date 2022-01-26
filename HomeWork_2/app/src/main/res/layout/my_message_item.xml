@@ -1,21 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingHorizontal="1dp"
+    android:background="@color/green_topic_color"
     android:id="@+id/my_message_layout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="50dp"
-    android:layout_marginEnd="5dp"
-    android:gravity="right"
-    app:flow_horizontalAlign="center">
+    android:layout_height="wrap_content">
 
-    <com.alexpaxom.homework_2.customview.MassageViewGroup
-        android:id="@+id/my_message_item"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:horizontalAlign="right"
-        app:massageTextBackground="@drawable/bg_chat_my_message"
-        app:showAvatar="false"
-        app:showUserName="false" />
+        android:paddingHorizontal="13dp"
+        android:paddingVertical="10dp"
+        android:background="@color/main_background"
+        android:weightSum="100">
 
-</LinearLayout>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="20" />
+
+        <com.alexpaxom.homework_2.customview.MassageViewGroup
+            android:id="@+id/my_message_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="80"
+            app:horizontalAlign="right"
+            android:layout_marginEnd="5dp"
+            app:massageTextBackground="@drawable/bg_chat_my_message"
+            app:showAvatar="false"
+            app:showUserName="false" />
+
+    </LinearLayout>
+
+</FrameLayout>

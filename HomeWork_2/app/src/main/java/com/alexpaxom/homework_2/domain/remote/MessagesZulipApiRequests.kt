@@ -1,5 +1,6 @@
 package com.alexpaxom.homework_2.domain.remote
 
+import com.alexpaxom.homework_2.domain.entity.MessageUpdateResult
 import com.alexpaxom.homework_2.domain.entity.MessagesResult
 import com.alexpaxom.homework_2.domain.entity.ReactionResult
 import com.alexpaxom.homework_2.domain.entity.SendResult
@@ -42,4 +43,15 @@ interface MessagesZulipApiRequests {
         @Path("messageId") messageId: Int,
         @Query("emoji_name") emojiName: String,
     ): Single<ReactionResult>
+
+    @DELETE("/api/v1/messages/{messageId}")
+    fun removeMessage(
+        @Path("messageId") messageId: Int,
+    ): Single<MessageUpdateResult>
+
+    @PATCH("/api/v1/messages/{messageId}")
+    fun editMessage(
+        @Path("messageId") messageId: Int,
+        @QueryMap hashMap: Map<String, String>
+    ): Single<MessageUpdateResult>
 }

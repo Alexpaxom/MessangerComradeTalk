@@ -116,7 +116,7 @@ class FlexBoxLayout @JvmOverloads constructor(
         // размещаем остальные элементы
         for(i in 1 until childCount) {
             child = getChildAt(i)
-            var elementWidth = maxOf(child.measuredWidth, itemBoundMinWidth)
+            val elementWidth = maxOf(child.measuredWidth, itemBoundMinWidth)
 
 
             if(left+elementWidth+separatorSize < maxWidth) {
@@ -138,7 +138,7 @@ class FlexBoxLayout @JvmOverloads constructor(
                 top + child.measuredHeight
             )
 
-            left = left+elementWidth
+            left += elementWidth
         }
     }
 

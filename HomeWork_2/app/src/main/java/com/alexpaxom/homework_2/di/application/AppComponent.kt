@@ -2,6 +2,7 @@ package com.alexpaxom.homework_2.di.application
 
 import com.alexpaxom.homework_2.app.App
 import com.alexpaxom.homework_2.di.screen.ScreenComponent
+import com.alexpaxom.homework_2.domain.entity.LoginResult
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -16,7 +17,9 @@ interface AppComponent {
     interface Factory {
         fun create(
             @BindsInstance
-            application: App
+            application: App,
+            @BindsInstance
+            loginResult: LoginResult
         ): AppComponent
     }
 }

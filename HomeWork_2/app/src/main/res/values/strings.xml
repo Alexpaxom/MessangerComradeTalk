@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">HomeWork_2</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name">ComradeTalk</string>
     <string name="massage_enter">Message</string>
     <string name="profile_user_online_status">online</string>
     <string name="profile_user_idle_status">idle</string>
@@ -10,4 +9,24 @@
     <string name="channels_tab_all_streams">All Streams</string>
     <string name="empty_string"></string>
     <string name="search_help_text">Search</string>
+    <string name="channel_name_hint">Channel name</string>
+    <string name="channel_description_hint">Channel description</string>
+    <string name="menu_delete_message_string">Delete message</string>
+    <string name="menu_set_message_reaction_string">Set reaction</string>
+    <string name="menu_edit_message_string">Edit message</string>
+    <string name="menu_change_message_topic_string">Change topic</string>
+    <string name="menu_copy_massage_text_string">Copy text</string>
+    <string name="bottom_menu_item_channels_string">Channels</string>
+    <string name="bottom_menu_item_people_string">People</string>
+    <string name="bottom_menu_item_profile_string">Profile</string>
+    <string name="archive_channel_menu_string">Archive channel</string>
+    <string name="delete_topic_menu_string">Delete topic</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="organization_hint">organization_url</string>
+    <string name="https_hint">https://</string>
+    <string name="login_hint_string">Login</string>
+    <string name="password_hint_string">Password</string>
+    <string name="log_in_text_btn">Log In</string>
+    <string name="default_chat_url">tinkoff-android-fall21.zulipchat.com</string>
+    <string name="no_internet_connection_hint">No internet connection</string>
 </resources>

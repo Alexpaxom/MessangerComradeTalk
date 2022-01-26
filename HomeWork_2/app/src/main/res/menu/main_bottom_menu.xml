@@ -3,15 +3,15 @@
     <item
         android:id="@+id/bottom_menu_item_channels"
         android:icon="@drawable/ic_channels_list"
-        android:title="Channels" />
+        android:title="@string/bottom_menu_item_channels_string" />
 
     <item
         android:id="@+id/bottom_menu_item_people"
         android:icon="@drawable/ic_people"
-        android:title="People" />
+        android:title="@string/bottom_menu_item_people_string" />
 
     <item
         android:id="@+id/bottom_menu_item_profile"
         android:icon="@drawable/ic_profile"
-        android:title="Profile" />
+        android:title="@string/bottom_menu_item_profile_string" />
 </menu>

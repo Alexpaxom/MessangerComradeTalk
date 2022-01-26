@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="chat_delimiter_messages">25dp</dimen>
+    <dimen name="chat_topic_delimiter_margin">5dp</dimen>
     <dimen name="profile_avatar_rounded_corners">15dp</dimen>
 </resources>

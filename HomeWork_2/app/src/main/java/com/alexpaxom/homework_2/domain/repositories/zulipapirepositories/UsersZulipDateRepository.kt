@@ -38,8 +38,6 @@ class UsersZulipDateRepository @Inject constructor(
                     usersDAO.deleteAllUsers()
                 usersDAO.insertAll(users)
 
-                // TODO пока обновляем каждый раз обновляем запись с собственных пользователем
-                // но потом это нужно будет перенести в отдельную таблицу либо в shared pref
                 usersDAO.insertAll(
                     listOf(
                         (usersZulipApiRequests.getOwnUser().execute().body() ?: defaultUser)

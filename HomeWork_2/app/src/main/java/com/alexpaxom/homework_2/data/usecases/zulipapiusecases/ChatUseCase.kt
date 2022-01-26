@@ -6,7 +6,7 @@ import com.alexpaxom.homework_2.di.screen.ScreenScope
 import javax.inject.Inject
 
 @ScreenScope
-class ChatUseCase @Inject constructor(){
+class ChatUseCase @Inject constructor() {
 
     fun addReactionByMessageID(
         messageId: Int,
@@ -18,9 +18,9 @@ class ChatUseCase @Inject constructor(){
         ret.addAll(messages)
 
         ret.indexOfLast { it.id == messageId }.let { messagePos ->
-            if(messagePos != -1) {
+            if (messagePos != -1) {
                 ret[messagePos] =
-                    ret[messagePos].copy (
+                    ret[messagePos].copy(
                         reactionsGroup = ret[messagePos].reactionsGroup.addReaction(reaction)
                     )
             }
@@ -39,9 +39,9 @@ class ChatUseCase @Inject constructor(){
         ret.addAll(messages)
 
         ret.indexOfLast { it.id == messageId }.let { messagePos ->
-            if(messagePos != -1) {
+            if (messagePos != -1) {
                 ret[messagePos] =
-                    ret[messagePos].copy (
+                    ret[messagePos].copy(
                         reactionsGroup = ret[messagePos].reactionsGroup.removeReaction(reaction)
                     )
             }
@@ -58,6 +58,32 @@ class ChatUseCase @Inject constructor(){
         val ret = arrayListOf<MessageItem>()
         ret.addAll(messages)
         ret.addAll(position, newMessages)
+        return ret
+    }
+
+    fun deleteMessageById(
+        messageId: Int,
+        messages: List<MessageItem>
+    ): List<MessageItem> {
+        return messages.filter { it.id != messageId }
+    }
+
+    fun updateMessageById(
+        messageId: Int,
+        newMessageItem: MessageItem,
+        messages: List<MessageItem>
+    ): List<MessageItem> {
+        val ret = arrayListOf<MessageItem>()
+        ret.addAll(messages)
+
+        val position = ret.indexOfLast { it.id == messageId }
+
+        if(position == -1) {
+            error("Can't update message with id $messageId")
+        }
+
+        ret[position] = newMessageItem
+
         return ret
     }
 

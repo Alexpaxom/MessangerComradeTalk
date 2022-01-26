@@ -31,4 +31,6 @@
     <color name="bottom_nav_main_menu_color_unselect">#919191</color>
     <color name="bottom_nav_main_menu_color_select">#FAFAFA</color>
     <color name="tab_underscore_color">#219653</color>
+    <color name="header_topic_background">#1C1C1C</color>
+    <color name="cancel_button_color">#F44336</color>
 </resources>

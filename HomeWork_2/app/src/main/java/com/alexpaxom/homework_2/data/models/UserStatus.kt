@@ -2,7 +2,7 @@ package com.alexpaxom.homework_2.data.models
 
 import android.os.Parcelable
 import com.alexpaxom.homework_2.R
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class UserStatus(

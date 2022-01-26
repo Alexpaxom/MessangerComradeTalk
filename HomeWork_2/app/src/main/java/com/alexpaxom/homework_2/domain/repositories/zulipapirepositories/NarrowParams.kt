@@ -5,7 +5,7 @@ import org.json.JSONObject
 
 class NarrowParams(
     val streamId: Int,
-    val topicName: String,
+    val topicName: String?,
 )
 {
     fun createFilterForMessages(): String {
@@ -18,7 +18,7 @@ class NarrowParams(
             }
         )
 
-        if(topicName != "")
+        if(topicName != null)
             filter.put(
                 JSONObject().apply {
                     put("operator", "topic")

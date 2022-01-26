@@ -8,41 +8,28 @@
     android:layout_height="match_parent"
     android:theme="@style/Theme.HomeWork_2"
     android:background="@color/main_background"
-    tools:context=".app.activities.MainActivity">
+    tools:context=".app.MainActivity">
 
-
-    <ProgressBar
-        android:id="@+id/main_activity_progress"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/main_navigatin_view_pager"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/main_navigatin_view_pager"
-        app:layout_constraintTop_toTopOf="@+id/main_navigatin_view_pager" />
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/main_navigatin_view_pager"
+    <TextView
+        android:id="@+id/no_internet_status"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/main_bottom_nav_menu"
+        android:layout_height="wrap_content"
+        android:background="#2A608A"
+        android:text="@string/no_internet_connection_hint"
+        android:textAlignment="center"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.viewpager2.widget.ViewPager2>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/main_bottom_nav_menu"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/main_container"
+        android:name="com.alexpaxom.homework_2.app.features.login.fragments.LoginFragment"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/bottom_nav_main_menu_background"
-        app:itemIconTint="@drawable/text_color_bottom_nav_main_menu"
-        app:itemTextColor="@drawable/text_color_bottom_nav_main_menu"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/main_bottom_menu" />
+        app:layout_constraintTop_toBottomOf="@+id/no_internet_status" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

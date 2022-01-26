@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:background="@color/main_background"
-    tools:context=".app.fragments.UsersFragment" >
+    tools:context=".app.features.userslist.fragments.UsersFragment" >
 
     <include
         android:id="@+id/search_users"

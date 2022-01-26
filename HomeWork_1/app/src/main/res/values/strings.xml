@@ -1,8 +1,0 @@
-<resources>
-    <string name="app_name">HomeWork_1</string>
-    <string name="range_search">Select dates</string>
-    <string name="error_cant_load">Can\'t get data!</string>
-    <string name="error_bad_data">Bad data returned!</string>
-    <string name="error_calendar_permission">Unable to retrieve data without access to the calendar</string>
-    <string name="get_data_btn">Get Events</string>
-</resources>
